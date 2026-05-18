@@ -1,0 +1,77 @@
+# Build output
+bin/
+obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# .NET / NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Visual Studio
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Test results / coverage
+TestResults/
+coverage/
+coverage.cobertura.xml
+*.coverage
+*.coveragexml
+*.trx
+
+# Logs
+*.log
+logs/
+
+# Publish output
+publish/
+artifacts/
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local app/cache/settings data - should not be committed
+*.local.json
+settings.json
+user-cache.json
+tickets-cache.json
+token.json
+
+# Environment / secrets
+.env
+.env.*
+*.secret.json
+secrets.json
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+~$*

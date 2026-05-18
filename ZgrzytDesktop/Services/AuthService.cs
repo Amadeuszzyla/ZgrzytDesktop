@@ -1,0 +1,82 @@
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Storage;
+
+namespace ZgrzytDesktop.Services;
+
+public class AuthService
+{
+    private readonly ApiService _apiService;
+    private readonly TokenStorage _tokenStorage;
+
+    public AuthService(ApiService apiService, TokenStorage tokenStorage)
+    {
+        _apiService = apiService;
+        _tokenStorage = tokenStorage;
+    }
+
+    public async Task<User?> LoginAsync(string login, string password)
+    {
+        var request = new LoginRequest
+        {
+            Login = login,
+            Password = password
+        };
+
+        var response = await _apiService.PostAsync<LoginRequest, LoginResponse>("login", request);
+
+        if (response is null || string.IsNullOrWhiteSpace(response.AccessToken))
+            return null;
+
+        await _tokenStorage.SaveTokenAsync(response.AccessToken);
+
+        var user = await _apiService.GetAsync<User>("user");
+
+        return user;
+    }
+
+    public async Task<User?> GetCurrentUserAsync()
+    {
+        return await _apiService.GetAsync<User>("user");
+    }
+
+    public async Task LogoutAsync()
+    {
+        try
+        {
+            await _apiService.PostAsync<object, LogoutResponse>("logout", new { });
+        }
+        finally
+        {
+            await _tokenStorage.ClearTokenAsync();
+        }
+    }
+}
+
+public class LoginRequest
+{
+    [JsonPropertyName("login")]
+    public string Login { get; set; } = string.Empty;
+
+    [JsonPropertyName("password")]
+    public string Password { get; set; } = string.Empty;
+}
+
+public class LoginResponse
+{
+    [JsonPropertyName("access_token")]
+    public string AccessToken { get; set; } = string.Empty;
+
+    [JsonPropertyName("token_type")]
+    public string TokenType { get; set; } = string.Empty;
+
+    [JsonPropertyName("role")]
+    public string Role { get; set; } = string.Empty;
+}
+
+public class LogoutResponse
+{
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
+}

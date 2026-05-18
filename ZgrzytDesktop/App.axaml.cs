@@ -1,0 +1,238 @@
+using System;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using Avalonia.Threading;
+using ZgrzytDesktop.Cache;
+using ZgrzytDesktop.Exceptions;
+using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Services;
+using ZgrzytDesktop.Storage;
+using ZgrzytDesktop.ViewModels;
+using ZgrzytDesktop.Views;
+
+namespace ZgrzytDesktop;
+
+public partial class App : Application
+{
+    private AuthService? _authService;
+    private TicketService? _ticketService;
+    private ApiService? _apiService;
+    private SettingsService? _settingsService;
+    private LocalTicketCacheService? _ticketCacheService;
+    private LocalUserCacheService? _userCacheService;
+
+    private MainWindow? _mainWindow;
+
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            _mainWindow = new MainWindow
+            {
+                Content = CreateStartupContent()
+            };
+
+            desktop.MainWindow = _mainWindow;
+
+            Dispatcher.UIThread.Post(async () =>
+            {
+                try
+                {
+                    InitializeServices();
+
+                    ShowLoginView();
+
+                    await TryAutoLoginAsync();
+                }
+                catch (Exception ex)
+                {
+                    ShowError(ex);
+                }
+            });
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    private void InitializeServices()
+    {
+        var tokenStorage = new TokenStorage();
+
+        _settingsService = new SettingsService();
+        _apiService = new ApiService(tokenStorage, _settingsService);
+
+        _authService = new AuthService(_apiService, tokenStorage);
+        _ticketService = new TicketService(_apiService);
+        _ticketCacheService = new LocalTicketCacheService();
+        _userCacheService = new LocalUserCacheService();
+    }
+
+    private async Task TryAutoLoginAsync()
+    {
+        if (_authService is null || _userCacheService is null)
+            return;
+
+        try
+        {
+            var user = await _authService.GetCurrentUserAsync();
+
+            if (user is not null)
+            {
+                await _userCacheService.SaveUserAsync(user);
+                ShowDashboardView(user);
+            }
+        }
+        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
+        {
+            await TryOpenOfflineDashboardAsync();
+        }
+        catch
+        {
+            // Brak tokenu, token wygasł albo użytkownik nie jest zalogowany.
+            // Zostajemy na ekranie logowania.
+        }
+    }
+
+    private async Task TryOpenOfflineDashboardAsync()
+    {
+        if (_userCacheService is null)
+            return;
+
+        var cachedUser = await _userCacheService.LoadUserAsync();
+
+        if (cachedUser is not null)
+        {
+            ShowDashboardView(cachedUser);
+        }
+    }
+
+    private void ShowLoginView()
+    {
+        if (_mainWindow is null)
+            return;
+
+        if (_authService is null)
+            throw new InvalidOperationException("AuthService nie został zainicjalizowany.");
+
+        var loginViewModel = new LoginViewModel(
+            _authService,
+            user => _ = HandleLoginSuccessAsync(user)
+        );
+
+        _mainWindow.Content = new LoginView
+        {
+            DataContext = loginViewModel
+        };
+    }
+
+    private async Task HandleLoginSuccessAsync(User user)
+    {
+        if (_userCacheService is not null)
+        {
+            await _userCacheService.SaveUserAsync(user);
+        }
+
+        ShowDashboardView(user);
+    }
+
+    private void ShowDashboardView(User user)
+    {
+        if (_mainWindow is null)
+            return;
+
+        if (_ticketService is null)
+            throw new InvalidOperationException("TicketService nie został zainicjalizowany.");
+
+        if (_apiService is null)
+            throw new InvalidOperationException("ApiService nie został zainicjalizowany.");
+
+        if (_settingsService is null)
+            throw new InvalidOperationException("SettingsService nie został zainicjalizowany.");
+
+        if (_ticketCacheService is null)
+            throw new InvalidOperationException("LocalTicketCacheService nie został zainicjalizowany.");
+
+        var dashboardViewModel = new DashboardViewModel(
+            user,
+            _ticketService,
+            _apiService,
+            _settingsService,
+            _ticketCacheService,
+            LogoutAsync
+        );
+
+        _mainWindow.Content = new DashboardView
+        {
+            DataContext = dashboardViewModel
+        };
+    }
+
+    private async Task LogoutAsync()
+    {
+        try
+        {
+            if (_authService is not null)
+            {
+                await _authService.LogoutAsync();
+            }
+        }
+        catch
+        {
+            // Nawet jeśli backend nie odpowie, lokalnie wracamy do logowania.
+        }
+
+        if (_userCacheService is not null)
+        {
+            await _userCacheService.ClearAsync();
+        }
+
+        if (_ticketCacheService is not null)
+        {
+            await _ticketCacheService.ClearAsync();
+        }
+
+        ShowLoginView();
+    }
+
+    private static Control CreateStartupContent()
+    {
+        return new Border
+        {
+            Padding = new Thickness(30),
+            Child = new TextBlock
+            {
+                Text = "Uruchamianie aplikacji ZGRZYT...",
+                FontSize = 22,
+                TextWrapping = TextWrapping.Wrap
+            }
+        };
+    }
+
+    private void ShowError(Exception ex)
+    {
+        if (_mainWindow is null)
+            return;
+
+        _mainWindow.Content = new Border
+        {
+            Padding = new Thickness(30),
+            Child = new ScrollViewer
+            {
+                Content = new TextBlock
+                {
+                    Text = "Błąd startu aplikacji:\n\n" + ex,
+                    TextWrapping = TextWrapping.Wrap
+                }
+            }
+        };
+    }
+}
