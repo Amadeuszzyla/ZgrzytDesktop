@@ -10,6 +10,7 @@ using ZgrzytDesktop.Cache;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services;
+using ZgrzytDesktop.Services.Interfaces;
 using ZgrzytDesktop.Storage;
 using ZgrzytDesktop.ViewModels;
 using ZgrzytDesktop.Views;
@@ -18,14 +19,14 @@ namespace ZgrzytDesktop;
 
 public partial class App : Application
 {
-    private AuthService? _authService;
-    private TicketService? _ticketService;
+    private IAuthService? _authService;
+    private ITicketService? _ticketService;
     private ApiService? _apiService;
-    private SettingsService? _settingsService;
+    private ISettingsService? _settingsService;
     private LocalTicketCacheService? _ticketCacheService;
     private LocalUserCacheService? _userCacheService;
-    private LocalAuditLogService? _auditLogService;
-    private UserAdminService? _userAdminService;
+    private ILocalAuditLogService? _auditLogService;
+    private IUserAdminService? _userAdminService;
 
     private MainWindow? _mainWindow;
 

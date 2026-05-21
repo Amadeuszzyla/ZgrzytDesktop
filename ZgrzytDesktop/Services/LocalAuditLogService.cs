@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Security;
 
+using ZgrzytDesktop.Services.Interfaces;
+
 namespace ZgrzytDesktop.Services;
 
-public class LocalAuditLogService
+public class LocalAuditLogService : ILocalAuditLogService
 {
     private readonly string _filePath;
 

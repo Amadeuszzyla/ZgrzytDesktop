@@ -3,21 +3,23 @@ using System.Threading.Tasks;
 using ZgrzytDesktop.Cache;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
+using ZgrzytDesktop.Services.Interfaces;
 using ZgrzytDesktop.Storage;
 
 namespace ZgrzytDesktop.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly AuthService _authService;
-    private readonly TicketService _ticketService;
+    private readonly IAuthService _authService;
+    private readonly ITicketService _ticketService;
     private readonly ApiService _apiService;
-    private readonly SettingsService _settingsService;
+    private readonly ISettingsService _settingsService;
     private readonly LocalTicketCacheService _ticketCacheService;
     private readonly LocalUserCacheService _userCacheService;
-    private readonly LocalAuditLogService _auditLogService;
-    private readonly UserAdminService _userAdminService;
+    private readonly ILocalAuditLogService _auditLogService;
+    private readonly IUserAdminService _userAdminService;
 
     private ViewModelBase _currentViewModel;
 
@@ -28,26 +30,90 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     public MainWindowViewModel()
+        : this(CreateProductionDependencies(), runStartup: true)
     {
-        var tokenStorage = new TokenStorage();
+    }
 
-        _settingsService = new SettingsService();
-        var settings = _settingsService.LoadSync();
-        ZgrzytDesktop.Resources.AppStrings.ApplyCulture(settings.UiCulture);
-
-        _apiService = new ApiService(tokenStorage, _settingsService);
-
-        _authService = new AuthService(_apiService, tokenStorage);
-        _apiService.TryRefreshSessionAsync = () => _authService.RefreshTokenAsync();
-        _ticketService = new TicketService(_apiService);
-        _ticketCacheService = new LocalTicketCacheService();
-        _userCacheService = new LocalUserCacheService();
-        _auditLogService = new LocalAuditLogService();
-        _userAdminService = new UserAdminService(_apiService);
+    internal MainWindowViewModel(MainWindowDependencies dependencies, bool runStartup = false)
+    {
+        _authService = dependencies.AuthService;
+        _ticketService = dependencies.TicketService;
+        _apiService = dependencies.ApiService;
+        _settingsService = dependencies.SettingsService;
+        _ticketCacheService = dependencies.TicketCacheService;
+        _userCacheService = dependencies.UserCacheService;
+        _auditLogService = dependencies.AuditLogService;
+        _userAdminService = dependencies.UserAdminService;
 
         _currentViewModel = new LoginViewModel(_authService, _auditLogService, OnLoginSuccess);
 
-        _ = TryAutoLoginAsync();
+        if (runStartup)
+            _ = TryAutoLoginAsync();
+    }
+
+    internal Task RunStartupAsync() => TryAutoLoginAsync();
+
+    internal Task LogoutForTestsAsync() => LogoutAsync();
+
+    internal static MainWindowDependencies CreateProductionDependencies()
+    {
+        var tokenStorage = new TokenStorage();
+        var settingsService = new SettingsService();
+        var settings = settingsService.LoadSync();
+        AppStrings.ApplyCulture(settings.UiCulture);
+
+        var apiService = new ApiService(tokenStorage, settingsService);
+        var authService = new AuthService(apiService, tokenStorage);
+        apiService.TryRefreshSessionAsync = () => authService.RefreshTokenAsync();
+
+        return new MainWindowDependencies(
+            authService,
+            new TicketService(apiService),
+            apiService,
+            settingsService,
+            new LocalTicketCacheService(),
+            new LocalUserCacheService(),
+            new LocalAuditLogService(),
+            new UserAdminService(apiService));
+    }
+
+    internal sealed class MainWindowDependencies
+    {
+        public MainWindowDependencies(
+            IAuthService authService,
+            ITicketService ticketService,
+            ApiService apiService,
+            ISettingsService settingsService,
+            LocalTicketCacheService ticketCacheService,
+            LocalUserCacheService userCacheService,
+            ILocalAuditLogService auditLogService,
+            IUserAdminService userAdminService)
+        {
+            AuthService = authService;
+            TicketService = ticketService;
+            ApiService = apiService;
+            SettingsService = settingsService;
+            TicketCacheService = ticketCacheService;
+            UserCacheService = userCacheService;
+            AuditLogService = auditLogService;
+            UserAdminService = userAdminService;
+        }
+
+        public IAuthService AuthService { get; }
+
+        public ITicketService TicketService { get; }
+
+        public ApiService ApiService { get; }
+
+        public ISettingsService SettingsService { get; }
+
+        public LocalTicketCacheService TicketCacheService { get; }
+
+        public LocalUserCacheService UserCacheService { get; }
+
+        public ILocalAuditLogService AuditLogService { get; }
+
+        public IUserAdminService UserAdminService { get; }
     }
 
     private async Task TryAutoLoginAsync()

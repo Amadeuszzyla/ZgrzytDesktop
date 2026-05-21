@@ -119,7 +119,7 @@ public partial class DashboardViewModel
             IsOffline = true;
 
             if (!silentRefresh)
-                ShowToast("Brak połączenia z API. Pokazuję dane offline.", "warning");
+                ShowToast("Brak połączenia z API. Pokazuję dane offline.", ToastTypes.Warning);
 
             await LoadTicketsFromCacheAsync();
         }
@@ -128,14 +128,14 @@ public partial class DashboardViewModel
             StatusMessage = GetApiErrorMessage(ex);
 
             if (!silentRefresh)
-                ShowToast(GetApiErrorMessage(ex), "error");
+                ShowToast(GetApiErrorMessage(ex), ToastTypes.Error);
         }
         catch
         {
             StatusMessage = "Wystąpił nieoczekiwany błąd podczas pobierania zgłoszeń.";
 
             if (!silentRefresh)
-                ShowToast("Wystąpił błąd podczas pobierania zgłoszeń.", "error");
+                ShowToast("Wystąpił błąd podczas pobierania zgłoszeń.", ToastTypes.Error);
         }
         finally
         {
@@ -186,7 +186,7 @@ public partial class DashboardViewModel
 
     private async Task AutoRefreshTicketsAsync()
     {
-        if (CurrentSection != "Tickets" || IsOffline || IsLoading)
+        if (CurrentSection != AppSections.Tickets || IsOffline || IsLoading)
             return;
 
         try
@@ -203,7 +203,7 @@ public partial class DashboardViewModel
             if (!_autoRefreshErrorToastShown)
             {
                 _autoRefreshErrorToastShown = true;
-                ShowToast("Utracono połączenie z API.", "warning");
+                ShowToast("Utracono połączenie z API.", ToastTypes.Warning);
             }
         }
         catch
@@ -213,7 +213,7 @@ public partial class DashboardViewModel
             if (!_autoRefreshErrorToastShown)
             {
                 _autoRefreshErrorToastShown = true;
-                ShowToast("Nie udało się odświeżyć listy zgłoszeń.", "error");
+                ShowToast("Nie udało się odświeżyć listy zgłoszeń.", ToastTypes.Error);
             }
         }
     }
@@ -232,9 +232,9 @@ public partial class DashboardViewModel
     private void ClearFilters()
     {
         SearchText = string.Empty;
-        SelectedFilterStatus = "Wszystkie";
-        SelectedFilterPriority = "Wszystkie";
-        SetSelectedTicketQueueViewSilently("Wszystkie");
+        SelectedFilterStatus = FilterLabels.All;
+        SelectedFilterPriority = FilterLabels.All;
+        SetSelectedTicketQueueViewSilently(FilterLabels.All);
         SetCurrentPageSilently(1);
 
         _ = LoadTicketsAsync();
@@ -246,7 +246,7 @@ public partial class DashboardViewModel
         {
             CreateTicketStatusMessage = "Nie można utworzyć zgłoszenia w trybie offline.";
 
-            ShowToast("Nie można utworzyć zgłoszenia w trybie offline.", "warning");
+            ShowToast("Nie można utworzyć zgłoszenia w trybie offline.", ToastTypes.Warning);
 
             return;
         }
@@ -274,60 +274,55 @@ public partial class DashboardViewModel
             IsLoading = true;
             CreateTicketStatusMessage = "Tworzenie zgłoszenia...";
 
-            var request = new CreateTicketRequest
-            {
-                Title = TicketCategoryHelper.FormatTitle(SelectedNewTicketCategory, NewTicketTitle),
-                Description = TicketCategoryHelper.FormatDescription(
-                    SelectedNewTicketCategory,
-                    NewTicketDescription),
-                Priority = NewTicketPriority
-            };
+            await ExecuteApiAsync(
+                async () =>
+                {
+                    var request = new CreateTicketRequest
+                    {
+                        Title = TicketCategoryHelper.FormatTitle(SelectedNewTicketCategory, NewTicketTitle),
+                        Description = TicketCategoryHelper.FormatDescription(
+                            SelectedNewTicketCategory,
+                            NewTicketDescription),
+                        Priority = NewTicketPriority
+                    };
 
-            var createdTicket = await _ticketService.CreateTicketAsync(request);
+                    var createdTicket = await _ticketService.CreateTicketAsync(request);
 
-            IsOffline = false;
+                    IsOffline = false;
 
-            NewTicketTitle = string.Empty;
-            NewTicketDescription = string.Empty;
-            NewTicketPriority = "niski";
-            SelectedNewTicketCategory = "Hardware";
+                    NewTicketTitle = string.Empty;
+                    NewTicketDescription = string.Empty;
+                    NewTicketPriority = TicketPriorities.Low;
+                    SelectedNewTicketCategory = "Hardware";
 
-            SetCurrentPageSilently(1);
-            await LoadTicketsAsync();
+                    SetCurrentPageSilently(1);
+                    await LoadTicketsAsync();
 
-            if (createdTicket is not null)
-                SelectedTicket = Tickets.FirstOrDefault(ticket => ticket.Id == createdTicket.Id);
+                    if (createdTicket is not null)
+                        SelectedTicket = Tickets.FirstOrDefault(ticket => ticket.Id == createdTicket.Id);
 
-            CreateTicketStatusMessage = "Zgłoszenie zostało utworzone.";
+                    CreateTicketStatusMessage = "Zgłoszenie zostało utworzone.";
 
-            ShowToast("Nowe zgłoszenie zostało utworzone.", "success");
+                    ShowToast("Nowe zgłoszenie zostało utworzone.", ToastTypes.Success);
 
-            if (createdTicket is not null)
-            {
-                await LogAuditAsync(
-                    "CreateTicket",
-                    createdTicket.Id,
-                    $"Utworzono zgłoszenie: {createdTicket.Title}");
-            }
-        }
-        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
-        {
-            IsOffline = true;
-            CreateTicketStatusMessage = "Brak połączenia z API. Nie można utworzyć zgłoszenia offline.";
-
-            ShowToast("Brak połączenia z API. Nie można utworzyć zgłoszenia.", "error");
-        }
-        catch (ApiException ex)
-        {
-            CreateTicketStatusMessage = GetApiErrorMessage(ex);
-
-            ShowToast(GetApiErrorMessage(ex), "error");
-        }
-        catch
-        {
-            CreateTicketStatusMessage = "Wystąpił nieoczekiwany błąd podczas tworzenia zgłoszenia.";
-
-            ShowToast("Wystąpił błąd podczas tworzenia zgłoszenia.", "error");
+                    if (createdTicket is not null)
+                    {
+                        await LogAuditAsync(
+                            "CreateTicket",
+                            createdTicket.Id,
+                            $"Utworzono zgłoszenie: {createdTicket.Title}");
+                    }
+                },
+                setStatusMessage: message => CreateTicketStatusMessage = message,
+                unexpectedStatusMessage: "Wystąpił nieoczekiwany błąd podczas tworzenia zgłoszenia.",
+                unexpectedToastMessage: "Wystąpił błąd podczas tworzenia zgłoszenia.",
+                onServiceUnavailableAsync: async _ =>
+                {
+                    IsOffline = true;
+                    CreateTicketStatusMessage = "Brak połączenia z API. Nie można utworzyć zgłoszenia offline.";
+                    ShowToast("Brak połączenia z API. Nie można utworzyć zgłoszenia.", ToastTypes.Error);
+                    await Task.CompletedTask;
+                });
         }
         finally
         {

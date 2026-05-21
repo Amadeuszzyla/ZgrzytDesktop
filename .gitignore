@@ -70,6 +70,8 @@ token.json
 .env.*
 *.secret.json
 secrets.json
+integration.local.env
+*.integration.env
 
 # Temporary files
 *.tmp

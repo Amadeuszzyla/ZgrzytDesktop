@@ -4,14 +4,14 @@ using CommunityToolkit.Mvvm.Input;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
-using ZgrzytDesktop.Services;
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.ViewModels;
 
 public partial class LoginViewModel : ViewModelBase
 {
-    private readonly AuthService _authService;
-    private readonly LocalAuditLogService _auditLogService;
+    private readonly IAuthService _authService;
+    private readonly ILocalAuditLogService _auditLogService;
     private readonly Action<User> _onLoginSuccess;
 
     private string _login = string.Empty;
@@ -64,8 +64,8 @@ public partial class LoginViewModel : ViewModelBase
     public IAsyncRelayCommand LoginCommand { get; }
 
     public LoginViewModel(
-        AuthService authService,
-        LocalAuditLogService auditLogService,
+        IAuthService authService,
+        ILocalAuditLogService auditLogService,
         Action<User> onLoginSuccess)
     {
         _authService = authService;

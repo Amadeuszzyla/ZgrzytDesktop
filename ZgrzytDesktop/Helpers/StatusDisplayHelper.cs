@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ZgrzytDesktop.Constants;
 
 namespace ZgrzytDesktop.Helpers;
 
@@ -8,9 +9,9 @@ public static class StatusDisplayHelper
     private static readonly Dictionary<string, string> ApiToDisplay =
         new(StringComparer.OrdinalIgnoreCase)
         {
-            ["nowe"] = "Nowe",
-            ["w trakcie"] = "W toku",
-            ["zamknięte"] = "Rozwiązane"
+            [TicketStatuses.Nowe] = TicketStatuses.DisplayNowe,
+            [TicketStatuses.WTrakcie] = TicketStatuses.DisplayWToku,
+            [TicketStatuses.Zamkniete] = TicketStatuses.DisplayRozwiazane
         };
 
     public static string ToDisplayStatus(string? apiStatus)
@@ -28,17 +29,17 @@ public static class StatusDisplayHelper
     public static string ToApiStatus(string? displayStatus)
     {
         if (string.IsNullOrWhiteSpace(displayStatus))
-            return "nowe";
+            return TicketStatuses.Nowe;
 
         return displayStatus.Trim() switch
         {
-            "Nowe" => "nowe",
-            "W toku" => "w trakcie",
-            "Rozwiązane" => "zamknięte",
-            "nowe" => "nowe",
-            "w trakcie" => "w trakcie",
-            "zamknięte" => "zamknięte",
-            _ => "nowe"
+            TicketStatuses.DisplayNowe => TicketStatuses.Nowe,
+            TicketStatuses.DisplayWToku => TicketStatuses.WTrakcie,
+            TicketStatuses.DisplayRozwiazane => TicketStatuses.Zamkniete,
+            TicketStatuses.Nowe => TicketStatuses.Nowe,
+            TicketStatuses.WTrakcie => TicketStatuses.WTrakcie,
+            TicketStatuses.Zamkniete => TicketStatuses.Zamkniete,
+            _ => TicketStatuses.Nowe
         };
     }
 }

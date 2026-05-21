@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Models;
+
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
 
@@ -14,7 +17,7 @@ public enum TicketQueueView
     Unassigned
 }
 
-public class TicketService
+public class TicketService : ITicketService
 {
     private readonly ApiService _apiService;
 
@@ -150,7 +153,7 @@ public class CreateTicketRequest
     public string Description { get; set; } = string.Empty;
 
     [JsonPropertyName("priority")]
-    public string Priority { get; set; } = "niski";
+    public string Priority { get; set; } = TicketPriorities.Low;
 }
 
 public class UpdateTicketRequest

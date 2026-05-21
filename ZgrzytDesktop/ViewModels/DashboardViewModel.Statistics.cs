@@ -20,18 +20,18 @@ public partial class DashboardViewModel
     {
         StatsTotalTickets = tickets.Count;
         StatsNewTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Status, "nowe", StringComparison.OrdinalIgnoreCase));
+            string.Equals(ticket.Status, TicketStatuses.Nowe, StringComparison.OrdinalIgnoreCase));
         StatsInProgressTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Status, "w trakcie", StringComparison.OrdinalIgnoreCase));
+            string.Equals(ticket.Status, TicketStatuses.WTrakcie, StringComparison.OrdinalIgnoreCase));
         StatsClosedTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Status, "zamknięte", StringComparison.OrdinalIgnoreCase));
+            string.Equals(ticket.Status, TicketStatuses.Zamkniete, StringComparison.OrdinalIgnoreCase));
 
         StatsLowPriorityTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Priority, "niski", StringComparison.OrdinalIgnoreCase));
+            string.Equals(ticket.Priority, TicketPriorities.Low, StringComparison.OrdinalIgnoreCase));
         StatsMediumPriorityTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Priority, "średni", StringComparison.OrdinalIgnoreCase));
+            string.Equals(ticket.Priority, TicketPriorities.Medium, StringComparison.OrdinalIgnoreCase));
         StatsHighPriorityTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Priority, "wysoki", StringComparison.OrdinalIgnoreCase));
+            string.Equals(ticket.Priority, TicketPriorities.High, StringComparison.OrdinalIgnoreCase));
 
         StatsAssignedTickets = tickets.Count(ticket => ticket.AssignedItId.HasValue);
         StatsUnassignedTickets = Math.Max(0, tickets.Count - StatsAssignedTickets);
@@ -86,17 +86,17 @@ public partial class DashboardViewModel
             } while (page <= lastPage);
 
             ApplyTicketStatistics(aggregated, totalInSystem, fromCurrentPageOnly: false);
-            ShowToast($"Zaktualizowano statystyki ({aggregated.Count} zgłoszeń).", "success");
+            ShowToast($"Zaktualizowano statystyki ({aggregated.Count} zgłoszeń).", ToastTypes.Success);
         }
         catch (ApiException ex)
         {
             StatsScopeMessage = GetApiErrorMessage(ex);
-            ShowToast(GetApiErrorMessage(ex), "error");
+            ShowToast(GetApiErrorMessage(ex), ToastTypes.Error);
         }
         catch
         {
             StatsScopeMessage = "Nie udało się pobrać statystyk ze wszystkich stron.";
-            ShowToast("Nie udało się pobrać statystyk.", "error");
+            ShowToast("Nie udało się pobrać statystyk.", ToastTypes.Error);
         }
         finally
         {

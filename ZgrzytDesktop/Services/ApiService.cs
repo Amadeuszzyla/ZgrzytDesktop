@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
-using ZgrzytDesktop.Storage;
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
 
@@ -39,7 +39,7 @@ public class ApiService
         SetBaseAddress(apiBaseUrl);
     }
 
-    public ApiService(TokenStorage tokenStorage, SettingsService settingsService)
+    public ApiService(ITokenStorage tokenStorage, ISettingsService settingsService)
     {
         var settings = settingsService.LoadSync();
 
@@ -254,7 +254,7 @@ public class ApiService
         }
     }
 
-    private void TryLoadStoredToken(TokenStorage tokenStorage)
+    private void TryLoadStoredToken(ITokenStorage tokenStorage)
     {
         try
         {

@@ -57,6 +57,6 @@ public partial class DashboardViewModel
     {
         await _auditLogService.ClearAsync();
         await RefreshSettingsAuditLogAsync();
-        ShowToast("Lokalny audyt został wyczyszczony.", "info");
+        ShowToast("Lokalny audyt został wyczyszczony.", ToastTypes.Info);
     }
 }

@@ -1,16 +1,16 @@
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Models;
-using ZgrzytDesktop.Storage;
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
 
-public class AuthService
+public class AuthService : IAuthService
 {
     private readonly ApiService _apiService;
-    private readonly TokenStorage _tokenStorage;
+    private readonly ITokenStorage _tokenStorage;
 
-    public AuthService(ApiService apiService, TokenStorage tokenStorage)
+    public AuthService(ApiService apiService, ITokenStorage tokenStorage)
     {
         _apiService = apiService;
         _tokenStorage = tokenStorage;

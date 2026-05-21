@@ -66,7 +66,9 @@ public partial class DashboardViewModel
         string? unexpectedStatusMessage = null,
         string? unexpectedToastMessage = null,
         string? offlineToastMessage = null,
-        bool showApiErrorToast = true)
+        bool showApiErrorToast = true,
+        bool setOfflineOnServiceUnavailable = true,
+        Func<ApiException, Task>? onServiceUnavailableAsync = null)
     {
         try
         {
@@ -75,8 +77,21 @@ public partial class DashboardViewModel
         }
         catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
         {
-            IsOffline = true;
-            HandleApiError(ex, setStatusMessage, offlineToastMessage, showApiErrorToast);
+            if (onServiceUnavailableAsync is not null)
+            {
+                await onServiceUnavailableAsync(ex);
+                return false;
+            }
+
+            if (setOfflineOnServiceUnavailable)
+                IsOffline = true;
+
+            HandleApiError(
+                ex,
+                setStatusMessage,
+                offlineToastMessage,
+                showApiErrorToast,
+                setOfflineOnServiceUnavailable);
             return false;
         }
         catch (ApiException ex)

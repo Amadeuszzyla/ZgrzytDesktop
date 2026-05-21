@@ -2,10 +2,11 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Security;
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Storage;
 
-public class TokenStorage
+public class TokenStorage : ITokenStorage
 {
     private readonly string _filePath;
 

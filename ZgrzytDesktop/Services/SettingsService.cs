@@ -4,11 +4,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
 
-public class SettingsService
+public class SettingsService : ISettingsService
 {
     private readonly string _filePath;
 
@@ -196,11 +198,19 @@ public class SettingsService
         if (Application.Current is null)
             return;
 
-        Application.Current.RequestedThemeVariant = themeMode switch
+        void Apply()
         {
-            "Light" => ThemeVariant.Light,
-            "Dark" => ThemeVariant.Dark,
-            _ => ThemeVariant.Default
-        };
+            Application.Current!.RequestedThemeVariant = themeMode switch
+            {
+                "Light" => ThemeVariant.Light,
+                "Dark" => ThemeVariant.Dark,
+                _ => ThemeVariant.Default
+            };
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+            Apply();
+        else
+            Dispatcher.UIThread.Invoke(Apply);
     }
 }

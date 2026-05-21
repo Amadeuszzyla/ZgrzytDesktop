@@ -62,7 +62,7 @@ public partial class DashboardViewModel
 
                 ShowToast(
                     "Serwer zwrócił stronę błędu zamiast danych API. Sprawdź endpoint lub uprawnienia.",
-                    "error");
+                    ToastTypes.Error);
 
                 return;
             }
@@ -90,19 +90,19 @@ public partial class DashboardViewModel
             IsOffline = true;
             DetailsStatusMessage = "Brak połączenia z API. Pokazuję dane dostępne offline.";
 
-            ShowToast("Brak połączenia z API. Szczegóły zgłoszenia są dostępne offline.", "warning");
+            ShowToast("Brak połączenia z API. Szczegóły zgłoszenia są dostępne offline.", ToastTypes.Warning);
         }
         catch (ApiException ex)
         {
             DetailsStatusMessage = GetApiErrorMessage(ex);
 
-            ShowToast(GetApiErrorMessage(ex), "error");
+            ShowToast(GetApiErrorMessage(ex), ToastTypes.Error);
         }
         catch
         {
             DetailsStatusMessage = "Wystąpił nieoczekiwany błąd podczas pobierania szczegółów zgłoszenia.";
 
-            ShowToast("Wystąpił błąd podczas pobierania szczegółów zgłoszenia.", "error");
+            ShowToast("Wystąpił błąd podczas pobierania szczegółów zgłoszenia.", ToastTypes.Error);
         }
         finally
         {
@@ -119,7 +119,7 @@ public partial class DashboardViewModel
         {
             DetailsStatusMessage = "Nie można wysłać wiadomości w trybie offline.";
 
-            ShowToast("Nie można wysłać wiadomości w trybie offline.", "warning");
+            ShowToast("Nie można wysłać wiadomości w trybie offline.", ToastTypes.Warning);
 
             return;
         }
@@ -144,41 +144,36 @@ public partial class DashboardViewModel
             var ticketId = TicketDetails.Id;
             var messageBody = NewMessageText.Trim();
 
-            await _ticketService.SendMessageAsync(ticketId, messageBody);
+            await ExecuteApiAsync(
+                async () =>
+                {
+                    await _ticketService.SendMessageAsync(ticketId, messageBody);
 
-            IsOffline = false;
+                    IsOffline = false;
 
-            NewMessageText = string.Empty;
+                    NewMessageText = string.Empty;
 
-            await LoadTicketDetailsAsync(ticketId);
+                    await LoadTicketDetailsAsync(ticketId);
 
-            DetailsStatusMessage = "Wiadomość została wysłana.";
+                    DetailsStatusMessage = "Wiadomość została wysłana.";
 
-            ShowToast("Wiadomość została wysłana.", "success");
+                    ShowToast("Wiadomość została wysłana.", ToastTypes.Success);
 
-            await LogAuditAsync(
-                "SendMessage",
-                ticketId,
-                "Wysłano wiadomość w zgłoszeniu.");
-        }
-        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
-        {
-            IsOffline = true;
-            DetailsStatusMessage = "Brak połączenia z API. Nie można wysłać wiadomości offline.";
-
-            ShowToast("Brak połączenia z API. Wiadomość nie została wysłana.", "error");
-        }
-        catch (ApiException ex)
-        {
-            DetailsStatusMessage = GetApiErrorMessage(ex);
-
-            ShowToast(GetApiErrorMessage(ex), "error");
-        }
-        catch
-        {
-            DetailsStatusMessage = "Wystąpił nieoczekiwany błąd podczas wysyłania wiadomości.";
-
-            ShowToast("Wystąpił błąd podczas wysyłania wiadomości.", "error");
+                    await LogAuditAsync(
+                        "SendMessage",
+                        ticketId,
+                        "Wysłano wiadomość w zgłoszeniu.");
+                },
+                setStatusMessage: message => DetailsStatusMessage = message,
+                unexpectedStatusMessage: "Wystąpił nieoczekiwany błąd podczas wysyłania wiadomości.",
+                unexpectedToastMessage: "Wystąpił błąd podczas wysyłania wiadomości.",
+                onServiceUnavailableAsync: async _ =>
+                {
+                    IsOffline = true;
+                    DetailsStatusMessage = "Brak połączenia z API. Nie można wysłać wiadomości offline.";
+                    ShowToast("Brak połączenia z API. Wiadomość nie została wysłana.", ToastTypes.Error);
+                    await Task.CompletedTask;
+                });
         }
         finally
         {
@@ -192,7 +187,7 @@ public partial class DashboardViewModel
         {
             DetailsStatusMessage = "Brak uprawnień do edycji zgłoszenia.";
 
-            ShowToast("Brak uprawnień do edycji zgłoszenia.", "warning");
+            ShowToast("Brak uprawnień do edycji zgłoszenia.", ToastTypes.Warning);
 
             return;
         }
@@ -201,7 +196,7 @@ public partial class DashboardViewModel
         {
             DetailsStatusMessage = "Nie można edytować zgłoszenia w trybie offline.";
 
-            ShowToast("Nie można edytować zgłoszenia w trybie offline.", "warning");
+            ShowToast("Nie można edytować zgłoszenia w trybie offline.", ToastTypes.Warning);
 
             return;
         }
@@ -237,40 +232,35 @@ public partial class DashboardViewModel
                 Priority = SelectedPriority
             };
 
-            await _ticketService.UpdateTicketAsync(ticketId, request);
+            await ExecuteApiAsync(
+                async () =>
+                {
+                    await _ticketService.UpdateTicketAsync(ticketId, request);
 
-            IsOffline = false;
+                    IsOffline = false;
 
-            await LoadTicketDetailsAsync(ticketId);
-            await LoadTicketsAsync();
+                    await LoadTicketDetailsAsync(ticketId);
+                    await LoadTicketsAsync();
 
-            DetailsStatusMessage = "Zmiany zostały zapisane.";
+                    DetailsStatusMessage = "Zmiany zostały zapisane.";
 
-            ShowToast("Zmiany w zgłoszeniu zostały zapisane.", "success");
+                    ShowToast("Zmiany w zgłoszeniu zostały zapisane.", ToastTypes.Success);
 
-            await LogAuditAsync(
-                "UpdateTicket",
-                ticketId,
-                $"Zmieniono status na „{SelectedStatus}”, priorytet na „{SelectedPriority}”.");
-        }
-        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
-        {
-            IsOffline = true;
-            DetailsStatusMessage = "Brak połączenia z API. Nie można zapisać zmian offline.";
-
-            ShowToast("Brak połączenia z API. Zmiany nie zostały zapisane.", "error");
-        }
-        catch (ApiException ex)
-        {
-            DetailsStatusMessage = GetApiErrorMessage(ex);
-
-            ShowToast(GetApiErrorMessage(ex), "error");
-        }
-        catch
-        {
-            DetailsStatusMessage = "Wystąpił nieoczekiwany błąd podczas zapisywania zmian.";
-
-            ShowToast("Wystąpił błąd podczas zapisywania zmian.", "error");
+                    await LogAuditAsync(
+                        "UpdateTicket",
+                        ticketId,
+                        $"Zmieniono status na „{SelectedStatus}”, priorytet na „{SelectedPriority}”.");
+                },
+                setStatusMessage: message => DetailsStatusMessage = message,
+                unexpectedStatusMessage: "Wystąpił nieoczekiwany błąd podczas zapisywania zmian.",
+                unexpectedToastMessage: "Wystąpił błąd podczas zapisywania zmian.",
+                onServiceUnavailableAsync: async _ =>
+                {
+                    IsOffline = true;
+                    DetailsStatusMessage = "Brak połączenia z API. Nie można zapisać zmian offline.";
+                    ShowToast("Brak połączenia z API. Zmiany nie zostały zapisane.", ToastTypes.Error);
+                    await Task.CompletedTask;
+                });
         }
         finally
         {
@@ -310,7 +300,7 @@ public partial class DashboardViewModel
 
             var request = new UpdateTicketRequest
             {
-                Status = "zamknięte"
+                Status = TicketStatuses.Zamkniete
             };
 
             var updatedTicket = await _ticketService.UpdateTicketAsync(ticketId, request);
@@ -329,7 +319,7 @@ public partial class DashboardViewModel
 
             DetailsStatusMessage = "Zgłoszenie zostało zamknięte.";
 
-            ShowToast("Zgłoszenie zostało zamknięte.", "success");
+            ShowToast("Zgłoszenie zostało zamknięte.", ToastTypes.Success);
 
             await LogAuditAsync(
                 "CloseTicket",
@@ -346,7 +336,7 @@ public partial class DashboardViewModel
 
             DetailsStatusMessage = errorMessage;
 
-            ShowToast(errorMessage, "error");
+            ShowToast(errorMessage, ToastTypes.Error);
 
             await LogAuditAsync(
                 "CloseTicket",
@@ -361,7 +351,7 @@ public partial class DashboardViewModel
 
             DetailsStatusMessage = "Wystąpił błąd podczas zamykania zgłoszenia.";
 
-            ShowToast("Nie udało się zamknąć zgłoszenia.", "error");
+            ShowToast("Nie udało się zamknąć zgłoszenia.", ToastTypes.Error);
 
             await LogAuditAsync(
                 "CloseTicket",
@@ -388,28 +378,26 @@ public partial class DashboardViewModel
             DetailsStatusMessage = "Usuwanie zgłoszenia...";
 
             var ticketId = TicketDetails.Id;
-            await _ticketService.DeleteTicketAsync(ticketId);
 
-            TicketDetails = null;
-            SelectedTicket = null;
-            CurrentSection = AppSections.Tickets;
+            await ExecuteApiAsync(
+                async () =>
+                {
+                    await _ticketService.DeleteTicketAsync(ticketId);
 
-            await LoadTicketsAsync();
+                    TicketDetails = null;
+                    SelectedTicket = null;
+                    CurrentSection = AppSections.Tickets;
 
-            DetailsStatusMessage = "Zgłoszenie zostało usunięte.";
-            ShowToast("Zgłoszenie zostało usunięte.", "success");
+                    await LoadTicketsAsync();
 
-            await LogAuditAsync("DeleteTicket", ticketId, "Usunięto zgłoszenie.");
-        }
-        catch (ApiException ex)
-        {
-            DetailsStatusMessage = GetApiErrorMessage(ex);
-            ShowToast(GetApiErrorMessage(ex), "error");
-        }
-        catch
-        {
-            DetailsStatusMessage = "Nie udało się usunąć zgłoszenia.";
-            ShowToast("Nie udało się usunąć zgłoszenia.", "error");
+                    DetailsStatusMessage = "Zgłoszenie zostało usunięte.";
+                    ShowToast("Zgłoszenie zostało usunięte.", ToastTypes.Success);
+
+                    await LogAuditAsync("DeleteTicket", ticketId, "Usunięto zgłoszenie.");
+                },
+                setStatusMessage: message => DetailsStatusMessage = message,
+                unexpectedStatusMessage: "Nie udało się usunąć zgłoszenia.",
+                unexpectedToastMessage: "Nie udało się usunąć zgłoszenia.");
         }
         finally
         {
@@ -422,7 +410,7 @@ public partial class DashboardViewModel
         {
             DetailsStatusMessage = "Brak uprawnień do przypisania zgłoszenia.";
 
-            ShowToast("Brak uprawnień do przypisania zgłoszenia.", "warning");
+            ShowToast("Brak uprawnień do przypisania zgłoszenia.", ToastTypes.Warning);
 
             return;
         }
@@ -431,7 +419,7 @@ public partial class DashboardViewModel
         {
             DetailsStatusMessage = "Nie można przypisać zgłoszenia w trybie offline.";
 
-            ShowToast("Nie można przypisać zgłoszenia w trybie offline.", "warning");
+            ShowToast("Nie można przypisać zgłoszenia w trybie offline.", ToastTypes.Warning);
 
             return;
         }
@@ -454,40 +442,35 @@ public partial class DashboardViewModel
                 AssignedItId = CurrentUser.Id
             };
 
-            await _ticketService.UpdateTicketAsync(ticketId, request);
+            await ExecuteApiAsync(
+                async () =>
+                {
+                    await _ticketService.UpdateTicketAsync(ticketId, request);
 
-            IsOffline = false;
+                    IsOffline = false;
 
-            await LoadTicketDetailsAsync(ticketId);
-            await LoadTicketsAsync();
+                    await LoadTicketDetailsAsync(ticketId);
+                    await LoadTicketsAsync();
 
-            DetailsStatusMessage = "Zgłoszenie zostało przypisane do Ciebie.";
+                    DetailsStatusMessage = "Zgłoszenie zostało przypisane do Ciebie.";
 
-            ShowToast("Zgłoszenie zostało przypisane do Ciebie.", "success");
+                    ShowToast("Zgłoszenie zostało przypisane do Ciebie.", ToastTypes.Success);
 
-            await LogAuditAsync(
-                "AssignToMe",
-                ticketId,
-                $"Przypisano zgłoszenie do użytkownika {CurrentUser.Login}.");
-        }
-        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
-        {
-            IsOffline = true;
-            DetailsStatusMessage = "Brak połączenia z API. Nie można przypisać zgłoszenia offline.";
-
-            ShowToast("Brak połączenia z API. Zgłoszenie nie zostało przypisane.", "error");
-        }
-        catch (ApiException ex)
-        {
-            DetailsStatusMessage = GetApiErrorMessage(ex);
-
-            ShowToast(GetApiErrorMessage(ex), "error");
-        }
-        catch
-        {
-            DetailsStatusMessage = "Wystąpił nieoczekiwany błąd podczas przypisywania zgłoszenia.";
-
-            ShowToast("Wystąpił błąd podczas przypisywania zgłoszenia.", "error");
+                    await LogAuditAsync(
+                        "AssignToMe",
+                        ticketId,
+                        $"Przypisano zgłoszenie do użytkownika {CurrentUser.Login}.");
+                },
+                setStatusMessage: message => DetailsStatusMessage = message,
+                unexpectedStatusMessage: "Wystąpił nieoczekiwany błąd podczas przypisywania zgłoszenia.",
+                unexpectedToastMessage: "Wystąpił błąd podczas przypisywania zgłoszenia.",
+                onServiceUnavailableAsync: async _ =>
+                {
+                    IsOffline = true;
+                    DetailsStatusMessage = "Brak połączenia z API. Nie można przypisać zgłoszenia offline.";
+                    ShowToast("Brak połączenia z API. Zgłoszenie nie zostało przypisane.", ToastTypes.Error);
+                    await Task.CompletedTask;
+                });
         }
         finally
         {

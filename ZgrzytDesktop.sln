@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZgrzytDesktop", "ZgrzytDesk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZgrzytDesktop.Tests", "ZgrzytDesktop.Tests\ZgrzytDesktop.Tests.csproj", "{3F21D575-6874-4F52-9DB9-8A5D3F20F0A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZgrzytDesktop.Headless.Tests", "ZgrzytDesktop.Headless.Tests\ZgrzytDesktop.Headless.Tests.csproj", "{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,18 @@ Global
 		{3F21D575-6874-4F52-9DB9-8A5D3F20F0A1}.Release|x64.Build.0 = Release|Any CPU
 		{3F21D575-6874-4F52-9DB9-8A5D3F20F0A1}.Release|x86.ActiveCfg = Release|Any CPU
 		{3F21D575-6874-4F52-9DB9-8A5D3F20F0A1}.Release|x86.Build.0 = Release|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Debug|x64.Build.0 = Debug|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Debug|x86.Build.0 = Debug|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Release|x64.ActiveCfg = Release|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Release|x64.Build.0 = Release|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Release|x86.ActiveCfg = Release|Any CPU
+		{141CD89F-CAF5-46C4-8DB5-0D3EE5E0EBAE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

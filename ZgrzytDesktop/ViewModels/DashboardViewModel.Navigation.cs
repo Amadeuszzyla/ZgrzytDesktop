@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
-using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
@@ -24,16 +23,16 @@ public partial class DashboardViewModel
     private void ConfigureTicketQueueViewsForRole()
     {
         TicketQueueViews.Clear();
-        TicketQueueViews.Add("Wszystkie");
+        TicketQueueViews.Add(FilterLabels.All);
 
         if (CanManageTickets)
         {
-            TicketQueueViews.Add("Aktywne");
-            TicketQueueViews.Add("Nieprzypisane");
+            TicketQueueViews.Add(FilterLabels.Active);
+            TicketQueueViews.Add(FilterLabels.Unassigned);
         }
 
         if (!TicketQueueViews.Contains(SelectedTicketQueueView))
-            SelectedTicketQueueView = "Wszystkie";
+            SelectedTicketQueueView = FilterLabels.All;
     }
 
     private void ShowRequestAccountPage()
@@ -49,7 +48,7 @@ public partial class DashboardViewModel
     private void ShowAdminPage()
     {
         CurrentSection = AppSections.Admin;
-        AdminTab = IsAdminRole ? "Users" : "NewAccount";
+        AdminTab = IsAdminRole ? AdminTabs.Users : AdminTabs.NewAccount;
 
         if (IsAdminRole)
             _ = LoadAdminUsersAsync();
@@ -104,54 +103,52 @@ public partial class DashboardViewModel
             IsRequestingAccount = true;
             RequestAccountStatusMessage = "Wysyłanie prośby...";
 
-            var request = new RequestAccountRequest
-            {
-                Name = RequestName.Trim(),
-                Login = RequestLogin.Trim(),
-                Email = RequestEmail.Trim(),
-                Password = RequestPassword,
-                PasswordConfirmation = RequestPasswordConfirmation
-            };
+            await ExecuteApiAsync(
+                async () =>
+                {
+                    var request = new RequestAccountRequest
+                    {
+                        Name = RequestName.Trim(),
+                        Login = RequestLogin.Trim(),
+                        Email = RequestEmail.Trim(),
+                        Password = RequestPassword,
+                        PasswordConfirmation = RequestPasswordConfirmation
+                    };
 
-            var success = await _authService.RequestAccountAsync(request);
+                    var success = await _authService.RequestAccountAsync(request);
 
-            if (!success)
-            {
-                RequestAccountStatusMessage = "Nie udało się wysłać prośby o utworzenie konta.";
-                return;
-            }
+                    if (!success)
+                    {
+                        RequestAccountStatusMessage = "Nie udało się wysłać prośby o utworzenie konta.";
+                        return;
+                    }
 
-            IsOffline = false;
+                    IsOffline = false;
 
-            RequestName = string.Empty;
-            RequestLogin = string.Empty;
-            RequestEmail = string.Empty;
-            RequestPassword = string.Empty;
-            RequestPasswordConfirmation = string.Empty;
+                    RequestName = string.Empty;
+                    RequestLogin = string.Empty;
+                    RequestEmail = string.Empty;
+                    RequestPassword = string.Empty;
+                    RequestPasswordConfirmation = string.Empty;
 
-            RequestAccountStatusMessage = "Prośba o utworzenie konta została wysłana.";
-            ShowToast("Prośba o utworzenie konta została wysłana.", "success");
+                    RequestAccountStatusMessage = "Prośba o utworzenie konta została wysłana.";
+                    ShowToast("Prośba o utworzenie konta została wysłana.", ToastTypes.Success);
 
-            await LogAuditAsync(
-                "RequestAccount",
-                null,
-                $"Wysłano prośbę o utworzenie konta: {request.Login}.");
-        }
-        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
-        {
-            IsOffline = true;
-            RequestAccountStatusMessage = "Brak połączenia z API. Nie można wysłać prośby offline.";
-            ShowToast("Brak połączenia z API. Nie można wysłać prośby offline.", "warning");
-        }
-        catch (ApiException ex)
-        {
-            RequestAccountStatusMessage = GetApiErrorMessage(ex);
-            ShowToast(GetApiErrorMessage(ex), "error");
-        }
-        catch
-        {
-            RequestAccountStatusMessage = "Wystąpił nieoczekiwany błąd podczas wysyłania prośby.";
-            ShowToast("Wystąpił nieoczekiwany błąd podczas wysyłania prośby.", "error");
+                    await LogAuditAsync(
+                        "RequestAccount",
+                        null,
+                        $"Wysłano prośbę o utworzenie konta: {request.Login}.");
+                },
+                setStatusMessage: message => RequestAccountStatusMessage = message,
+                unexpectedStatusMessage: "Wystąpił nieoczekiwany błąd podczas wysyłania prośby.",
+                unexpectedToastMessage: "Wystąpił nieoczekiwany błąd podczas wysyłania prośby.",
+                onServiceUnavailableAsync: async _ =>
+                {
+                    IsOffline = true;
+                    RequestAccountStatusMessage = "Brak połączenia z API. Nie można wysłać prośby offline.";
+                    ShowToast("Brak połączenia z API. Nie można wysłać prośby offline.", ToastTypes.Warning);
+                    await Task.CompletedTask;
+                });
         }
         finally
         {
@@ -160,11 +157,12 @@ public partial class DashboardViewModel
     }
     private async Task LogoutAsync()
     {
-        _ticketPollingTimer.Stop();
+        if (_ticketPollingTimer is not null)
+            _ticketPollingTimer.IsEnabled = false;
 
         await LogAuditAsync("Logout", null, "Wylogowano użytkownika z aplikacji desktopowej.");
 
-        ShowToast("Wylogowano z aplikacji.", "info");
+        ShowToast("Wylogowano z aplikacji.", ToastTypes.Info);
 
         await _onLogoutRequested();
     }
@@ -236,15 +234,15 @@ public partial class DashboardViewModel
     {
         return SelectedTicketQueueView switch
         {
-            "Aktywne" => TicketQueueView.Active,
-            "Nieprzypisane" => TicketQueueView.Unassigned,
+            FilterLabels.Active => TicketQueueView.Active,
+            FilterLabels.Unassigned => TicketQueueView.Unassigned,
             _ => TicketQueueView.All
         };
     }
 
     private static string? GetSelectedFilterValue(string value)
     {
-        return string.Equals(value, "Wszystkie", StringComparison.OrdinalIgnoreCase)
+        return string.Equals(value, FilterLabels.All, StringComparison.OrdinalIgnoreCase)
             ? null
             : value;
     }

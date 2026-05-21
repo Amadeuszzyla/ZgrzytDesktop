@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
 
-public class UserAdminService
+public class UserAdminService : IUserAdminService
 {
     private readonly ApiService _apiService;
 
