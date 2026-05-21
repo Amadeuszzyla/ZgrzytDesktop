@@ -34,8 +34,6 @@ public partial class DashboardViewModel : ViewModelBase
 
     private readonly ITicketService _ticketService;
 
-    private readonly ApiService _apiService;
-
     private readonly ISettingsService _settingsService;
 
     private readonly LocalTicketCacheService _ticketCacheService;
@@ -70,8 +68,6 @@ public partial class DashboardViewModel : ViewModelBase
 
         ITicketService ticketService,
 
-        ApiService apiService,
-
         ISettingsService settingsService,
 
         LocalTicketCacheService ticketCacheService,
@@ -89,8 +85,6 @@ public partial class DashboardViewModel : ViewModelBase
             authService,
 
             ticketService,
-
-            apiService,
 
             settingsService,
 
@@ -118,8 +112,6 @@ public partial class DashboardViewModel : ViewModelBase
 
         ITicketService ticketService,
 
-        ApiService apiService,
-
         ISettingsService settingsService,
 
         LocalTicketCacheService ticketCacheService,
@@ -139,8 +131,6 @@ public partial class DashboardViewModel : ViewModelBase
         _authService = authService;
 
         _ticketService = ticketService;
-
-        _apiService = apiService;
 
         _settingsService = settingsService;
 

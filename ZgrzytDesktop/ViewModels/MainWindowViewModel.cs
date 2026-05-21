@@ -3,10 +3,7 @@ using System.Threading.Tasks;
 using ZgrzytDesktop.Cache;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
-using ZgrzytDesktop.Resources;
-using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Services.Interfaces;
-using ZgrzytDesktop.Storage;
 
 namespace ZgrzytDesktop.ViewModels;
 
@@ -14,7 +11,6 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly IAuthService _authService;
     private readonly ITicketService _ticketService;
-    private readonly ApiService _apiService;
     private readonly ISettingsService _settingsService;
     private readonly LocalTicketCacheService _ticketCacheService;
     private readonly LocalUserCacheService _userCacheService;
@@ -29,8 +25,24 @@ public partial class MainWindowViewModel : ViewModelBase
         set => SetProperty(ref _currentViewModel, value);
     }
 
-    public MainWindowViewModel()
-        : this(CreateProductionDependencies(), runStartup: true)
+    public MainWindowViewModel(
+        IAuthService authService,
+        ITicketService ticketService,
+        ISettingsService settingsService,
+        LocalTicketCacheService ticketCacheService,
+        LocalUserCacheService userCacheService,
+        ILocalAuditLogService auditLogService,
+        IUserAdminService userAdminService)
+        : this(
+            new MainWindowDependencies(
+                authService,
+                ticketService,
+                settingsService,
+                ticketCacheService,
+                userCacheService,
+                auditLogService,
+                userAdminService),
+            runStartup: true)
     {
     }
 
@@ -38,7 +50,6 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _authService = dependencies.AuthService;
         _ticketService = dependencies.TicketService;
-        _apiService = dependencies.ApiService;
         _settingsService = dependencies.SettingsService;
         _ticketCacheService = dependencies.TicketCacheService;
         _userCacheService = dependencies.UserCacheService;
@@ -55,34 +66,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
     internal Task LogoutForTestsAsync() => LogoutAsync();
 
-    internal static MainWindowDependencies CreateProductionDependencies()
-    {
-        var tokenStorage = new TokenStorage();
-        var settingsService = new SettingsService();
-        var settings = settingsService.LoadSync();
-        AppStrings.ApplyCulture(settings.UiCulture);
-
-        var apiService = new ApiService(tokenStorage, settingsService);
-        var authService = new AuthService(apiService, tokenStorage);
-        apiService.TryRefreshSessionAsync = () => authService.RefreshTokenAsync();
-
-        return new MainWindowDependencies(
-            authService,
-            new TicketService(apiService),
-            apiService,
-            settingsService,
-            new LocalTicketCacheService(),
-            new LocalUserCacheService(),
-            new LocalAuditLogService(),
-            new UserAdminService(apiService));
-    }
-
     internal sealed class MainWindowDependencies
     {
         public MainWindowDependencies(
             IAuthService authService,
             ITicketService ticketService,
-            ApiService apiService,
             ISettingsService settingsService,
             LocalTicketCacheService ticketCacheService,
             LocalUserCacheService userCacheService,
@@ -91,7 +79,6 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             AuthService = authService;
             TicketService = ticketService;
-            ApiService = apiService;
             SettingsService = settingsService;
             TicketCacheService = ticketCacheService;
             UserCacheService = userCacheService;
@@ -102,8 +89,6 @@ public partial class MainWindowViewModel : ViewModelBase
         public IAuthService AuthService { get; }
 
         public ITicketService TicketService { get; }
-
-        public ApiService ApiService { get; }
 
         public ISettingsService SettingsService { get; }
 
@@ -167,7 +152,6 @@ public partial class MainWindowViewModel : ViewModelBase
             user,
             _authService,
             _ticketService,
-            _apiService,
             _settingsService,
             _ticketCacheService,
             _auditLogService,

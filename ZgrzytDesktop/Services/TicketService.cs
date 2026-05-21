@@ -19,9 +19,9 @@ public enum TicketQueueView
 
 public class TicketService : ITicketService
 {
-    private readonly ApiService _apiService;
+    private readonly IApiService _apiService;
 
-    public TicketService(ApiService apiService)
+    public TicketService(IApiService apiService)
     {
         _apiService = apiService;
     }

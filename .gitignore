@@ -1,6 +1,8 @@
 # Build output
 bin/
 obj/
+_audit_build/
+*.pdb
 [Bb]uild/
 [Dd]ebug/
 [Rr]elease/
@@ -79,8 +81,3 @@ integration.local.env
 *.bak
 *.orig
 ~$*
-# Build/audit artifacts
-_audit_build/
-bin/
-obj/
-*.pdb

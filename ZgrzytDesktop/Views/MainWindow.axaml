@@ -2,6 +2,8 @@
     x:Class="ZgrzytDesktop.Views.MainWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ZgrzytDesktop.ViewModels"
+    x:DataType="vm:MainWindowViewModel"
     Icon="/Assets/avalonia-logo.ico"
     Title="ZGRZYT Desktop"
     Width="1200"
@@ -9,4 +11,7 @@
     MinWidth="1000"
     MinHeight="650"
     WindowStartupLocation="CenterScreen">
+
+    <ContentControl Content="{Binding CurrentViewModel}" />
+
 </Window>

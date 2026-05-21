@@ -1,6 +1,6 @@
 # ZGRZYT Desktop — status i ograniczenia
 
-Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ograniczenia wynikające z API (bez zmian backendu). Ostatnia aktualizacja: po Fazie 3–4 (partial ViewModel, testy mock HTTP, dokumentacja wdrożenia).
+Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ograniczenia wynikające z API (bez zmian backendu). Ostatnia aktualizacja: po Fazie 9A (finalny audyt, dokumentacja testów i jakości kodu).
 
 ## Co działa
 
@@ -38,12 +38,36 @@ Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ogran
 - Język: **pl** / **en** (`AppStrings.resx` + `AppStrings.en.resx`, `UiCulture` w ustawieniach)
 - Toasty w oknie aplikacji; tryb offline z cache zgłoszeń
 
-### Jakość kodu (Faza 3)
+### Jakość kodu i testy
 
-- `DashboardViewModel` podzielony na pliki partial (Navigation, Tickets, TicketDetails, Admin, Settings, Statistics, Audit, Toast, Support, Localization)
-- Wspólna obsługa błędów API (`HandleApiError`, `ExecuteApiAsync`)
-- Stałe: `AppSections`, `AppRoles`, `TicketStatuses`, itd.
-- Testy: **91** scenariuszy z mockowanym HTTP (bez żywego API)
+- `DashboardViewModel` podzielony na **19** plików partial (Navigation, Tickets, TicketDetails, Admin, Settings, Statistics, Audit, Toast, Support, Localization, …)
+- Główny plik `DashboardViewModel.cs`: ok. **289** linii fizycznie, ok. **126** niepustych; **partiale łącznie:** ok. **2427** linii
+- Wspólna obsługa błędów API (`HandleApiError`, `ExecuteApiAsync`) — używana w mutacjach admin/ustawienia/część szczegółów; listy/statystyki/offline nadal z dedykowanym `catch`
+- Stałe: `AppSections`, `AppRoles`, `TicketStatuses`, `TicketPriorities`, `FilterLabels`, `AdminTabs`, `ToastTypes`
+- **Interfejsy serwisów** (`Services/Interfaces/`): `IAuthService`, `ITicketService`, `ISettingsService`, `ILocalAuditLogService`, `ITokenStorage`, `IUserAdminService` — ViewModele i testy zależą od abstrakcji (DIP)
+
+**Weryfikacja build/test/publish:**
+
+| Krok | Wynik |
+|------|--------|
+| `dotnet build` | OK — 0 błędów, 0 ostrzeżeń |
+| `dotnet test` | **153** passed, **5** skipped (integracja), **158** łącznie |
+| `ZgrzytDesktop.Tests` | **147** passed, **5** skipped |
+| `ZgrzytDesktop.Headless.Tests` | **6** passed |
+| `dotnet publish` `-c Release -r win-x64 --self-contained false` | OK |
+
+**Projekty testowe:**
+
+| Obszar | Projekt / pliki |
+|--------|-----------------|
+| ViewModele | `LoginViewModelTests`, `MainWindowViewModelTests`, `DashboardViewModelTests`, `DashboardStatisticsTests`, `DashboardPollingTests`, `DashboardOfflineCacheTests` |
+| Audyt | `LocalAuditLogServiceTests` |
+| i18n | `AppStringsTests` |
+| Serwisy, helpery, modele | m.in. `AuthServiceTests`, `TicketServiceTests`, `UserAdminServiceTests`, `ApiErrorSanitizerTests`, `StatusDisplayHelperTests`, … |
+| UI headless | `ZgrzytDesktop.Headless.Tests` — `HeadlessViewsTests` (6) |
+| Integracja API (opcjonalna) | `LiveApiIntegrationTests` — skip bez env; [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) |
+
+Testy jednostkowe i headless używają mock HTTP / fake serwisów — **nie** wymagają żywego API domyślnie.
 
 ## Ograniczenia API i produktu (świadome)
 
@@ -84,5 +108,6 @@ Tytuły i treści zgłoszeń na liście pochodzą z API — desktop nie filtruje
 
 ## Powiązane dokumenty
 
-- [README.md](README.md) — uruchomienie, publish, skrót funkcji
+- [README.md](README.md) — uruchomienie, publish, skrót funkcji, podsumowanie testów
 - [REQUIREMENTS.md](REQUIREMENTS.md) — wymagania środowiska
+- [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) — testy integracyjne i ręczne wywołania API

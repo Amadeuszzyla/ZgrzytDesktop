@@ -13,7 +13,7 @@ using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
 
-public class ApiService
+public class ApiService : IApiService
 {
     private readonly HttpClient _httpClient;
     private string? _accessToken;

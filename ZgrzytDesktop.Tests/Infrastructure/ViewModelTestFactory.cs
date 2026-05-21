@@ -37,7 +37,7 @@ public static class ViewModelTestFactory
         userAdmin ??= new FakeUserAdminService();
         bootstrap ??= DashboardViewModel.BootstrapOptions.Testing;
 
-        var (api, _, tempDir) = TestApiFactory.CreateApi();
+        var (_, _, tempDir) = TestApiFactory.CreateApi();
         try
         {
             var ticketCache = new LocalTicketCacheService(tempDir);
@@ -56,7 +56,6 @@ public static class ViewModelTestFactory
                 user,
                 auth,
                 tickets,
-                api,
                 settings,
                 ticketCache,
                 audit,
@@ -84,11 +83,10 @@ public static class ViewModelTestFactory
         settings ??= new FakeSettingsService();
         audit ??= new FakeAuditLogService();
 
-        var (api, _, tempDir) = TestApiFactory.CreateApi();
+        var (_, _, tempDir) = TestApiFactory.CreateApi();
         return new MainWindowViewModel.MainWindowDependencies(
             auth,
             tickets,
-            api,
             settings,
             new LocalTicketCacheService(tempDir),
             new LocalUserCacheService(tempDir),

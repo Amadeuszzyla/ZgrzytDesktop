@@ -7,10 +7,10 @@ namespace ZgrzytDesktop.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly ApiService _apiService;
+    private readonly IApiService _apiService;
     private readonly ITokenStorage _tokenStorage;
 
-    public AuthService(ApiService apiService, ITokenStorage tokenStorage)
+    public AuthService(IApiService apiService, ITokenStorage tokenStorage)
     {
         _apiService = apiService;
         _tokenStorage = tokenStorage;

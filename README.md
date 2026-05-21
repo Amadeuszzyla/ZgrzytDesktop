@@ -37,7 +37,24 @@ W Riderze: projekt startowy `ZgrzytDesktop`, profil uruchomienia.
 dotnet test
 ```
 
-Testy jednostkowe (91) używają mockowanego `HttpMessageHandler` — nie wymagają żywego API.
+**Stan weryfikacji (finalny audyt):**
+
+| Krok | Wynik |
+|------|--------|
+| `dotnet build` | OK — 0 błędów, 0 ostrzeżeń |
+| `dotnet test` | **153** passed, **5** skipped (integracja), **158** łącznie |
+| `ZgrzytDesktop.Tests` | **147** passed, **5** skipped |
+| `ZgrzytDesktop.Headless.Tests` | **6** passed |
+| `dotnet publish` win-x64 | OK |
+
+Większość testów używa mockowanego `HttpMessageHandler` i fake serwisów — nie wymaga żywego API. **5** testów integracyjnych (`Category=Integration`) jest pomijanych bez zmiennych `ZGRZYT_API_URL`, `ZGRZYT_LOGIN`, `ZGRZYT_PASSWORD` — szczegóły: [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md).
+
+```powershell
+# tylko integracja na żywo (opcjonalnie, po ustawieniu env)
+dotnet test --filter "Category=Integration"
+```
+
+Pokrycie obejmuje m.in.: ViewModele (login, main window, dashboard), audyt lokalny, statystyki, offline/cache, polling, i18n (`AppStrings`), testy headless UI (Avalonia) oraz serwisy/helpery z mock HTTP.
 
 ## Publikacja (Windows x64)
 
@@ -52,6 +69,8 @@ ZgrzytDesktop\bin\Release\net10.0-windows\win-x64\publish\ZgrzytDesktop.exe
 ```
 
 Na docelowym PC wymagany jest zainstalowany **.NET 10 Desktop Runtime** (przy `--self-contained false`).
+
+Ostatnia weryfikacja publish: **OK** (`Release`, `win-x64`, framework-dependent).
 
 ## Funkcje
 
@@ -85,12 +104,16 @@ Pełna tabela: [README_DESKTOP_STATUS.md](README_DESKTOP_STATUS.md).
 
 ```text
 ZgrzytDesktop/
-├── ZgrzytDesktop/              # aplikacja Avalonia (MVVM, partial ViewModels)
-│   ├── ViewModels/             # DashboardViewModel.*.cs (Navigation, Tickets, Admin, …)
-│   ├── Constants/              # AppSections, AppRoles, statusy, …
-│   └── Services/               # ApiService, AuthService, TicketService, …
-├── ZgrzytDesktop.Tests/        # testy jednostkowe
-├── .vscode/                    # launch.json, tasks.json
+├── ZgrzytDesktop/                    # aplikacja Avalonia (MVVM, partial ViewModels)
+│   ├── ViewModels/                   # DashboardViewModel.*.cs (Navigation, Tickets, Admin, …)
+│   ├── Constants/                    # AppSections, AppRoles, statusy, …
+│   └── Services/
+│       ├── Interfaces/               # IAuthService, ITicketService, ISettingsService, …
+│       └── …                         # implementacje (ApiService, AuthService, …)
+├── ZgrzytDesktop.Tests/              # testy jednostkowe i integracyjne (opcjonalne)
+├── ZgrzytDesktop.Headless.Tests/     # testy UI headless (Avalonia)
+├── INTEGRATION_TESTS.md              # ręczne i automatyczne testy API
+├── .vscode/                          # launch.json, tasks.json
 ├── README_DESKTOP_STATUS.md
 ├── REQUIREMENTS.md
 └── ZgrzytDesktop.sln

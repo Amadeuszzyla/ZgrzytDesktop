@@ -7,9 +7,9 @@ namespace ZgrzytDesktop.Services;
 
 public class UserAdminService : IUserAdminService
 {
-    private readonly ApiService _apiService;
+    private readonly IApiService _apiService;
 
-    public UserAdminService(ApiService apiService)
+    public UserAdminService(IApiService apiService)
     {
         _apiService = apiService;
     }
