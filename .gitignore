@@ -77,3 +77,8 @@ secrets.json
 *.bak
 *.orig
 ~$*
+# Build/audit artifacts
+_audit_build/
+bin/
+obj/
+*.pdb
