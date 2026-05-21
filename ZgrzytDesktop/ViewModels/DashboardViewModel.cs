@@ -21,6 +21,7 @@ public partial class DashboardViewModel : ViewModelBase
     private readonly SettingsService _settingsService;
     private readonly LocalTicketCacheService _ticketCacheService;
     private readonly LocalAuditLogService _auditLogService;
+    private readonly UserAdminService _userAdminService;
     private readonly Func<Task> _onLogoutRequested;
     private readonly List<Ticket> _allTickets = new();
     private readonly DispatcherTimer _ticketPollingTimer;
@@ -36,7 +37,9 @@ public partial class DashboardViewModel : ViewModelBase
     private string _statusMessage = "Gotowy.";
     private string _detailsStatusMessage = "Wybierz zgłoszenie z listy.";
     private string _settingsStatusMessage = "Ustawienia gotowe.";
-    private string _pollingStatusMessage = "Auto-sprawdzanie nowych zgłoszeń działa na ostatniej stronie.";
+    private string _pollingStatusMessage = string.Empty;
+    private string _adminTab = "Users";
+    private bool _autoRefreshErrorToastShown;
     private string _newMessageText = string.Empty;
     private string _searchText = string.Empty;
     private string _apiBaseUrl = "http://127.0.0.1:9000/api/";
@@ -63,9 +66,15 @@ public partial class DashboardViewModel : ViewModelBase
     private int _statsLowPriorityTickets;
     private int _statsMediumPriorityTickets;
     private int _statsHighPriorityTickets;
+    private int _statsAssignedTickets;
+    private int _statsUnassignedTickets;
     private double _statsStatusChartMaximum = 1;
     private double _statsPriorityChartMaximum = 1;
+    private double _statsAssignmentChartMaximum = 1;
     private string _statsScopeMessage = "Brak pobranych zgłoszeń.";
+    private bool _isLoadingAllStatistics;
+    private string _adminStatusMessage = string.Empty;
+    private User? _selectedAdminUser;
 
     private string? _selectedStatus;
     private string? _selectedPriority;
@@ -98,9 +107,17 @@ public partial class DashboardViewModel : ViewModelBase
 
     public ObservableCollection<Message> Messages { get; } = new();
 
+    public bool HasNoMessages => Messages.Count == 0;
+
     public ObservableCollection<AuditLogEntry> TicketAuditLogEntries { get; } = new();
 
     public bool HasNoTicketAuditLogEntries => TicketAuditLogEntries.Count == 0;
+
+    public ObservableCollection<AuditLogEntry> SettingsAuditLogEntries { get; } = new();
+
+    public bool HasNoSettingsAuditLogEntries => SettingsAuditLogEntries.Count == 0;
+
+    public ObservableCollection<User> AdminUsers { get; } = new();
 
     public ObservableCollection<int> PageNumbers { get; } = new();
 
@@ -170,10 +187,32 @@ public partial class DashboardViewModel : ViewModelBase
                 OnPropertyChanged(nameof(IsSettingsPageVisible));
                 OnPropertyChanged(nameof(IsRequestAccountPageVisible));
                 OnPropertyChanged(nameof(IsStatisticsPageVisible));
+                OnPropertyChanged(nameof(IsAdminPageVisible));
                 OnPropertyChanged(nameof(CurrentSectionTitle));
+                OnPropertyChanged(nameof(IsTicketsNavActive));
+                OnPropertyChanged(nameof(IsRequestAccountNavActive));
+                OnPropertyChanged(nameof(ShowRequestAccountNav));
+                OnPropertyChanged(nameof(ShowAdministrationNav));
+                OnPropertyChanged(nameof(IsStatisticsNavActive));
+                OnPropertyChanged(nameof(IsSettingsNavActive));
+                OnPropertyChanged(nameof(IsAdminNavActive));
+                OnPropertyChanged(nameof(IsAdminUsersPanelVisible));
+                OnPropertyChanged(nameof(IsAdminNewAccountPanelVisible));
             }
         }
     }
+
+    public const int TicketAutoRefreshIntervalSeconds = 45;
+
+    public bool IsTicketsNavActive => CurrentSection == "Tickets";
+
+    public bool IsRequestAccountNavActive => CurrentSection == "RequestAccount";
+
+    public bool IsStatisticsNavActive => CurrentSection == "Statistics";
+
+    public bool IsSettingsNavActive => CurrentSection == "Settings";
+
+    public bool IsAdminNavActive => CurrentSection == "Admin";
 
     public bool IsTicketsPageVisible => CurrentSection == "Tickets";
 
@@ -185,17 +224,61 @@ public partial class DashboardViewModel : ViewModelBase
 
     public bool IsStatisticsPageVisible => CurrentSection == "Statistics";
 
+    public bool IsAdminPageVisible => CurrentSection == "Admin";
+
+    public bool IsAdminRole =>
+        string.Equals(CurrentUser.Role, "admin", StringComparison.OrdinalIgnoreCase);
+
+    public bool IsStaffRole =>
+        IsAdminRole ||
+        string.Equals(CurrentUser.Role, "it", StringComparison.OrdinalIgnoreCase);
+
+    public bool ShowAdministrationNav => IsStaffRole;
+
+    public bool ShowRequestAccountNav => !IsStaffRole;
+
+    public string AdminTab
+    {
+        get => _adminTab;
+        set
+        {
+            if (SetProperty(ref _adminTab, value))
+            {
+                OnPropertyChanged(nameof(IsAdminUsersTabActive));
+                OnPropertyChanged(nameof(IsAdminNewAccountTabActive));
+                OnPropertyChanged(nameof(IsAdminUsersPanelVisible));
+                OnPropertyChanged(nameof(IsAdminNewAccountPanelVisible));
+            }
+        }
+    }
+
+    public bool IsAdminUsersTabActive => AdminTab == "Users";
+
+    public bool IsAdminNewAccountTabActive => AdminTab == "NewAccount";
+
+    public bool IsAdminUsersPanelVisible => IsAdminUsersTabActive && IsAdminRole;
+
+    public bool IsAdminNewAccountPanelVisible => IsAdminNewAccountTabActive && IsStaffRole;
+
     public string CurrentSectionTitle => CurrentSection switch
     {
         "Tickets" => "Zgłoszenia",
         "Details" => "Szczegóły zgłoszenia",
         "Settings" => "Ustawienia",
-        "RequestAccount" => "Zgłoszenie utworzenia konta",
+        "RequestAccount" => "Zgłoś nowe konto",
         "Statistics" => "Statystyki",
+        "Admin" => "Administracja",
         _ => "ZGRZYT Desktop"
     };
 
     public bool CanOpenDetailsPage => SelectedTicket is not null || TicketDetails is not null;
+
+    public string PagePositionText => $"Strona {CurrentPage} z {LastPage}";
+
+    public string PageTotalText => $"Razem: {TotalTickets}";
+
+    public string AutoRefreshStatusText =>
+        $"Aplikacja automatycznie odświeża listę co {TicketAutoRefreshIntervalSeconds} sekund.";
 
     public Ticket? SelectedTicket
     {
@@ -219,7 +302,9 @@ public partial class DashboardViewModel : ViewModelBase
         {
             if (SetProperty(ref _ticketDetails, value))
             {
+                OnPropertyChanged(nameof(CanCloseOwnTicket));
                 OnPropertyChanged(nameof(CanCloseTicket));
+                OnPropertyChanged(nameof(CanDeleteTicket));
                 OnPropertyChanged(nameof(CanOpenDetailsPage));
             }
         }
@@ -417,6 +502,18 @@ public partial class DashboardViewModel : ViewModelBase
         private set => SetProperty(ref _statsHighPriorityTickets, value);
     }
 
+    public int StatsAssignedTickets
+    {
+        get => _statsAssignedTickets;
+        private set => SetProperty(ref _statsAssignedTickets, value);
+    }
+
+    public int StatsUnassignedTickets
+    {
+        get => _statsUnassignedTickets;
+        private set => SetProperty(ref _statsUnassignedTickets, value);
+    }
+
     public double StatsStatusChartMaximum
     {
         get => _statsStatusChartMaximum;
@@ -427,6 +524,12 @@ public partial class DashboardViewModel : ViewModelBase
     {
         get => _statsPriorityChartMaximum;
         private set => SetProperty(ref _statsPriorityChartMaximum, value);
+    }
+
+    public double StatsAssignmentChartMaximum
+    {
+        get => _statsAssignmentChartMaximum;
+        private set => SetProperty(ref _statsAssignmentChartMaximum, value);
     }
 
     public string StatsScopeMessage
@@ -572,11 +675,15 @@ public partial class DashboardViewModel : ViewModelBase
         set
         {
             if (SetProperty(ref _totalTickets, value))
+            {
                 OnPropertyChanged(nameof(PageInfoText));
+                OnPropertyChanged(nameof(PagePositionText));
+                OnPropertyChanged(nameof(PageTotalText));
+            }
         }
     }
 
-    public string PageInfoText => $"Strona {CurrentPage} z {LastPage} | Razem: {TotalTickets}";
+    public string PageInfoText => $"{PagePositionText} | {PageTotalText}";
 
     public bool IsOnLastPage => CurrentPage >= LastPage;
 
@@ -584,7 +691,7 @@ public partial class DashboardViewModel : ViewModelBase
 
     public bool CanGoNextPage => CurrentPage < LastPage && !IsLoading;
 
-    public bool CanCheckForNewTickets => IsOnLastPage && !IsLoading && !IsCheckingForNewTickets;
+    public bool CanRefreshTicketsNow => !IsLoading;
 
     public bool IsLoading
     {
@@ -615,7 +722,9 @@ public partial class DashboardViewModel : ViewModelBase
                 OnPropertyChanged(nameof(CanSendMessage));
                 OnPropertyChanged(nameof(CanEditTicket));
                 OnPropertyChanged(nameof(CanAssignTicket));
+                OnPropertyChanged(nameof(CanCloseOwnTicket));
                 OnPropertyChanged(nameof(CanCloseTicket));
+                OnPropertyChanged(nameof(CanDeleteTicket));
             }
         }
     }
@@ -640,7 +749,7 @@ public partial class DashboardViewModel : ViewModelBase
         set
         {
             if (SetProperty(ref _isCheckingForNewTickets, value))
-                OnPropertyChanged(nameof(CanCheckForNewTickets));
+                OnPropertyChanged(nameof(CanRefreshTicketsNow));
         }
     }
 
@@ -659,7 +768,9 @@ public partial class DashboardViewModel : ViewModelBase
                 OnPropertyChanged(nameof(CanSendMessage));
                 OnPropertyChanged(nameof(CanEditTicket));
                 OnPropertyChanged(nameof(CanAssignTicket));
+                OnPropertyChanged(nameof(CanCloseOwnTicket));
                 OnPropertyChanged(nameof(CanCloseTicket));
+                OnPropertyChanged(nameof(CanDeleteTicket));
             }
         }
     }
@@ -685,18 +796,67 @@ public partial class DashboardViewModel : ViewModelBase
 
     public bool CanAssignTicket => CanManageTickets && !IsOffline && !IsLoadingDetails;
 
+    public bool CanCloseOwnTicket =>
+        IsRegularUser &&
+        TicketDetails is not null &&
+        TicketDetails.UserId == CurrentUser.Id &&
+        !string.Equals(TicketDetails.Status, "zamknięte", StringComparison.OrdinalIgnoreCase);
+
     public bool CanCloseTicket =>
-        CanManageTickets &&
         !IsOffline &&
         !IsLoadingDetails &&
         TicketDetails is not null &&
-        !string.Equals(TicketDetails.Status, "zamknięte", StringComparison.OrdinalIgnoreCase);
+        !string.Equals(TicketDetails.Status, "zamknięte", StringComparison.OrdinalIgnoreCase) &&
+        (CanManageTickets || CanCloseOwnTicket);
+
+    public bool CanDeleteTicket =>
+        CanManageTickets &&
+        !IsOffline &&
+        !IsLoadingDetails &&
+        TicketDetails is not null;
+
+    public bool IsLoadingAllStatistics
+    {
+        get => _isLoadingAllStatistics;
+        private set => SetProperty(ref _isLoadingAllStatistics, value);
+    }
+
+    public string AdminStatusMessage
+    {
+        get => _adminStatusMessage;
+        private set => SetProperty(ref _adminStatusMessage, value);
+    }
+
+    public User? SelectedAdminUser
+    {
+        get => _selectedAdminUser;
+        set
+        {
+            if (SetProperty(ref _selectedAdminUser, value))
+            {
+                OnPropertyChanged(nameof(CanBanAdminUser));
+                OnPropertyChanged(nameof(CanActivateAdminUser));
+                OnPropertyChanged(nameof(CanUnbanAdminUser));
+            }
+        }
+    }
+
+    public bool CanBanAdminUser =>
+        IsAdminRole && SelectedAdminUser is not null && !SelectedAdminUser.Ban;
+
+    public bool CanActivateAdminUser =>
+        IsAdminRole && SelectedAdminUser is not null && !SelectedAdminUser.Active && !SelectedAdminUser.Ban;
+
+    public bool CanUnbanAdminUser =>
+        IsAdminRole && SelectedAdminUser is not null && SelectedAdminUser.Ban;
 
     public IRelayCommand ShowTicketsPageCommand { get; }
 
-    public IRelayCommand ShowDetailsPageCommand { get; }
-
     public IRelayCommand ShowSettingsPageCommand { get; }
+
+    public IRelayCommand ShowAdminUsersTabCommand { get; }
+
+    public IRelayCommand ShowAdminNewAccountTabCommand { get; }
 
     public IRelayCommand ShowRequestAccountPageCommand { get; }
 
@@ -720,7 +880,25 @@ public partial class DashboardViewModel : ViewModelBase
 
     public IAsyncRelayCommand CloseTicketCommand { get; }
 
+    public IAsyncRelayCommand DeleteTicketCommand { get; }
+
+    public IAsyncRelayCommand LoadAllPagesStatisticsCommand { get; }
+
+    public IAsyncRelayCommand RefreshSessionCommand { get; }
+
+    public IAsyncRelayCommand LoadAdminUsersCommand { get; }
+
+    public IAsyncRelayCommand BanAdminUserCommand { get; }
+
+    public IAsyncRelayCommand ActivateAdminUserCommand { get; }
+
+    public IRelayCommand ShowAdminPageCommand { get; }
+
     public IAsyncRelayCommand SaveSettingsCommand { get; }
+
+    public IAsyncRelayCommand LoadAuditLogsCommand { get; }
+
+    public IAsyncRelayCommand ClearAuditLogsCommand { get; }
 
     public IAsyncRelayCommand TestApiConnectionCommand { get; }
 
@@ -732,7 +910,7 @@ public partial class DashboardViewModel : ViewModelBase
 
     public IAsyncRelayCommand LastPageCommand { get; }
 
-    public IAsyncRelayCommand CheckForNewTicketsCommand { get; }
+    public IAsyncRelayCommand RefreshTicketsNowCommand { get; }
 
     public IAsyncRelayCommand LogoutCommand { get; }
 
@@ -753,21 +931,29 @@ public partial class DashboardViewModel : ViewModelBase
         _settingsService = settingsService;
         _ticketCacheService = ticketCacheService;
         _auditLogService = auditLogService;
+        _userAdminService = new UserAdminService(apiService);
         _onLogoutRequested = onLogoutRequested;
 
         ApiBaseUrl = _apiService.CurrentApiBaseUrl;
 
         var appSettings = _settingsService.LoadSync();
         SelectedThemeMode = appSettings.ThemeMode;
+        SettingsService.ApplyThemeMode(appSettings.ThemeMode);
+
+        ConfigureTicketQueueViewsForRole();
+
+        PollingStatusMessage = AutoRefreshStatusText;
 
         ShowTicketsPageCommand = new RelayCommand(ShowTicketsPage);
-        ShowDetailsPageCommand = new RelayCommand(ShowDetailsPage);
         ShowSettingsPageCommand = new RelayCommand(ShowSettingsPage);
         ShowRequestAccountPageCommand = new RelayCommand(ShowRequestAccountPage);
         ShowStatisticsPageCommand = new RelayCommand(ShowStatisticsPage);
+        ShowAdminPageCommand = new RelayCommand(ShowAdminPage);
+        ShowAdminUsersTabCommand = new RelayCommand(() => AdminTab = "Users");
+        ShowAdminNewAccountTabCommand = new RelayCommand(() => AdminTab = "NewAccount");
         RequestAccountCommand = new AsyncRelayCommand(RequestAccountAsync);
 
-        LoadTicketsCommand = new AsyncRelayCommand(LoadTicketsAsync);
+        LoadTicketsCommand = new AsyncRelayCommand(() => LoadTicketsAsync());
         SearchTicketsCommand = new AsyncRelayCommand(SearchTicketsAsync);
         ClearFiltersCommand = new RelayCommand(ClearFilters);
 
@@ -776,15 +962,23 @@ public partial class DashboardViewModel : ViewModelBase
         UpdateTicketCommand = new AsyncRelayCommand(UpdateTicketAsync);
         AssignToMeCommand = new AsyncRelayCommand(AssignToMeAsync);
         CloseTicketCommand = new AsyncRelayCommand(CloseTicketAsync);
+        DeleteTicketCommand = new AsyncRelayCommand(DeleteTicketAsync);
+        LoadAllPagesStatisticsCommand = new AsyncRelayCommand(LoadAllPagesStatisticsAsync);
+        RefreshSessionCommand = new AsyncRelayCommand(RefreshSessionAsync);
+        LoadAdminUsersCommand = new AsyncRelayCommand(LoadAdminUsersAsync);
+        BanAdminUserCommand = new AsyncRelayCommand(BanAdminUserAsync, () => CanBanAdminUser);
+        ActivateAdminUserCommand = new AsyncRelayCommand(ActivateAdminUserAsync, () => CanActivateAdminUser);
 
         SaveSettingsCommand = new AsyncRelayCommand(SaveSettingsAsync);
+        LoadAuditLogsCommand = new AsyncRelayCommand(RefreshSettingsAuditLogAsync);
+        ClearAuditLogsCommand = new AsyncRelayCommand(ClearSettingsAuditLogAsync);
         TestApiConnectionCommand = new AsyncRelayCommand(TestApiConnectionAsync);
 
         FirstPageCommand = new AsyncRelayCommand(GoToFirstPageAsync);
         PreviousPageCommand = new AsyncRelayCommand(GoToPreviousPageAsync);
         NextPageCommand = new AsyncRelayCommand(GoToNextPageAsync);
         LastPageCommand = new AsyncRelayCommand(GoToLastPageAsync);
-        CheckForNewTicketsCommand = new AsyncRelayCommand(() => CheckForNewTicketsAsync(manualCheck: true));
+        RefreshTicketsNowCommand = new AsyncRelayCommand(() => RefreshTicketsNowAsync());
 
         LogoutCommand = new AsyncRelayCommand(LogoutAsync);
 
@@ -801,12 +995,12 @@ public partial class DashboardViewModel : ViewModelBase
 
         _ticketPollingTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromSeconds(8)
+            Interval = TimeSpan.FromSeconds(TicketAutoRefreshIntervalSeconds)
         };
 
         _ticketPollingTimer.Tick += async (_, _) =>
         {
-            await CheckForNewTicketsAsync(manualCheck: false);
+            await AutoRefreshTicketsAsync();
         };
 
         _ticketPollingTimer.Start();
@@ -822,6 +1016,13 @@ public partial class DashboardViewModel : ViewModelBase
 
     public void ShowToast(string message, string type = "info")
     {
+        if (ApiErrorSanitizer.IsHtmlResponse(message))
+        {
+            message = ApiErrorSanitizer.SanitizeForDisplay(
+                message,
+                System.Net.HttpStatusCode.InternalServerError);
+        }
+
         void DisplayToast()
         {
             _toastHideTimer.Stop();
@@ -866,20 +1067,25 @@ public partial class DashboardViewModel : ViewModelBase
         CurrentSection = "Tickets";
     }
 
-    private void ShowDetailsPage()
-    {
-        if (!CanOpenDetailsPage)
-        {
-            DetailsStatusMessage = "Najpierw wybierz zgłoszenie z listy.";
-            return;
-        }
-
-        CurrentSection = "Details";
-    }
-
     private void ShowSettingsPage()
     {
         CurrentSection = "Settings";
+        _ = RefreshSettingsAuditLogAsync();
+    }
+
+    private void ConfigureTicketQueueViewsForRole()
+    {
+        TicketQueueViews.Clear();
+        TicketQueueViews.Add("Wszystkie");
+
+        if (CanManageTickets)
+        {
+            TicketQueueViews.Add("Aktywne");
+            TicketQueueViews.Add("Nieprzypisane");
+        }
+
+        if (!TicketQueueViews.Contains(SelectedTicketQueueView))
+            SelectedTicketQueueView = "Wszystkie";
     }
 
     private void ShowRequestAccountPage()
@@ -890,6 +1096,15 @@ public partial class DashboardViewModel : ViewModelBase
     private void ShowStatisticsPage()
     {
         CurrentSection = "Statistics";
+    }
+
+    private void ShowAdminPage()
+    {
+        CurrentSection = "Admin";
+        AdminTab = IsAdminRole ? "Users" : "NewAccount";
+
+        if (IsAdminRole)
+            _ = LoadAdminUsersAsync();
     }
 
     private async Task RequestAccountAsync()
@@ -968,6 +1183,11 @@ public partial class DashboardViewModel : ViewModelBase
 
             RequestAccountStatusMessage = "Prośba o utworzenie konta została wysłana.";
             ShowToast("Prośba o utworzenie konta została wysłana.", "success");
+
+            await LogAuditAsync(
+                "RequestAccount",
+                null,
+                $"Wysłano prośbę o utworzenie konta: {request.Login}.");
         }
         catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
         {
@@ -1037,32 +1257,31 @@ public partial class DashboardViewModel : ViewModelBase
     {
         try
         {
-            SettingsStatusMessage = "Zapisywanie ustawień...";
+            var existing = await _settingsService.LoadAsync();
 
             var settings = new AppSettings
             {
-                ApiBaseUrl = ApiBaseUrl,
+                ApiBaseUrl = existing.ApiBaseUrl,
                 ThemeMode = SelectedThemeMode
             };
 
             await _settingsService.SaveAsync(settings);
 
-            var normalizedUrl = _settingsService.NormalizeApiBaseUrl(settings.ApiBaseUrl);
-            ApiBaseUrl = normalizedUrl;
-            _apiService.SetBaseAddress(normalizedUrl);
-
             SelectedThemeMode = settings.ThemeMode;
             SettingsService.ApplyThemeMode(settings.ThemeMode);
 
-            SettingsStatusMessage = "Ustawienia zostały zapisane.";
+            SettingsStatusMessage = string.Empty;
 
-            ShowToast("Ustawienia aplikacji zostały zapisane.", "success");
+            await LogAuditAsync("Zapis ustawień", null, "Zmieniono ustawienia aplikacji.");
+
+            ShowToast("Ustawienia zapisane", "success");
+
+            if (CurrentSection == "Settings")
+                await RefreshSettingsAuditLogAsync();
         }
         catch
         {
-            SettingsStatusMessage = "Nie udało się zapisać ustawień.";
-
-            ShowToast("Nie udało się zapisać ustawień aplikacji.", "error");
+            ShowToast("Nie udało się zapisać ustawień.", "error");
         }
     }
 
@@ -1096,12 +1315,15 @@ public partial class DashboardViewModel : ViewModelBase
         }
     }
 
-    private async Task LoadTicketsAsync()
+    private async Task LoadTicketsAsync(bool silentRefresh = false)
     {
         try
         {
-            IsLoading = true;
-            StatusMessage = "Pobieranie zgłoszeń...";
+            if (!silentRefresh)
+            {
+                IsLoading = true;
+                StatusMessage = "Pobieranie zgłoszeń...";
+            }
 
             var response = await _ticketService.GetTicketsAsync(
                 page: CurrentPage,
@@ -1126,7 +1348,7 @@ public partial class DashboardViewModel : ViewModelBase
                 if (CurrentPage > LastPage)
                 {
                     SetCurrentPageSilently(LastPage);
-                    await LoadTicketsAsync();
+                    await LoadTicketsAsync(silentRefresh);
                     return;
                 }
 
@@ -1136,9 +1358,9 @@ public partial class DashboardViewModel : ViewModelBase
                 UpdateTicketStatistics();
 
                 StatusMessage = $"Pobrano zgłoszeń: {Tickets.Count} z {TotalTickets}";
-                PollingStatusMessage = IsOnLastPage
-                    ? "Jesteś na ostatniej stronie — aplikacja automatycznie sprawdza nowe zgłoszenia."
-                    : "Auto-sprawdzanie nowych zgłoszeń działa tylko na ostatniej stronie.";
+
+                if (!silentRefresh)
+                    PollingStatusMessage = AutoRefreshStatusText;
             }
             else
             {
@@ -1154,7 +1376,8 @@ public partial class DashboardViewModel : ViewModelBase
         {
             IsOffline = true;
 
-            ShowToast("Brak połączenia z API. Pokazuję dane offline.", "warning");
+            if (!silentRefresh)
+                ShowToast("Brak połączenia z API. Pokazuję dane offline.", "warning");
 
             await LoadTicketsFromCacheAsync();
         }
@@ -1162,17 +1385,21 @@ public partial class DashboardViewModel : ViewModelBase
         {
             StatusMessage = GetApiErrorMessage(ex);
 
-            ShowToast(GetApiErrorMessage(ex), "error");
+            if (!silentRefresh)
+                ShowToast(GetApiErrorMessage(ex), "error");
         }
         catch
         {
             StatusMessage = "Wystąpił nieoczekiwany błąd podczas pobierania zgłoszeń.";
 
-            ShowToast("Wystąpił błąd podczas pobierania zgłoszeń.", "error");
+            if (!silentRefresh)
+                ShowToast("Wystąpił błąd podczas pobierania zgłoszeń.", "error");
         }
         finally
         {
-            IsLoading = false;
+            if (!silentRefresh)
+                IsLoading = false;
+
             RefreshPaginationProperties();
         }
     }
@@ -1211,8 +1438,11 @@ public partial class DashboardViewModel : ViewModelBase
 
     private void UpdateTicketStatistics()
     {
-        var tickets = _allTickets;
+        ApplyTicketStatistics(_allTickets, TotalTickets, fromCurrentPageOnly: true);
+    }
 
+    private void ApplyTicketStatistics(IReadOnlyList<Ticket> tickets, int totalInSystem, bool fromCurrentPageOnly)
+    {
         StatsTotalTickets = tickets.Count;
         StatsNewTickets = tickets.Count(ticket =>
             string.Equals(ticket.Status, "nowe", StringComparison.OrdinalIgnoreCase));
@@ -1228,83 +1458,63 @@ public partial class DashboardViewModel : ViewModelBase
         StatsHighPriorityTickets = tickets.Count(ticket =>
             string.Equals(ticket.Priority, "wysoki", StringComparison.OrdinalIgnoreCase));
 
+        StatsAssignedTickets = tickets.Count(ticket => ticket.AssignedItId.HasValue);
+        StatsUnassignedTickets = Math.Max(0, tickets.Count - StatsAssignedTickets);
+
         StatsStatusChartMaximum = Math.Max(
             1,
             Math.Max(StatsNewTickets, Math.Max(StatsInProgressTickets, StatsClosedTickets)));
         StatsPriorityChartMaximum = Math.Max(
             1,
             Math.Max(StatsLowPriorityTickets, Math.Max(StatsMediumPriorityTickets, StatsHighPriorityTickets)));
+        StatsAssignmentChartMaximum = Math.Max(
+            1,
+            Math.Max(StatsAssignedTickets, StatsUnassignedTickets));
 
         StatsScopeMessage = StatsTotalTickets == 0
-            ? "Brak zgłoszeń do analizy na bieżącej stronie."
-            : TotalTickets > StatsTotalTickets
-                ? $"Statystyki dla {StatsTotalTickets} zgłoszeń pobranych na bieżącej stronie (łącznie w systemie: {TotalTickets})."
-                : $"Statystyki dla {StatsTotalTickets} pobranych zgłoszeń.";
+            ? "Brak zgłoszeń do analizy."
+            : fromCurrentPageOnly && totalInSystem > StatsTotalTickets
+                ? $"Statystyki dla {StatsTotalTickets} zgłoszeń na bieżącej stronie listy (łącznie w systemie: {totalInSystem})."
+                : $"Statystyki dla {StatsTotalTickets} zgłoszeń (łącznie w systemie: {totalInSystem}).";
     }
 
-    private async Task CheckForNewTicketsAsync(bool manualCheck)
+    private async Task RefreshTicketsNowAsync()
     {
-        if (IsOffline || IsLoading || IsCheckingForNewTickets)
-            return;
+        await LoadTicketsAsync();
+        PollingStatusMessage = $"{AutoRefreshStatusText} Ostatnie odświeżenie: {DateTime.Now:HH:mm:ss}.";
+    }
 
-        if (!IsOnLastPage)
-        {
-            if (manualCheck)
-                PollingStatusMessage = "Nowe zgłoszenia są sprawdzane tylko na ostatniej stronie.";
-
+    private async Task AutoRefreshTicketsAsync()
+    {
+        if (CurrentSection != "Tickets" || IsOffline || IsLoading)
             return;
-        }
 
         try
         {
-            IsCheckingForNewTickets = true;
-
-            var response = await _ticketService.GetTicketsAsync(
-                page: CurrentPage,
-                perPage: PageSize,
-                search: string.IsNullOrWhiteSpace(SearchText) ? null : SearchText.Trim(),
-                status: GetSelectedFilterValue(SelectedFilterStatus),
-                priority: GetSelectedFilterValue(SelectedFilterPriority),
-                queueView: GetSelectedTicketQueueView()
-            );
-
-            if (response is null)
-                return;
-
-            if (response.Total > TotalTickets)
-            {
-                var difference = response.Total - TotalTickets;
-
-                ShowToast($"Pojawiło się nowych zgłoszeń: {difference}.", "info");
-
-                PollingStatusMessage = $"Wykryto nowe zgłoszenia: {difference}. Lista została odświeżona.";
-
-                await LoadTicketsAsync();
-            }
-            else if (manualCheck)
-            {
-                PollingStatusMessage = "Brak nowych zgłoszeń.";
-            }
+            await LoadTicketsAsync(silentRefresh: true);
+            _autoRefreshErrorToastShown = false;
+            PollingStatusMessage = AutoRefreshStatusText;
         }
         catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
         {
             IsOffline = true;
-            PollingStatusMessage = "Brak połączenia z API. Auto-sprawdzanie zatrzymane do czasu powrotu połączenia.";
+            PollingStatusMessage = "Brak połączenia z API. Automatyczne odświeżanie wstrzymane.";
 
-            ShowToast("Utracono połączenie z API.", "warning");
+            if (!_autoRefreshErrorToastShown)
+            {
+                _autoRefreshErrorToastShown = true;
+                ShowToast("Utracono połączenie z API.", "warning");
+            }
         }
         catch
         {
-            if (manualCheck)
+            PollingStatusMessage = "Nie udało się automatycznie odświeżyć listy.";
+
+            if (!_autoRefreshErrorToastShown)
             {
-                PollingStatusMessage = "Nie udało się sprawdzić nowych zgłoszeń.";
-                ShowToast("Nie udało się sprawdzić nowych zgłoszeń.", "error");
+                _autoRefreshErrorToastShown = true;
+                ShowToast("Nie udało się odświeżyć listy zgłoszeń.", "error");
             }
-        }
-        finally
-        {
-            IsCheckingForNewTickets = false;
-            RefreshPaginationProperties();
         }
     }
 
@@ -1452,6 +1662,8 @@ public partial class DashboardViewModel : ViewModelBase
                         Messages.Add(message);
                 }
 
+                NotifyMessagesUiState();
+
                 SelectedStatus = StatusDisplayHelper.ToDisplayStatus(cachedTicket?.Status);
                 SelectedPriority = cachedTicket?.Priority;
 
@@ -1466,6 +1678,18 @@ public partial class DashboardViewModel : ViewModelBase
 
             IsOffline = false;
 
+            if (!IsValidTicketForDisplay(ticket))
+            {
+                DetailsStatusMessage =
+                    "Serwer zwrócił nieprawidłowe dane zgłoszenia. Poprzednie dane pozostają na ekranie.";
+
+                ShowToast(
+                    "Serwer zwrócił stronę błędu zamiast danych API. Sprawdź endpoint lub uprawnienia.",
+                    "error");
+
+                return;
+            }
+
             TicketDetails = ticket;
 
             Messages.Clear();
@@ -1474,6 +1698,8 @@ public partial class DashboardViewModel : ViewModelBase
 
             foreach (var message in messages)
                 Messages.Add(message);
+
+            NotifyMessagesUiState();
 
             SelectedStatus = StatusDisplayHelper.ToDisplayStatus(ticket?.Status);
             SelectedPriority = ticket?.Priority;
@@ -1677,7 +1903,7 @@ public partial class DashboardViewModel : ViewModelBase
 
     private async Task CloseTicketAsync()
     {
-        if (!CanManageTickets)
+        if (!CanCloseTicket)
         {
             DetailsStatusMessage = "Brak uprawnień do zamknięcia zgłoszenia.";
             return;
@@ -1695,19 +1921,29 @@ public partial class DashboardViewModel : ViewModelBase
             return;
         }
 
+        var ticketId = TicketDetails.Id;
+        var previousDetails = TicketDetails;
+        var previousStatus = SelectedStatus;
+        var previousPriority = SelectedPriority;
+
         try
         {
             IsLoadingDetails = true;
             DetailsStatusMessage = "Zamykanie zgłoszenia...";
-
-            var ticketId = TicketDetails.Id;
 
             var request = new UpdateTicketRequest
             {
                 Status = "zamknięte"
             };
 
-            await _ticketService.UpdateTicketAsync(ticketId, request);
+            var updatedTicket = await _ticketService.UpdateTicketAsync(ticketId, request);
+
+            if (updatedTicket is not null && !IsValidTicketForDisplay(updatedTicket))
+            {
+                throw new ApiException(
+                    System.Net.HttpStatusCode.InternalServerError,
+                    "Serwer zwrócił stronę błędu zamiast danych API. Sprawdź endpoint lub uprawnienia.");
+            }
 
             IsOffline = false;
 
@@ -1725,19 +1961,265 @@ public partial class DashboardViewModel : ViewModelBase
         }
         catch (ApiException ex)
         {
-            DetailsStatusMessage = GetApiErrorMessage(ex);
+            TicketDetails = previousDetails;
+            SelectedStatus = previousStatus;
+            SelectedPriority = previousPriority;
 
-            ShowToast(GetApiErrorMessage(ex), "error");
+            var errorMessage = GetApiErrorMessage(ex);
+
+            DetailsStatusMessage = errorMessage;
+
+            ShowToast(errorMessage, "error");
+
+            await LogAuditAsync(
+                "CloseTicket",
+                ticketId,
+                "Nie udało się zamknąć zgłoszenia: brak uprawnień lub błąd serwera.");
         }
         catch
         {
+            TicketDetails = previousDetails;
+            SelectedStatus = previousStatus;
+            SelectedPriority = previousPriority;
+
             DetailsStatusMessage = "Wystąpił błąd podczas zamykania zgłoszenia.";
 
             ShowToast("Nie udało się zamknąć zgłoszenia.", "error");
+
+            await LogAuditAsync(
+                "CloseTicket",
+                ticketId,
+                "Nie udało się zamknąć zgłoszenia: brak uprawnień lub błąd serwera.");
         }
         finally
         {
             IsLoadingDetails = false;
+        }
+    }
+
+    private async Task DeleteTicketAsync()
+    {
+        if (!CanDeleteTicket || TicketDetails is null)
+        {
+            DetailsStatusMessage = "Brak uprawnień do usunięcia zgłoszenia.";
+            return;
+        }
+
+        try
+        {
+            IsLoadingDetails = true;
+            DetailsStatusMessage = "Usuwanie zgłoszenia...";
+
+            var ticketId = TicketDetails.Id;
+            await _ticketService.DeleteTicketAsync(ticketId);
+
+            TicketDetails = null;
+            SelectedTicket = null;
+            CurrentSection = "Tickets";
+
+            await LoadTicketsAsync();
+
+            DetailsStatusMessage = "Zgłoszenie zostało usunięte.";
+            ShowToast("Zgłoszenie zostało usunięte.", "success");
+
+            await LogAuditAsync("DeleteTicket", ticketId, "Usunięto zgłoszenie.");
+        }
+        catch (ApiException ex)
+        {
+            DetailsStatusMessage = GetApiErrorMessage(ex);
+            ShowToast(GetApiErrorMessage(ex), "error");
+        }
+        catch
+        {
+            DetailsStatusMessage = "Nie udało się usunąć zgłoszenia.";
+            ShowToast("Nie udało się usunąć zgłoszenia.", "error");
+        }
+        finally
+        {
+            IsLoadingDetails = false;
+        }
+    }
+
+    private async Task LoadAllPagesStatisticsAsync()
+    {
+        if (IsOffline)
+        {
+            StatsScopeMessage = "Statystyki wielostronicowe wymagają połączenia z API.";
+            return;
+        }
+
+        try
+        {
+            IsLoadingAllStatistics = true;
+
+            var aggregated = new List<Ticket>();
+            var page = 1;
+            var lastPage = 1;
+            var totalInSystem = 0;
+
+            do
+            {
+                var response = await _ticketService.GetTicketsAsync(
+                    page: page,
+                    perPage: 50,
+                    queueView: TicketQueueView.All);
+
+                if (response?.Data is null || response.Data.Count == 0)
+                    break;
+
+                aggregated.AddRange(response.Data);
+                lastPage = Math.Max(1, response.LastPage);
+                totalInSystem = response.Total;
+                page++;
+            } while (page <= lastPage);
+
+            ApplyTicketStatistics(aggregated, totalInSystem, fromCurrentPageOnly: false);
+            ShowToast($"Zaktualizowano statystyki ({aggregated.Count} zgłoszeń).", "success");
+        }
+        catch (ApiException ex)
+        {
+            StatsScopeMessage = GetApiErrorMessage(ex);
+            ShowToast(GetApiErrorMessage(ex), "error");
+        }
+        catch
+        {
+            StatsScopeMessage = "Nie udało się pobrać statystyk ze wszystkich stron.";
+            ShowToast("Nie udało się pobrać statystyk.", "error");
+        }
+        finally
+        {
+            IsLoadingAllStatistics = false;
+        }
+    }
+
+    private async Task RefreshSessionAsync()
+    {
+        try
+        {
+            SettingsStatusMessage = "Odświeżanie sesji...";
+
+            var refreshed = await _authService.RefreshTokenAsync();
+
+            if (refreshed)
+            {
+                SettingsStatusMessage = "Sesja została odświeżona.";
+                ShowToast("Token sesji został odświeżony.", "success");
+                return;
+            }
+
+            SettingsStatusMessage = "Serwer nie zwrócił nowego tokenu (sprawdź POST /api/refresh).";
+            ShowToast("Nie udało się odświeżyć sesji.", "warning");
+        }
+        catch (ApiException ex)
+        {
+            SettingsStatusMessage = GetApiErrorMessage(ex);
+            ShowToast(GetApiErrorMessage(ex), "error");
+        }
+        catch
+        {
+            SettingsStatusMessage = "Nie udało się odświeżyć sesji.";
+            ShowToast("Nie udało się odświeżyć sesji.", "error");
+        }
+    }
+
+    private async Task LoadAdminUsersAsync()
+    {
+        if (!IsAdminRole)
+        {
+            AdminStatusMessage = "Panel administracji jest dostępny tylko dla roli admin.";
+            return;
+        }
+
+        try
+        {
+            AdminStatusMessage = "Pobieranie użytkowników...";
+
+            var users = await _userAdminService.GetUsersAsync();
+
+            AdminUsers.Clear();
+
+            if (users is null || users.Count == 0)
+            {
+                AdminStatusMessage = "Brak użytkowników do wyświetlenia.";
+                return;
+            }
+
+            foreach (var user in users.OrderBy(user => user.Login))
+                AdminUsers.Add(user);
+
+            AdminStatusMessage = $"Załadowano {AdminUsers.Count} użytkowników.";
+        }
+        catch (ApiException ex)
+        {
+            AdminStatusMessage = GetApiErrorMessage(ex);
+            ShowToast(GetApiErrorMessage(ex), "error");
+        }
+        catch
+        {
+            AdminStatusMessage = "Nie udało się pobrać listy użytkowników.";
+            ShowToast("Nie udało się pobrać użytkowników.", "error");
+        }
+    }
+
+    private async Task BanAdminUserAsync()
+    {
+        if (SelectedAdminUser is null)
+            return;
+
+        try
+        {
+            AdminStatusMessage = $"Banowanie użytkownika {SelectedAdminUser.Login}...";
+            var login = SelectedAdminUser.Login;
+
+            await _userAdminService.BanUserAsync(SelectedAdminUser.Id);
+            await LoadAdminUsersAsync();
+            ShowToast("Użytkownik został zbanowany.", "success");
+
+            await LogAuditAsync("BanUser", null, $"Zbanowano użytkownika: {login}.");
+        }
+        catch (ApiException ex)
+        {
+            AdminStatusMessage = GetApiErrorMessage(ex);
+            ShowToast(GetApiErrorMessage(ex), "error");
+        }
+        catch
+        {
+            AdminStatusMessage = "Nie udało się zbanować użytkownika.";
+            ShowToast("Nie udało się zbanować użytkownika.", "error");
+        }
+    }
+
+    private async Task ActivateAdminUserAsync()
+    {
+        if (SelectedAdminUser is null)
+            return;
+
+        try
+        {
+            var login = SelectedAdminUser.Login;
+            var wasBanned = SelectedAdminUser.Ban;
+
+            AdminStatusMessage = $"Aktywacja użytkownika {login}...";
+            await _userAdminService.ActivateUserAsync(SelectedAdminUser.Id);
+            await LoadAdminUsersAsync();
+            ShowToast("Użytkownik został aktywowany.", "success");
+
+            await LogAuditAsync(
+                wasBanned ? "UnbanUser" : "ActivateUser",
+                null,
+                wasBanned
+                    ? $"Odbanowano użytkownika: {login}."
+                    : $"Aktywowano użytkownika: {login}.");
+        }
+        catch (ApiException ex)
+        {
+            AdminStatusMessage = GetApiErrorMessage(ex);
+            ShowToast(GetApiErrorMessage(ex), "error");
+        }
+        catch
+        {
+            AdminStatusMessage = "Nie udało się aktywować użytkownika.";
+            ShowToast("Nie udało się aktywować użytkownika.", "error");
         }
     }
 
@@ -1833,6 +2315,13 @@ public partial class DashboardViewModel : ViewModelBase
 
     private async Task LogAuditAsync(string action, int? ticketId, string description)
     {
+        if (ApiErrorSanitizer.IsHtmlResponse(description))
+        {
+            description = ApiErrorSanitizer.SanitizeForDisplay(
+                description,
+                System.Net.HttpStatusCode.InternalServerError);
+        }
+
         await _auditLogService.AddAsync(new AuditLogEntry
         {
             Timestamp = DateTime.Now,
@@ -1853,6 +2342,25 @@ public partial class DashboardViewModel : ViewModelBase
             TicketAuditLogEntries.Add(entry);
 
         OnPropertyChanged(nameof(HasNoTicketAuditLogEntries));
+    }
+
+    private async Task RefreshSettingsAuditLogAsync()
+    {
+        var entries = await _auditLogService.LoadAsync();
+
+        SettingsAuditLogEntries.Clear();
+
+        foreach (var entry in entries.OrderByDescending(e => e.Timestamp))
+            SettingsAuditLogEntries.Add(entry);
+
+        OnPropertyChanged(nameof(HasNoSettingsAuditLogEntries));
+    }
+
+    private async Task ClearSettingsAuditLogAsync()
+    {
+        await _auditLogService.ClearAsync();
+        await RefreshSettingsAuditLogAsync();
+        ShowToast("Lokalny audyt został wyczyszczony.", "info");
     }
 
     private void SetCurrentPageSilently(int page)
@@ -1914,7 +2422,8 @@ public partial class DashboardViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsOnLastPage));
         OnPropertyChanged(nameof(CanGoPreviousPage));
         OnPropertyChanged(nameof(CanGoNextPage));
-        OnPropertyChanged(nameof(CanCheckForNewTickets));
+        OnPropertyChanged(nameof(CanRefreshTicketsNow));
+        OnPropertyChanged(nameof(PagePositionText));
         OnPropertyChanged(nameof(CanCloseTicket));
     }
 
@@ -1935,32 +2444,24 @@ public partial class DashboardViewModel : ViewModelBase
             : value;
     }
 
+    private void NotifyMessagesUiState()
+    {
+        OnPropertyChanged(nameof(HasNoMessages));
+    }
+
     private static string GetApiErrorMessage(ApiException ex)
     {
-        return ex.StatusCode switch
-        {
-            System.Net.HttpStatusCode.Unauthorized =>
-                "Sesja wygasła albo użytkownik nie jest zalogowany.",
+        return ApiErrorSanitizer.SanitizeApiErrorMessage(
+            ex.ResponseContent ?? ex.Message,
+            ex.StatusCode);
+    }
 
-            System.Net.HttpStatusCode.Forbidden =>
-                "Brak uprawnień do wykonania tej operacji.",
+    private static bool IsValidTicketForDisplay(Ticket? ticket)
+    {
+        if (ticket is null)
+            return false;
 
-            System.Net.HttpStatusCode.NotFound =>
-                "Nie znaleziono wybranego zasobu.",
-
-            System.Net.HttpStatusCode.Conflict =>
-                "Operacja jest sprzeczna z aktualnym stanem danych.",
-
-            System.Net.HttpStatusCode.UnprocessableEntity =>
-                "Dane formularza są niepoprawne. Sprawdź wymagane pola.",
-
-            System.Net.HttpStatusCode.ServiceUnavailable =>
-                "Brak połączenia z API. Sprawdź, czy backend Laravel działa.",
-
-            System.Net.HttpStatusCode.InternalServerError =>
-                "Wystąpił błąd po stronie serwera.",
-
-            _ => ex.Message
-        };
+        return !ApiErrorSanitizer.IsHtmlResponse(ticket.Title) &&
+               !ApiErrorSanitizer.IsHtmlResponse(ticket.Description);
     }
 }

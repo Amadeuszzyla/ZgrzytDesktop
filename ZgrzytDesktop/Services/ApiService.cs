@@ -451,8 +451,17 @@ public class ApiService
     private static async Task ThrowApiExceptionAsync(HttpResponseMessage response)
     {
         var errorContent = await response.Content.ReadAsStringAsync();
+        var mediaType = response.Content.Headers.ContentType?.MediaType;
 
-        throw new ApiException(response.StatusCode, errorContent);
+        if (ApiErrorSanitizer.IsHtmlContentType(mediaType) ||
+            ApiErrorSanitizer.IsHtmlResponse(errorContent))
+        {
+            errorContent = string.Empty;
+        }
+
+        var message = ApiErrorSanitizer.SanitizeApiErrorMessage(errorContent, response.StatusCode);
+
+        throw new ApiException(response.StatusCode, message, errorContent);
     }
 
     private static string NormalizeEndpoint(string endpoint)

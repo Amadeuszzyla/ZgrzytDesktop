@@ -53,6 +53,7 @@ public class SettingsServiceTests
             var loaded = await service.LoadAsync();
 
             Assert.Equal("http://127.0.0.1:9000/api/", loaded.ApiBaseUrl);
+            Assert.Equal("System", loaded.ThemeMode);
         }
         finally
         {
@@ -72,6 +73,55 @@ public class SettingsServiceTests
             var loaded = await service.LoadAsync();
 
             Assert.Equal("http://127.0.0.1:9000/api/", loaded.ApiBaseUrl);
+            Assert.Equal("System", loaded.ThemeMode);
+        }
+        finally
+        {
+            DeleteDirectory(directory);
+        }
+    }
+
+    [Theory]
+    [InlineData("System", "System")]
+    [InlineData("Light", "Light")]
+    [InlineData("Dark", "Dark")]
+    [InlineData("invalid", "System")]
+    public void NormalizeThemeMode_ShouldReturnExpectedValue(string input, string expected)
+    {
+        var directory = CreateTempDirectory();
+
+        try
+        {
+            var service = new SettingsService(directory);
+
+            Assert.Equal(expected, service.NormalizeThemeMode(input));
+        }
+        finally
+        {
+            DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public async Task SaveAsync_WithThemeMode_ShouldPersistThemeMode()
+    {
+        var directory = CreateTempDirectory();
+
+        try
+        {
+            var service = new SettingsService(directory);
+
+            var settings = new AppSettings
+            {
+                ApiBaseUrl = "http://127.0.0.1:9000/api/",
+                ThemeMode = "Dark"
+            };
+
+            await service.SaveAsync(settings);
+
+            var loaded = await service.LoadAsync();
+
+            Assert.Equal("Dark", loaded.ThemeMode);
         }
         finally
         {

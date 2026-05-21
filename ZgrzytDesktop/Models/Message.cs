@@ -26,3 +26,15 @@ public class Message
     [JsonPropertyName("updated_at")]
     public DateTime? UpdatedAt { get; set; }
 }
+
+/// <summary>
+/// Rozszerzony model wiadomości (dodatkowe pola z API, jeśli dostępne).
+/// </summary>
+public class MessageFull : Message
+{
+    [JsonPropertyName("read_at")]
+    public DateTime? ReadAt { get; set; }
+
+    [JsonPropertyName("is_internal")]
+    public bool? IsInternal { get; set; }
+}

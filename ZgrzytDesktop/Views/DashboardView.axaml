@@ -5,12 +5,12 @@
     x:CompileBindings="False">
 
     <Grid>
-        <Grid ColumnDefinitions="240,*" Background="#F4F6F8">
+        <Grid ColumnDefinitions="240,*" Background="{DynamicResource AppPageBackgroundBrush}">
 
         <Border
             Grid.Column="0"
-            Background="#111827"
-            Padding="18">
+            Background="{DynamicResource SidebarBackgroundBrush}"
+            Padding="16,18">
 
             <Grid RowDefinitions="Auto,Auto,*,Auto">
 
@@ -19,17 +19,17 @@
                         Text="ZGRZYT"
                         FontSize="28"
                         FontWeight="Bold"
-                        Foreground="White" />
+                        Foreground="{DynamicResource SidebarPrimaryTextBrush}" />
 
                     <TextBlock
                         Text="Desktop"
                         FontSize="14"
-                        Foreground="#9CA3AF" />
+                        Foreground="{DynamicResource SidebarMutedTextBrush}" />
                 </StackPanel>
 
                 <Border
                     Grid.Row="1"
-                    Background="#1F2937"
+                    Background="{DynamicResource SidebarSurfaceBrush}"
                     CornerRadius="12"
                     Padding="12"
                     Margin="0,24,0,20">
@@ -37,17 +37,17 @@
                     <StackPanel Spacing="4">
                         <TextBlock
                             Text="{Binding CurrentUser.Name}"
-                            Foreground="White"
-                            FontWeight="SemiBold"
-                            TextWrapping="Wrap" />
+                        Foreground="{DynamicResource SidebarPrimaryTextBrush}"
+                        FontWeight="SemiBold"
+                        TextWrapping="Wrap" />
 
                         <TextBlock
                             Text="{Binding CurrentUser.Role}"
-                            Foreground="#9CA3AF"
+                            Foreground="{DynamicResource SidebarMutedTextBrush}"
                             FontSize="12" />
 
                         <Border
-                            Background="#374151"
+                            Background="{DynamicResource SidebarNavPointerOverBrush}"
                             CornerRadius="10"
                             Padding="8,4"
                             HorizontalAlignment="Left"
@@ -55,76 +55,55 @@
 
                             <TextBlock
                                 Text="{Binding ConnectionStatusText}"
-                                Foreground="White"
+                                Foreground="{DynamicResource SidebarPrimaryTextBrush}"
                                 FontSize="12" />
                         </Border>
                     </StackPanel>
                 </Border>
 
-                <StackPanel Grid.Row="2" Spacing="10">
+                <StackPanel Grid.Row="2" Spacing="4" Margin="0,4,0,0">
 
                     <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsTicketsNavActive}"
                         Content="Zgłoszenia"
-                        Command="{Binding ShowTicketsPageCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Left"
-                        Padding="14,11"
-                        Background="#1F2937"
-                        Foreground="White"
-                        BorderBrush="#374151" />
+                        Command="{Binding ShowTicketsPageCommand}" />
 
                     <Button
-                        Content="Szczegóły"
-                        Command="{Binding ShowDetailsPageCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Left"
-                        Padding="14,11"
-                        Background="#1F2937"
-                        Foreground="White"
-                        BorderBrush="#374151"
-                        IsEnabled="{Binding CanOpenDetailsPage}" />
-
-                    <Button
-                        Content="Nowe konto"
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsRequestAccountNavActive}"
+                        Content="Zgłoś nowe konto"
                         Command="{Binding ShowRequestAccountPageCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Left"
-                        Padding="14,11"
-                        Background="#1F2937"
-                        Foreground="White"
-                        BorderBrush="#374151" />
+                        IsVisible="{Binding ShowRequestAccountNav}" />
 
                     <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsStatisticsNavActive}"
                         Content="Statystyki"
-                        Command="{Binding ShowStatisticsPageCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Left"
-                        Padding="14,11"
-                        Background="#1F2937"
-                        Foreground="White"
-                        BorderBrush="#374151" />
+                        Command="{Binding ShowStatisticsPageCommand}" />
 
                     <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsSettingsNavActive}"
                         Content="Ustawienia"
-                        Command="{Binding ShowSettingsPageCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Left"
-                        Padding="14,11"
-                        Background="#1F2937"
-                        Foreground="White"
-                        BorderBrush="#374151" />
+                        Command="{Binding ShowSettingsPageCommand}" />
+
+                    <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsAdminNavActive}"
+                        Content="Administracja"
+                        Command="{Binding ShowAdminPageCommand}"
+                        IsVisible="{Binding ShowAdministrationNav}" />
                 </StackPanel>
 
-                <Button
-                    Grid.Row="3"
-                    Content="Wyloguj"
-                    Command="{Binding LogoutCommand}"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center"
-                    Padding="12"
-                    Background="#374151"
-                    Foreground="White"
-                    BorderBrush="#4B5563" />
+                <StackPanel Grid.Row="3" Spacing="10" Margin="0,8,0,0">
+                    <Separator Background="{DynamicResource SidebarDividerBrush}" />
+
+                    <Button
+                        Classes="sidebar-logout"
+                        Content="Wyloguj"
+                        Command="{Binding LogoutCommand}" />
+                </StackPanel>
 
             </Grid>
         </Border>
@@ -135,8 +114,8 @@
 
             <Border
                 Grid.Row="0"
-                Background="White"
-                BorderBrush="#E5E7EB"
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppCardBorderBrush}"
                 BorderThickness="0,0,0,1"
                 Padding="22,16">
 
@@ -145,838 +124,513 @@
                         Text="{Binding CurrentSectionTitle}"
                         FontSize="26"
                         FontWeight="Bold"
-                        Foreground="#111827" />
+                        Foreground="{DynamicResource AppPrimaryTextBrush}" />
 
                     <TextBlock
                         Text="Panel obsługi zgłoszeń technicznych"
-                        Foreground="#6B7280"
+                        Foreground="{DynamicResource AppMutedTextBrush}"
                         FontSize="13" />
                 </StackPanel>
             </Border>
 
-            <Grid
-                Grid.Row="1"
-                Margin="20"
-                RowDefinitions="Auto,Auto,*,Auto"
-                RowSpacing="14"
-                IsVisible="{Binding IsTicketsPageVisible}">
-
-                <Border
-                    Grid.Row="0"
-                    Background="White"
-                    BorderBrush="#D1D5DB"
-                    BorderThickness="1"
-                    CornerRadius="12"
-                    Padding="16">
-
-                    <Grid RowDefinitions="Auto,Auto" RowSpacing="12">
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Text="Wyszukiwanie i filtry"
-                            FontSize="18"
-                            FontWeight="Bold"
-                            Foreground="#111827" />
-
-                        <StackPanel
-                            Grid.Row="1"
-                            Orientation="Horizontal"
-                            Spacing="10">
-
-                            <TextBox
-                                Width="280"
-                                Text="{Binding SearchText}"
-                                PlaceholderText="Szukaj po tytule lub opisie..."
-                                IsEnabled="{Binding IsNotLoading}" />
-
-                            <ComboBox
-                                Width="150"
-                                ItemsSource="{Binding TicketQueueViews}"
-                                SelectedItem="{Binding SelectedTicketQueueView}"
-                                IsEnabled="{Binding IsNotLoading}" />
-
-                            <ComboBox
-                                Width="150"
-                                ItemsSource="{Binding FilterStatuses}"
-                                SelectedItem="{Binding SelectedFilterStatus}"
-                                IsEnabled="{Binding IsNotLoading}" />
-
-                            <ComboBox
-                                Width="150"
-                                ItemsSource="{Binding FilterPriorities}"
-                                SelectedItem="{Binding SelectedFilterPriority}"
-                                IsEnabled="{Binding IsNotLoading}" />
-
-                            <Button
-                                Content="Szukaj"
-                                Command="{Binding SearchTicketsCommand}"
-                                IsEnabled="{Binding IsNotLoading}" />
-
-                            <Button
-                                Content="Wyczyść"
-                                Command="{Binding ClearFiltersCommand}"
-                                IsEnabled="{Binding IsNotLoading}" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <Border
-                    Grid.Row="1"
-                    Background="White"
-                    BorderBrush="#D1D5DB"
-                    BorderThickness="1"
-                    CornerRadius="12"
-                    Padding="14">
-
-                    <Grid RowDefinitions="Auto,Auto" RowSpacing="10">
-
-                        <StackPanel
-                            Grid.Row="0"
-                            Orientation="Horizontal"
-                            Spacing="10">
-
-                            <TextBlock
-                                Text="Na stronę:"
-                                VerticalAlignment="Center"
-                                Foreground="#374151" />
-
-                            <ComboBox
-                                Width="90"
-                                ItemsSource="{Binding PageSizeOptions}"
-                                SelectedItem="{Binding SelectedPageSize}"
-                                IsEnabled="{Binding IsNotLoading}" />
-
-                            <Button
-                                Content="Pierwsza"
-                                Command="{Binding FirstPageCommand}"
-                                IsEnabled="{Binding CanGoPreviousPage}" />
-
-                            <Button
-                                Content="Poprzednia"
-                                Command="{Binding PreviousPageCommand}"
-                                IsEnabled="{Binding CanGoPreviousPage}" />
-
-                            <TextBlock
-                                Text="Strona:"
-                                VerticalAlignment="Center"
-                                Foreground="#374151" />
-
-                            <ComboBox
-                                Width="90"
-                                ItemsSource="{Binding PageNumbers}"
-                                SelectedItem="{Binding SelectedPageNumber}"
-                                IsEnabled="{Binding IsNotLoading}" />
-
-                            <Button
-                                Content="Następna"
-                                Command="{Binding NextPageCommand}"
-                                IsEnabled="{Binding CanGoNextPage}" />
-
-                            <Button
-                                Content="Ostatnia"
-                                Command="{Binding LastPageCommand}"
-                                IsEnabled="{Binding CanGoNextPage}" />
-
-                            <TextBlock
-                                Text="{Binding PageInfoText}"
-                                VerticalAlignment="Center"
-                                Foreground="#374151" />
-                        </StackPanel>
-
-                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
-
-                            <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock
-                                    Text="{Binding StatusMessage}"
-                                    Foreground="#374151"
-                                    TextWrapping="Wrap" />
-
-                                <TextBlock
-                                    Text="{Binding PollingStatusMessage}"
-                                    Foreground="#6B7280"
-                                    FontSize="12"
-                                    TextWrapping="Wrap" />
-                            </StackPanel>
-
-                            <StackPanel
-                                Grid.Column="1"
-                                Orientation="Horizontal"
-                                Spacing="8">
-
-                                <Button
-                                    Content="Sprawdź nowe"
-                                    Command="{Binding CheckForNewTicketsCommand}"
-                                    IsEnabled="{Binding CanCheckForNewTickets}" />
-
-                                <TextBlock
-                                    Text="Trwa operacja..."
-                                    IsVisible="{Binding IsLoading}"
-                                    VerticalAlignment="Center"
-                                    FontStyle="Italic"
-                                    Foreground="#6B7280" />
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                </Border>
-
-                <Border
-                    Grid.Row="2"
-                    Background="White"
-                    BorderBrush="#D1D5DB"
-                    BorderThickness="1"
-                    CornerRadius="12"
-                    Padding="10">
-
-                    <DataGrid
-                        ItemsSource="{Binding Tickets}"
-                        SelectedItem="{Binding SelectedTicket}"
-                        AutoGenerateColumns="False"
-                        IsReadOnly="True"
-                        IsEnabled="{Binding IsNotLoadingDetails}"
-                        GridLinesVisibility="Horizontal"
-                        HeadersVisibility="Column"
-                        CanUserSortColumns="True">
-
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" SortMemberPath="Id" Width="70" />
-                            <DataGridTextColumn Header="Kategoria" Binding="{Binding DisplayCategory}" SortMemberPath="DisplayCategory" Width="110" />
-                            <DataGridTextColumn Header="Tytuł" Binding="{Binding Title}" SortMemberPath="Title" Width="*" />
-                            <DataGridTextColumn Header="Status" Binding="{Binding DisplayStatus}" SortMemberPath="Status" Width="130" />
-                            <DataGridTextColumn Header="Priorytet" Binding="{Binding Priority}" SortMemberPath="Priority" Width="130" />
-                            <DataGridTextColumn Header="Utworzono" Binding="{Binding CreatedAt}" SortMemberPath="CreatedAt" Width="170" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
-
-                <Border
-                    Grid.Row="3"
-                    Background="White"
-                    BorderBrush="#D1D5DB"
-                    BorderThickness="1"
-                    CornerRadius="12"
-                    Padding="16">
-
-                    <Grid ColumnDefinitions="*,180,160" ColumnSpacing="12">
-
-                        <StackPanel Grid.Column="0" Spacing="8">
-                            <TextBlock
-                                Text="Nowe zgłoszenie"
-                                FontSize="18"
-                                FontWeight="Bold"
-                                Foreground="#111827" />
-
-                            <TextBlock Text="Kategoria" Foreground="#374151" />
-
-                            <ComboBox
-                                ItemsSource="{Binding NewTicketCategories}"
-                                SelectedItem="{Binding SelectedNewTicketCategory}"
-                                HorizontalAlignment="Stretch"
-                                IsEnabled="{Binding CanUseOnlineActions}" />
-
-                            <TextBox
-                                Text="{Binding NewTicketTitle}"
-                                PlaceholderText="Tytuł zgłoszenia"
-                                IsEnabled="{Binding CanUseOnlineActions}" />
-
-                            <TextBox
-                                Text="{Binding NewTicketDescription}"
-                                AcceptsReturn="True"
-                                TextWrapping="Wrap"
-                                MinHeight="72"
-                                PlaceholderText="Opis problemu"
-                                IsEnabled="{Binding CanUseOnlineActions}" />
-
-                            <TextBlock
-                                Text="{Binding CreateTicketStatusMessage}"
-                                TextWrapping="Wrap"
-                                Foreground="#374151" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Bottom">
-                            <TextBlock Text="Priorytet" Foreground="#374151" />
-
-                            <ComboBox
-                                ItemsSource="{Binding AvailablePriorities}"
-                                SelectedItem="{Binding NewTicketPriority}"
-                                HorizontalAlignment="Stretch"
-                                IsEnabled="{Binding CanUseOnlineActions}" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
-                            <Button
-                                Content="Utwórz zgłoszenie"
-                                Command="{Binding CreateTicketCommand}"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                Padding="10"
-                                IsEnabled="{Binding CanUseOnlineActions}" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <Grid
-                Grid.Row="1"
-                Margin="20"
-                ColumnDefinitions="1.05*,1.25*"
-                ColumnSpacing="16"
-                IsVisible="{Binding IsDetailsPageVisible}">
-
-                <ScrollViewer Grid.Column="0">
-                    <StackPanel Spacing="14">
-
-                        <Border
-                            Background="White"
-                            BorderBrush="#D1D5DB"
-                            BorderThickness="1"
-                            CornerRadius="12"
-                            Padding="16">
-
-                            <StackPanel Spacing="10">
-
-                                <TextBlock
-                                    Text="Informacje o zgłoszeniu"
-                                    FontSize="20"
-                                    FontWeight="Bold"
-                                    Foreground="#111827" />
-
-                                <Border
-                                    Background="#F3F4F6"
-                                    CornerRadius="8"
-                                    Padding="10">
-                                    <TextBlock
-                                        Text="{Binding DetailsStatusMessage}"
-                                        TextWrapping="Wrap"
-                                        Foreground="#374151" />
-                                </Border>
-
-                                <TextBlock
-                                    Text="Przetwarzanie..."
-                                    IsVisible="{Binding IsLoadingDetails}"
-                                    FontStyle="Italic"
-                                    Foreground="#6B7280" />
-
-                                <TextBlock Text="Tytuł:" FontWeight="Bold" />
-                                <TextBlock
-                                    Text="{Binding TicketDetails.Title}"
-                                    TextWrapping="Wrap"
-                                    Foreground="#374151" />
-
-                                <TextBlock Text="Opis:" FontWeight="Bold" />
-                                <TextBlock
-                                    Text="{Binding TicketDetails.Description}"
-                                    TextWrapping="Wrap"
-                                    Foreground="#374151" />
-
-                                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="6">
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Status:" FontWeight="Bold" />
-                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TicketDetails.DisplayStatus}" />
-
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Priorytet:" FontWeight="Bold" />
-                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TicketDetails.Priority}" />
-
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Zgłaszający:" FontWeight="Bold" />
-                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TicketDetails.User.Name}" />
-
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Przypisany IT:" FontWeight="Bold" />
-                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding TicketDetails.AssignedTo.Name}" />
-                                </Grid>
-
-                            </StackPanel>
-                        </Border>
-
-                        <Border
-                            Background="#E0F2FE"
-                            CornerRadius="10"
-                            Padding="12"
-                            IsVisible="{Binding IsRegularUser}">
-                            <TextBlock
-                                Text="Masz dostęp do podglądu zgłoszenia i wiadomości. Edycja statusu, priorytetu oraz przypisywanie są dostępne dla ról admin/it."
-                                TextWrapping="Wrap"
-                                Foreground="#075985" />
-                        </Border>
-
-                        <Border
-                            Background="#FEF3C7"
-                            CornerRadius="10"
-                            Padding="12"
-                            IsVisible="{Binding IsOffline}">
-                            <TextBlock
-                                Text="Tryb offline — edycja, przypisywanie i wiadomości są niedostępne."
-                                TextWrapping="Wrap"
-                                Foreground="#92400E" />
-                        </Border>
-
-                        <Border
-                            Background="White"
-                            BorderBrush="#D1D5DB"
-                            BorderThickness="1"
-                            CornerRadius="12"
-                            Padding="16"
-                            IsVisible="{Binding CanManageTickets}">
-
-                            <StackPanel Spacing="10">
-                                <TextBlock
-                                    Text="Zarządzanie zgłoszeniem"
-                                    FontSize="20"
-                                    FontWeight="Bold"
-                                    Foreground="#111827" />
-
-                                <TextBlock Text="Status" />
-                                <ComboBox
-                                    ItemsSource="{Binding AvailableStatuses}"
-                                    SelectedItem="{Binding SelectedStatus}"
-                                    HorizontalAlignment="Stretch"
-                                    IsEnabled="{Binding CanEditTicket}" />
-
-                                <TextBlock Text="Priorytet" />
-                                <ComboBox
-                                    ItemsSource="{Binding AvailablePriorities}"
-                                    SelectedItem="{Binding SelectedPriority}"
-                                    HorizontalAlignment="Stretch"
-                                    IsEnabled="{Binding CanEditTicket}" />
-
-                                <Button
-                                    Content="Zapisz zmiany"
-                                    Command="{Binding UpdateTicketCommand}"
-                                    HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Center"
-                                    Padding="10"
-                                    IsEnabled="{Binding CanEditTicket}" />
-
-                                <Button
-                                    Content="Przypisz do mnie"
-                                    Command="{Binding AssignToMeCommand}"
-                                    HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Center"
-                                    Padding="10"
-                                    IsEnabled="{Binding CanAssignTicket}" />
-
-                                <Button
-                                    Content="Zamknij zgłoszenie"
-                                    Command="{Binding CloseTicketCommand}"
-                                    HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Center"
-                                    Padding="10"
-                                    IsEnabled="{Binding CanCloseTicket}" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border
-                            Background="White"
-                            BorderBrush="#D1D5DB"
-                            BorderThickness="1"
-                            CornerRadius="12"
-                            Padding="16">
-
-                            <StackPanel Spacing="10">
-                                <TextBlock
-                                    Text="Historia lokalnych zmian"
-                                    FontSize="20"
-                                    FontWeight="Bold"
-                                    Foreground="#111827" />
-
-                                <TextBlock
-                                    Text="Lokalna historia działań desktopu"
-                                    FontSize="12"
-                                    Foreground="#6B7280"
-                                    TextWrapping="Wrap" />
-
-                                <ItemsControl ItemsSource="{Binding TicketAuditLogEntries}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border
-                                                Background="#F9FAFB"
-                                                BorderBrush="#E5E7EB"
-                                                BorderThickness="1"
-                                                CornerRadius="8"
-                                                Padding="10"
-                                                Margin="0,0,0,8">
-
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock
-                                                        Text="{Binding Action}"
-                                                        FontWeight="SemiBold"
-                                                        Foreground="#111827" />
-
-                                                    <TextBlock
-                                                        Text="{Binding Description}"
-                                                        TextWrapping="Wrap"
-                                                        Foreground="#374151" />
-
-                                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                                        <TextBlock
-                                                            Text="{Binding UserLogin}"
-                                                            FontSize="11"
-                                                            Foreground="#6B7280" />
-
-                                                        <TextBlock
-                                                            Text="·"
-                                                            FontSize="11"
-                                                            Foreground="#6B7280" />
-
-                                                        <TextBlock
-                                                            Text="{Binding Timestamp}"
-                                                            FontSize="11"
-                                                            Foreground="#6B7280" />
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-
-                                <TextBlock
-                                    Text="Brak lokalnych wpisów dla tego zgłoszenia."
-                                    FontStyle="Italic"
-                                    Foreground="#6B7280"
-                                    IsVisible="{Binding HasNoTicketAuditLogEntries}" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
-
-                <Border
-                    Grid.Column="1"
-                    Background="White"
-                    BorderBrush="#D1D5DB"
-                    BorderThickness="1"
-                    CornerRadius="12"
-                    Padding="16">
-
-                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Text="Wiadomości"
-                            FontSize="20"
-                            FontWeight="Bold"
-                            Foreground="#111827" />
-
-                        <ScrollViewer Grid.Row="1">
-                            <ItemsControl ItemsSource="{Binding Messages}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Background="#F9FAFB"
-                                            BorderBrush="#E5E7EB"
-                                            BorderThickness="1"
-                                            CornerRadius="10"
-                                            Padding="10"
-                                            Margin="0,0,0,8">
-
-                                            <StackPanel Spacing="4">
-                                                <TextBlock
-                                                    Text="{Binding Sender.Name}"
-                                                    FontWeight="Bold"
-                                                    Foreground="#111827" />
-
-                                                <TextBlock
-                                                    Text="{Binding Content}"
-                                                    TextWrapping="Wrap"
-                                                    Foreground="#374151" />
-
-                                                <TextBlock
-                                                    Text="{Binding CreatedAt}"
-                                                    FontSize="11"
-                                                    Foreground="#6B7280" />
-                                            </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-
-                        <StackPanel Grid.Row="2" Spacing="8">
-                            <TextBox
-                                Text="{Binding NewMessageText}"
-                                AcceptsReturn="True"
-                                TextWrapping="Wrap"
-                                MinHeight="90"
-                                PlaceholderText="Wpisz wiadomość..."
-                                IsEnabled="{Binding CanSendMessage}" />
-
-                            <Button
-                                Content="Wyślij wiadomość"
-                                Command="{Binding SendMessageCommand}"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                Padding="10"
-                                IsEnabled="{Binding CanSendMessage}" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </Grid>
-
             <ScrollViewer
                 Grid.Row="1"
-                Margin="20"
-                IsVisible="{Binding IsStatisticsPageVisible}">
+                VerticalScrollBarVisibility="Auto"
+                IsVisible="{Binding IsTicketsPageVisible}">
 
-                <StackPanel Spacing="16" MaxWidth="900">
+                <StackPanel Classes="page-content">
 
-                    <TextBlock
-                        Text="{Binding StatsScopeMessage}"
-                        TextWrapping="Wrap"
-                        Foreground="#6B7280"
-                        FontSize="13" />
+                    <Border Classes="app-card" Margin="0,0,0,20">
 
-                    <Border
-                        Background="White"
-                        BorderBrush="#D1D5DB"
-                        BorderThickness="1"
-                        CornerRadius="12"
-                        Padding="18">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section-title" Text="Wyszukiwanie i filtry" />
+                                <TextBlock
+                                    Classes="section-subtitle"
+                                    Text="Filtruj listę zgłoszeń i zarządzaj paginacją wyników." />
+                            </StackPanel>
 
+                            <Grid ColumnDefinitions="2*,160,160,160,110,110" ColumnSpacing="10">
+                                <TextBox
+                                    Grid.Column="0"
+                                    MinHeight="38"
+                                    VerticalContentAlignment="Center"
+                                    Text="{Binding SearchText}"
+                                    PlaceholderText="Szukaj po tytule lub opisie..."
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <ComboBox
+                                    Grid.Column="1"
+                                    MinHeight="38"
+                                    ItemsSource="{Binding FilterStatuses}"
+                                    SelectedItem="{Binding SelectedFilterStatus}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <ComboBox
+                                    Grid.Column="2"
+                                    MinHeight="38"
+                                    ItemsSource="{Binding FilterPriorities}"
+                                    SelectedItem="{Binding SelectedFilterPriority}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <ComboBox
+                                    Grid.Column="3"
+                                    MinHeight="38"
+                                    ItemsSource="{Binding TicketQueueViews}"
+                                    SelectedItem="{Binding SelectedTicketQueueView}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <Button
+                                    Grid.Column="4"
+                                    Classes="btn-primary filter-action"
+                                    Content="Szukaj"
+                                    Command="{Binding SearchTicketsCommand}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <Button
+                                    Grid.Column="5"
+                                    Classes="btn-secondary filter-action"
+                                    Content="Wyczyść"
+                                    Command="{Binding ClearFiltersCommand}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+                            </Grid>
+
+                            <Separator Background="{DynamicResource AppCardBorderBrush}" />
+
+                            <Grid ColumnDefinitions="Auto,88,44,44,Auto,88,44,44,Auto,Auto" ColumnSpacing="8">
+                                <TextBlock Grid.Column="0" Text="Na stronę:" VerticalAlignment="Center" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                <ComboBox Grid.Column="1" MinHeight="36" VerticalAlignment="Center" ItemsSource="{Binding PageSizeOptions}" SelectedItem="{Binding SelectedPageSize}" IsEnabled="{Binding IsNotLoading}" />
+                                <Button Grid.Column="2" Classes="btn-secondary" Content="«" VerticalAlignment="Center" Command="{Binding FirstPageCommand}" IsEnabled="{Binding CanGoPreviousPage}" MinHeight="36" />
+                                <Button Grid.Column="3" Classes="btn-secondary" Content="‹" VerticalAlignment="Center" Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoPreviousPage}" MinHeight="36" />
+                                <TextBlock Grid.Column="4" Text="Strona:" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                <ComboBox Grid.Column="5" MinHeight="36" VerticalAlignment="Center" ItemsSource="{Binding PageNumbers}" SelectedItem="{Binding SelectedPageNumber}" IsEnabled="{Binding IsNotLoading}" />
+                                <Button Grid.Column="6" Classes="btn-secondary" Content="›" VerticalAlignment="Center" Command="{Binding NextPageCommand}" IsEnabled="{Binding CanGoNextPage}" MinHeight="36" />
+                                <Button Grid.Column="7" Classes="btn-secondary" Content="»" VerticalAlignment="Center" Command="{Binding LastPageCommand}" IsEnabled="{Binding CanGoNextPage}" MinHeight="36" />
+                                <TextBlock Grid.Column="8" Text="{Binding PagePositionText}" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                <TextBlock Grid.Column="9" Text="{Binding PageTotalText}" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource AppSecondaryTextBrush}" TextWrapping="Wrap" />
+                                    <TextBlock Text="{Binding AutoRefreshStatusText}" Foreground="{DynamicResource AppMutedTextBrush}" FontSize="12" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <Button
+                                    Grid.Column="1"
+                                    Classes="btn-secondary"
+                                    Content="Odśwież teraz"
+                                    Command="{Binding RefreshTicketsNowCommand}"
+                                    IsEnabled="{Binding CanRefreshTicketsNow}"
+                                    VerticalAlignment="Center"
+                                    MinWidth="130"
+                                    MinHeight="36" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="app-card" Margin="0,0,0,20" Padding="14">
                         <StackPanel Spacing="10">
-                            <TextBlock
-                                Text="Podsumowanie"
-                                FontSize="20"
-                                FontWeight="Bold"
-                                Foreground="#111827" />
-
-                            <UniformGrid Columns="4" Rows="1">
-                                <Border
-                                    Background="#EFF6FF"
-                                    CornerRadius="10"
-                                    Padding="14"
-                                    Margin="0,0,8,0">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Text="Wszystkie" Foreground="#1D4ED8" FontSize="12" />
-                                        <TextBlock
-                                            Text="{Binding StatsTotalTickets}"
-                                            FontSize="28"
-                                            FontWeight="Bold"
-                                            Foreground="#1E3A8A" />
-                                    </StackPanel>
-                                </Border>
-
-                                <Border
-                                    Background="#ECFDF5"
-                                    CornerRadius="10"
-                                    Padding="14"
-                                    Margin="0,0,8,0">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Text="Nowe" Foreground="#047857" FontSize="12" />
-                                        <TextBlock
-                                            Text="{Binding StatsNewTickets}"
-                                            FontSize="28"
-                                            FontWeight="Bold"
-                                            Foreground="#065F46" />
-                                    </StackPanel>
-                                </Border>
-
-                                <Border
-                                    Background="#FFFBEB"
-                                    CornerRadius="10"
-                                    Padding="14"
-                                    Margin="0,0,8,0">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Text="W trakcie" Foreground="#B45309" FontSize="12" />
-                                        <TextBlock
-                                            Text="{Binding StatsInProgressTickets}"
-                                            FontSize="28"
-                                            FontWeight="Bold"
-                                            Foreground="#92400E" />
-                                    </StackPanel>
-                                </Border>
-
-                                <Border
-                                    Background="#F3F4F6"
-                                    CornerRadius="10"
-                                    Padding="14">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Text="Zamknięte" Foreground="#4B5563" FontSize="12" />
-                                        <TextBlock
-                                            Text="{Binding StatsClosedTickets}"
-                                            FontSize="28"
-                                            FontWeight="Bold"
-                                            Foreground="#111827" />
-                                    </StackPanel>
-                                </Border>
-                            </UniformGrid>
+                            <TextBlock Classes="section-title" Text="Lista zgłoszeń" />
+                            <DataGrid
+                                ItemsSource="{Binding Tickets}"
+                                SelectedItem="{Binding SelectedTicket}"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="True"
+                                IsEnabled="{Binding IsNotLoading}"
+                                MinHeight="260"
+                                MaxHeight="420"
+                                GridLinesVisibility="Horizontal"
+                                HeadersVisibility="Column"
+                                CanUserSortColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" />
+                                    <DataGridTextColumn Header="Kategoria" Binding="{Binding DisplayCategory}" Width="140" />
+                                    <DataGridTemplateColumn Header="Tytuł" Width="3*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Status" Binding="{Binding DisplayStatus}" Width="140" />
+                                    <DataGridTextColumn Header="Priorytet" Binding="{Binding Priority}" Width="120" />
+                                    <DataGridTextColumn Header="Utworzono" Binding="{Binding CreatedAt}" Width="190" />
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </StackPanel>
                     </Border>
 
-                    <Border
-                        Background="White"
-                        BorderBrush="#D1D5DB"
-                        BorderThickness="1"
-                        CornerRadius="12"
-                        Padding="18">
+                    <Border Classes="app-card" Margin="0,0,0,0">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section-title" Text="Nowe zgłoszenie" />
+                                <TextBlock Classes="section-subtitle" Text="Uzupełnij pola i utwórz zgłoszenie w systemie." />
+                            </StackPanel>
 
-                        <StackPanel Spacing="12">
-                            <TextBlock
-                                Text="Statusy zgłoszeń"
-                                FontSize="18"
-                                FontWeight="Bold"
-                                Foreground="#111827" />
-
-                            <Grid ColumnDefinitions="110,*,40" ColumnSpacing="10">
-                                <TextBlock Grid.Column="0" Text="Nowe" VerticalAlignment="Center" />
-                                <ProgressBar
-                                    Grid.Column="1"
-                                    Height="18"
-                                    Minimum="0"
-                                    Maximum="{Binding StatsStatusChartMaximum}"
-                                    Value="{Binding StatsNewTickets}"
-                                    Foreground="#10B981" />
-                                <TextBlock
-                                    Grid.Column="2"
-                                    Text="{Binding StatsNewTickets}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <StackPanel Grid.Column="0" Spacing="6">
+                                    <TextBlock Classes="field-label" Text="Kategoria" Margin="0" />
+                                    <ComboBox MinHeight="38" ItemsSource="{Binding NewTicketCategories}" SelectedItem="{Binding SelectedNewTicketCategory}" IsEnabled="{Binding CanUseOnlineActions}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="6">
+                                    <TextBlock Classes="field-label" Text="Priorytet" Margin="0" />
+                                    <ComboBox MinHeight="38" ItemsSource="{Binding AvailablePriorities}" SelectedItem="{Binding NewTicketPriority}" IsEnabled="{Binding CanUseOnlineActions}" />
+                                </StackPanel>
                             </Grid>
 
-                            <Grid ColumnDefinitions="110,*,40" ColumnSpacing="10">
-                                <TextBlock Grid.Column="0" Text="W trakcie" VerticalAlignment="Center" />
-                                <ProgressBar
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="field-label" Text="Tytuł" Margin="0" />
+                                <TextBox MinHeight="38" Text="{Binding NewTicketTitle}" PlaceholderText="Tytuł zgłoszenia" IsEnabled="{Binding CanUseOnlineActions}" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="field-label" Text="Opis" Margin="0" />
+                                <TextBox MinHeight="100" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding NewTicketDescription}" PlaceholderText="Opis problemu" IsEnabled="{Binding CanUseOnlineActions}" />
+                            </StackPanel>
+
+                            <TextBlock Text="{Binding CreateTicketStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" FontSize="12" />
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Button
                                     Grid.Column="1"
-                                    Height="18"
-                                    Minimum="0"
-                                    Maximum="{Binding StatsStatusChartMaximum}"
-                                    Value="{Binding StatsInProgressTickets}"
-                                    Foreground="#F59E0B" />
-                                <TextBlock
-                                    Grid.Column="2"
-                                    Text="{Binding StatsInProgressTickets}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right" />
-                            </Grid>
-
-                            <Grid ColumnDefinitions="110,*,40" ColumnSpacing="10">
-                                <TextBlock Grid.Column="0" Text="Rozwiązane" VerticalAlignment="Center" />
-                                <ProgressBar
-                                    Grid.Column="1"
-                                    Height="18"
-                                    Minimum="0"
-                                    Maximum="{Binding StatsStatusChartMaximum}"
-                                    Value="{Binding StatsClosedTickets}"
-                                    Foreground="#6B7280" />
-                                <TextBlock
-                                    Grid.Column="2"
-                                    Text="{Binding StatsClosedTickets}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Border
-                        Background="White"
-                        BorderBrush="#D1D5DB"
-                        BorderThickness="1"
-                        CornerRadius="12"
-                        Padding="18">
-
-                        <StackPanel Spacing="12">
-                            <TextBlock
-                                Text="Priorytety zgłoszeń"
-                                FontSize="18"
-                                FontWeight="Bold"
-                                Foreground="#111827" />
-
-                            <Grid ColumnDefinitions="110,*,40" ColumnSpacing="10">
-                                <TextBlock Grid.Column="0" Text="Niski" VerticalAlignment="Center" />
-                                <ProgressBar
-                                    Grid.Column="1"
-                                    Height="18"
-                                    Minimum="0"
-                                    Maximum="{Binding StatsPriorityChartMaximum}"
-                                    Value="{Binding StatsLowPriorityTickets}"
-                                    Foreground="#3B82F6" />
-                                <TextBlock
-                                    Grid.Column="2"
-                                    Text="{Binding StatsLowPriorityTickets}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right" />
-                            </Grid>
-
-                            <Grid ColumnDefinitions="110,*,40" ColumnSpacing="10">
-                                <TextBlock Grid.Column="0" Text="Średni" VerticalAlignment="Center" />
-                                <ProgressBar
-                                    Grid.Column="1"
-                                    Height="18"
-                                    Minimum="0"
-                                    Maximum="{Binding StatsPriorityChartMaximum}"
-                                    Value="{Binding StatsMediumPriorityTickets}"
-                                    Foreground="#8B5CF6" />
-                                <TextBlock
-                                    Grid.Column="2"
-                                    Text="{Binding StatsMediumPriorityTickets}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right" />
-                            </Grid>
-
-                            <Grid ColumnDefinitions="110,*,40" ColumnSpacing="10">
-                                <TextBlock Grid.Column="0" Text="Wysoki" VerticalAlignment="Center" />
-                                <ProgressBar
-                                    Grid.Column="1"
-                                    Height="18"
-                                    Minimum="0"
-                                    Maximum="{Binding StatsPriorityChartMaximum}"
-                                    Value="{Binding StatsHighPriorityTickets}"
-                                    Foreground="#EF4444" />
-                                <TextBlock
-                                    Grid.Column="2"
-                                    Text="{Binding StatsHighPriorityTickets}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right" />
+                                    Classes="btn-primary"
+                                    Content="Utwórz zgłoszenie"
+                                    Command="{Binding CreateTicketCommand}"
+                                    HorizontalAlignment="Right"
+                                    MinWidth="200"
+                                    MinHeight="38"
+                                    IsEnabled="{Binding CanUseOnlineActions}" />
                             </Grid>
                         </StackPanel>
                     </Border>
                 </StackPanel>
             </ScrollViewer>
 
+            <Grid
+                Grid.Row="1"
+                ColumnDefinitions="1.2*,*"
+                ColumnSpacing="20"
+                Margin="{DynamicResource AppPagePadding}"
+                IsVisible="{Binding IsDetailsPageVisible}">
+
+                <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="16" MinWidth="560">
+
+                        <Border Classes="app-card">
+                            <StackPanel Spacing="14">
+                                <TextBlock Classes="section-title-large" Text="Informacje o zgłoszeniu" />
+
+                                <Border Classes="app-subtle-panel">
+                                    <TextBlock Text="{Binding DetailsStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                </Border>
+
+                                <TextBlock Text="Przetwarzanie..." IsVisible="{Binding IsLoadingDetails}" FontStyle="Italic" Foreground="{DynamicResource AppMutedTextBrush}" />
+
+                                <TextBlock Classes="ticket-title" Text="{Binding TicketDetails.Title}" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Classes="app-chip">
+                                        <TextBlock Classes="app-chip-text" Text="{Binding TicketDetails.DisplayStatus}" />
+                                    </Border>
+                                    <Border Classes="app-chip-warning">
+                                        <TextBlock Classes="app-chip-text-warning" Text="{Binding TicketDetails.Priority}" />
+                                    </Border>
+                                </StackPanel>
+
+                                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-label" Text="Zgłaszający" Margin="0" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TicketDetails.User.Name}" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Classes="field-label" Text="Przypisany IT" Margin="0" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TicketDetails.AssignedTo.Name}" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                </Grid>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Classes="field-label" Text="Opis" Margin="0" />
+                                    <Border Classes="app-subtle-panel">
+                                        <TextBlock Text="{Binding TicketDetails.Description}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                    </Border>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource AppInfoPanelBackgroundBrush}" CornerRadius="10" Padding="12" IsVisible="{Binding IsRegularUser}">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Możesz zamknąć własne zgłoszenie, jeśli backend na to pozwala. Przy błędzie 403 operacja jest zablokowana po stronie API." TextWrapping="Wrap" Foreground="{DynamicResource AppInfoPanelForegroundBrush}" FontSize="12" IsVisible="{Binding CanCloseOwnTicket}" />
+                                <TextBlock Text="Masz dostęp do podglądu zgłoszenia i wiadomości. Edycja statusu, priorytetu oraz przypisywanie są dostępne dla ról admin/it." TextWrapping="Wrap" Foreground="{DynamicResource AppInfoPanelForegroundBrush}" FontSize="12" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource AppWarnPanelBackgroundBrush}" CornerRadius="10" Padding="12" IsVisible="{Binding IsOffline}">
+                            <TextBlock Text="Tryb offline — edycja, przypisywanie i wiadomości są niedostępne." TextWrapping="Wrap" Foreground="{DynamicResource AppWarnPanelForegroundBrush}" />
+                        </Border>
+
+                        <Border Classes="app-card" IsVisible="{Binding CanManageTickets}">
+                            <StackPanel Spacing="14">
+                                <TextBlock Classes="section-title-large" Text="Zarządzanie zgłoszeniem" />
+
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                    <StackPanel Grid.Column="0" Spacing="6">
+                                        <TextBlock Classes="field-label" Text="Status" Margin="0" />
+                                        <ComboBox MinHeight="38" ItemsSource="{Binding AvailableStatuses}" SelectedItem="{Binding SelectedStatus}" IsEnabled="{Binding CanEditTicket}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Spacing="6">
+                                        <TextBlock Classes="field-label" Text="Priorytet" Margin="0" />
+                                        <ComboBox MinHeight="38" ItemsSource="{Binding AvailablePriorities}" SelectedItem="{Binding SelectedPriority}" IsEnabled="{Binding CanEditTicket}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <UniformGrid Columns="2" Rows="2" Margin="0,4,0,0">
+                                    <Button Classes="btn-primary" Content="Zapisz zmiany" Command="{Binding UpdateTicketCommand}" IsEnabled="{Binding CanEditTicket}" Margin="0,0,6,6" HorizontalAlignment="Stretch" />
+                                    <Button Classes="btn-secondary" Content="Przypisz do mnie" Command="{Binding AssignToMeCommand}" IsEnabled="{Binding CanAssignTicket}" Margin="6,0,0,6" HorizontalAlignment="Stretch" />
+                                    <Button Classes="btn-warning" Content="Zamknij zgłoszenie" Command="{Binding CloseTicketCommand}" IsEnabled="{Binding CanCloseTicket}" Margin="0,0,6,0" HorizontalAlignment="Stretch" />
+                                    <Button Classes="btn-danger" Content="Usuń zgłoszenie" Command="{Binding DeleteTicketCommand}" IsEnabled="{Binding CanDeleteTicket}" Margin="6,0,0,0" HorizontalAlignment="Stretch" />
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="app-card">
+                            <StackPanel Spacing="10">
+                                <TextBlock Classes="section-title-large" Text="Historia lokalnych zmian" />
+                                <TextBlock Classes="section-subtitle" Text="Historia działań wykonanych w tej aplikacji." />
+
+                                <Border MaxHeight="220" Classes="app-subtle-panel" Padding="8">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{Binding TicketAuditLogEntries}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Classes="message-bubble" Margin="0,0,0,8">
+                                                        <StackPanel Spacing="4">
+                                                            <TextBlock Text="{Binding Action}" FontWeight="SemiBold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                                            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                                <TextBlock Text="{Binding UserLogin}" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                                <TextBlock Text="·" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                                <TextBlock Text="{Binding Timestamp}" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Border>
+
+                                <TextBlock Classes="empty-state" Text="Brak lokalnych wpisów dla tego zgłoszenia." IsVisible="{Binding HasNoTicketAuditLogEntries}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <Border Grid.Column="1" Classes="app-card" MinHeight="480" MaxWidth="720" HorizontalAlignment="Stretch" Padding="0">
+                    <DockPanel LastChildFill="True">
+                        <StackPanel DockPanel.Dock="Top" Margin="18,18,18,12" Spacing="4">
+                            <TextBlock Classes="section-title-large" Text="Wiadomości" />
+                            <TextBlock Classes="section-subtitle" Text="Korespondencja w ramach zgłoszenia." />
+                        </StackPanel>
+
+                        <Border
+                            DockPanel.Dock="Bottom"
+                            BorderBrush="{DynamicResource AppCardBorderBrush}"
+                            BorderThickness="0,1,0,0"
+                            Padding="18,14">
+
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <TextBox
+                                    Grid.Column="0"
+                                    Text="{Binding NewMessageText}"
+                                    AcceptsReturn="True"
+                                    TextWrapping="Wrap"
+                                    MinHeight="80"
+                                    PlaceholderText="Wpisz wiadomość..."
+                                    IsEnabled="{Binding CanSendMessage}" />
+
+                                <Button
+                                    Grid.Column="1"
+                                    Classes="btn-primary"
+                                    Content="Wyślij"
+                                    Command="{Binding SendMessageCommand}"
+                                    IsEnabled="{Binding CanSendMessage}"
+                                    VerticalAlignment="Bottom"
+                                    MinWidth="100" />
+                            </Grid>
+                        </Border>
+
+                        <Panel Margin="18,0,18,12">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Messages}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Classes="message-bubble" Margin="0,0,0,10">
+                                                <StackPanel Spacing="6">
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <TextBlock Text="{Binding Sender.Name}" FontWeight="SemiBold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding CreatedAt}" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                    </Grid>
+                                                    <TextBlock Text="{Binding Content}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                            <TextBlock
+                                Classes="empty-state"
+                                Text="Brak wiadomości w tym zgłoszeniu."
+                                IsVisible="{Binding HasNoMessages}" />
+                        </Panel>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" IsVisible="{Binding IsStatisticsPageVisible}">
+                <StackPanel Classes="page-content">
+                    <Border Classes="app-card">
+                        <StackPanel Spacing="12">
+                            <TextBlock Classes="section-title-large" Text="Statystyki zgłoszeń" />
+                            <TextBlock Classes="section-subtitle" Text="{Binding StatsScopeMessage}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Classes="btn-secondary" Content="Pobierz statystyki ze wszystkich stron" Command="{Binding LoadAllPagesStatisticsCommand}" IsEnabled="{Binding IsNotLoading}" />
+                            </StackPanel>
+                            <TextBlock Text="Trwa agregacja wielu stron listy..." Foreground="{DynamicResource AppMutedTextBrush}" IsVisible="{Binding IsLoadingAllStatistics}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="app-card">
+                        <UniformGrid Columns="5" Rows="1">
+                            <Border Classes="kpi-card">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Wszystkie" Foreground="{DynamicResource AppSecondaryTextBrush}" FontSize="12" />
+                                    <TextBlock Text="{Binding StatsTotalTickets}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Classes="kpi-card">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Nowe" Foreground="{DynamicResource AppChipForegroundBrush}" FontSize="12" />
+                                    <TextBlock Text="{Binding StatsNewTickets}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Classes="kpi-card">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="W toku" Foreground="{DynamicResource AppChipWarningForegroundBrush}" FontSize="12" />
+                                    <TextBlock Text="{Binding StatsInProgressTickets}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Classes="kpi-card">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Rozwiązane" Foreground="{DynamicResource AppMutedTextBrush}" FontSize="12" />
+                                    <TextBlock Text="{Binding StatsClosedTickets}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Classes="kpi-card" Margin="0">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Wysoki priorytet" Foreground="{DynamicResource AppDangerBrush}" FontSize="12" />
+                                    <TextBlock Text="{Binding StatsHighPriorityTickets}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16">
+                        <Border Grid.Column="0" Classes="app-card">
+                            <StackPanel Spacing="10">
+                                <TextBlock Classes="section-title" Text="Według statusu" />
+                                <Grid ColumnDefinitions="120,*,48" ColumnSpacing="10">
+                                    <TextBlock Grid.Column="0" Text="Nowe" VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Height="16" Minimum="0" Maximum="{Binding StatsStatusChartMaximum}" Value="{Binding StatsNewTickets}" Foreground="{DynamicResource AppSuccessBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatsNewTickets}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid ColumnDefinitions="120,*,48" ColumnSpacing="10">
+                                    <TextBlock Grid.Column="0" Text="W toku" VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Height="16" Minimum="0" Maximum="{Binding StatsStatusChartMaximum}" Value="{Binding StatsInProgressTickets}" Foreground="{DynamicResource AppWarningBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatsInProgressTickets}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid ColumnDefinitions="120,*,48" ColumnSpacing="10">
+                                    <TextBlock Grid.Column="0" Text="Rozwiązane" VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Height="16" Minimum="0" Maximum="{Binding StatsStatusChartMaximum}" Value="{Binding StatsClosedTickets}" Foreground="{DynamicResource AppMutedTextBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatsClosedTickets}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Classes="app-card">
+                            <StackPanel Spacing="10">
+                                <TextBlock Classes="section-title" Text="Według priorytetu" />
+                                <Grid ColumnDefinitions="120,*,48" ColumnSpacing="10">
+                                    <TextBlock Grid.Column="0" Text="Niski" VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Height="16" Minimum="0" Maximum="{Binding StatsPriorityChartMaximum}" Value="{Binding StatsLowPriorityTickets}" Foreground="{DynamicResource AppAccentBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatsLowPriorityTickets}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid ColumnDefinitions="120,*,48" ColumnSpacing="10">
+                                    <TextBlock Grid.Column="0" Text="Średni" VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Height="16" Minimum="0" Maximum="{Binding StatsPriorityChartMaximum}" Value="{Binding StatsMediumPriorityTickets}" Foreground="{DynamicResource AppChipWarningForegroundBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatsMediumPriorityTickets}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid ColumnDefinitions="120,*,48" ColumnSpacing="10">
+                                    <TextBlock Grid.Column="0" Text="Wysoki" VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Height="16" Minimum="0" Maximum="{Binding StatsPriorityChartMaximum}" Value="{Binding StatsHighPriorityTickets}" Foreground="{DynamicResource AppDangerBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatsHighPriorityTickets}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2" Classes="app-card">
+                            <StackPanel Spacing="10">
+                                <TextBlock Classes="section-title" Text="Przypisanie" />
+                                <Grid ColumnDefinitions="120,*,48" ColumnSpacing="10">
+                                    <TextBlock Grid.Column="0" Text="Przypisane" VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Height="16" Minimum="0" Maximum="{Binding StatsAssignmentChartMaximum}" Value="{Binding StatsAssignedTickets}" Foreground="{DynamicResource AppAccentBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatsAssignedTickets}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid ColumnDefinitions="120,*,48" ColumnSpacing="10">
+                                    <TextBlock Grid.Column="0" Text="Nieprzypisane" VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Height="16" Minimum="0" Maximum="{Binding StatsAssignmentChartMaximum}" Value="{Binding StatsUnassignedTickets}" Foreground="{DynamicResource AppWarningBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatsUnassignedTickets}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+
             <ScrollViewer
                 Grid.Row="1"
-                Margin="20"
+                VerticalScrollBarVisibility="Auto"
                 IsVisible="{Binding IsRequestAccountPageVisible}">
 
-                <StackPanel Spacing="16" MaxWidth="760">
+                <StackPanel Classes="page-content" MaxWidth="760">
 
-                    <Border
-                        Background="White"
-                        BorderBrush="#D1D5DB"
-                        BorderThickness="1"
-                        CornerRadius="12"
-                        Padding="18">
+                    <Border Classes="app-card">
 
                         <StackPanel Spacing="12">
-                            <TextBlock
-                                Text="Zgłoszenie utworzenia konta"
-                                FontSize="20"
-                                FontWeight="Bold"
-                                Foreground="#111827" />
+                            <TextBlock Classes="section-title-large" Text="Zgłoś nowe konto" />
 
                             <TextBlock
-                                Text="Wypełnij dane nowego użytkownika. Prośba zostanie wysłana do administratora (wymagane zalogowanie)."
-                                TextWrapping="Wrap"
-                                Foreground="#6B7280"
-                                FontSize="13" />
+                                Classes="section-subtitle"
+                                Text="Wypełnij dane nowego użytkownika. Prośba zostanie wysłana do administratora." />
 
-                            <TextBlock Text="Imię i nazwisko" FontWeight="SemiBold" Foreground="#374151" />
+                            <TextBlock Classes="field-label" Text="Imię i nazwisko" Margin="0" />
 
                             <TextBox
                                 Text="{Binding RequestName}"
                                 PlaceholderText="np. Jan Kowalski"
                                 IsEnabled="{Binding CanRequestAccount}" />
 
-                            <TextBlock Text="Login" FontWeight="SemiBold" Foreground="#374151" />
+                            <TextBlock Classes="field-label" Text="Login" Margin="0" />
 
                             <TextBox
                                 Text="{Binding RequestLogin}"
                                 PlaceholderText="np. j.kowalski"
                                 IsEnabled="{Binding CanRequestAccount}" />
 
-                            <TextBlock Text="E-mail" FontWeight="SemiBold" Foreground="#374151" />
+                            <TextBlock Classes="field-label" Text="E-mail" Margin="0" />
 
                             <TextBox
                                 Text="{Binding RequestEmail}"
                                 PlaceholderText="np. jan.kowalski@firma.pl"
                                 IsEnabled="{Binding CanRequestAccount}" />
 
-                            <TextBlock Text="Hasło" FontWeight="SemiBold" Foreground="#374151" />
+                            <TextBlock Classes="field-label" Text="Hasło" Margin="0" />
 
                             <TextBox
                                 Text="{Binding RequestPassword}"
@@ -984,7 +638,7 @@
                                 PlaceholderText="Hasło"
                                 IsEnabled="{Binding CanRequestAccount}" />
 
-                            <TextBlock Text="Potwierdzenie hasła" FontWeight="SemiBold" Foreground="#374151" />
+                            <TextBlock Classes="field-label" Text="Potwierdzenie hasła" Margin="0" />
 
                             <TextBox
                                 Text="{Binding RequestPasswordConfirmation}"
@@ -993,115 +647,183 @@
                                 IsEnabled="{Binding CanRequestAccount}" />
 
                             <Button
+                                Classes="btn-primary"
                                 Content="Wyślij prośbę"
                                 Command="{Binding RequestAccountCommand}"
                                 HorizontalAlignment="Left"
-                                Padding="14,10"
                                 IsEnabled="{Binding CanRequestAccount}" />
 
                             <TextBlock
                                 Text="{Binding RequestAccountStatusMessage}"
                                 TextWrapping="Wrap"
-                                Foreground="#374151" />
+                                Foreground="{DynamicResource AppSecondaryTextBrush}" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
             </ScrollViewer>
 
-            <ScrollViewer
-                Grid.Row="1"
-                Margin="20"
-                IsVisible="{Binding IsSettingsPageVisible}">
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" IsVisible="{Binding IsAdminPageVisible}">
+                <StackPanel Classes="page-content">
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+                        <Button
+                            Classes="btn-secondary"
+                            Classes.active="{Binding IsAdminUsersTabActive}"
+                            Content="Użytkownicy"
+                            Command="{Binding ShowAdminUsersTabCommand}"
+                            IsVisible="{Binding IsAdminRole}"
+                            MinWidth="120" />
+                        <Button
+                            Classes="btn-secondary"
+                            Classes.active="{Binding IsAdminNewAccountTabActive}"
+                            Content="Nowe konto"
+                            Command="{Binding ShowAdminNewAccountTabCommand}"
+                            IsVisible="{Binding IsStaffRole}"
+                            MinWidth="120" />
+                    </StackPanel>
 
-                <StackPanel Spacing="16" MaxWidth="760">
+                    <Border Classes="app-card" IsVisible="{Binding IsAdminUsersPanelVisible}">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section-title-large" Text="Użytkownicy systemu" />
+                                <TextBlock Classes="section-subtitle" Text="Zarządzanie kontami: odświeżanie listy, aktywacja i ban." />
+                            </StackPanel>
 
-                    <Border
-                        Background="White"
-                        BorderBrush="#D1D5DB"
-                        BorderThickness="1"
-                        CornerRadius="12"
-                        Padding="18">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Classes="btn-secondary" Content="Odśwież listę" Command="{Binding LoadAdminUsersCommand}" MinWidth="130" MinHeight="36" VerticalAlignment="Center" />
+                                <Button Classes="btn-primary" Content="Aktywuj" Command="{Binding ActivateAdminUserCommand}" IsEnabled="{Binding CanActivateAdminUser}" MinWidth="100" MinHeight="36" VerticalAlignment="Center" />
+                                <Button Classes="btn-danger" Content="Zbanuj" Command="{Binding BanAdminUserCommand}" IsEnabled="{Binding CanBanAdminUser}" MinWidth="100" MinHeight="36" VerticalAlignment="Center" />
+                                <Button Classes="btn-secondary" Content="Odbanuj" Command="{Binding ActivateAdminUserCommand}" IsEnabled="{Binding CanUnbanAdminUser}" MinWidth="100" MinHeight="36" VerticalAlignment="Center" />
+                            </StackPanel>
 
+                            <TextBlock Text="{Binding AdminStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+
+                            <DataGrid
+                                ItemsSource="{Binding AdminUsers}"
+                                SelectedItem="{Binding SelectedAdminUser}"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="True"
+                                CanUserSortColumns="False"
+                                MinHeight="200"
+                                MaxHeight="480"
+                                GridLinesVisibility="Horizontal"
+                                HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" />
+                                    <DataGridTextColumn Header="Login" Binding="{Binding Login}" Width="*" />
+                                    <DataGridTextColumn Header="E-mail" Binding="{Binding Email}" Width="2*" />
+                                    <DataGridTextColumn Header="Rola" Binding="{Binding Role}" Width="120" />
+                                    <DataGridCheckBoxColumn Header="Aktywny" Binding="{Binding Active}" Width="90" />
+                                    <DataGridCheckBoxColumn Header="Ban" Binding="{Binding Ban}" Width="90" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="app-card" IsVisible="{Binding IsAdminNewAccountPanelVisible}">
                         <StackPanel Spacing="12">
-                            <TextBlock
-                                Text="Konfiguracja API"
-                                FontSize="20"
-                                FontWeight="Bold"
-                                Foreground="#111827" />
+                            <TextBlock Classes="section-title-large" Text="Rejestracja użytkownika" />
+                            <TextBlock Classes="section-subtitle" Text="Utwórz prośbę o nowe konto w systemie (POST /api/request-account)." />
 
-                            <TextBlock
-                                Text="Adres API"
-                                FontWeight="SemiBold"
-                                Foreground="#374151" />
+                            <TextBlock Classes="field-label" Text="Imię i nazwisko" Margin="0" />
+                            <TextBox Text="{Binding RequestName}" PlaceholderText="np. Jan Kowalski" IsEnabled="{Binding CanRequestAccount}" />
 
-                            <TextBox
-                                Text="{Binding ApiBaseUrl}"
-                                PlaceholderText="np. http://127.0.0.1:9000/api/" />
+                            <TextBlock Classes="field-label" Text="Login" Margin="0" />
+                            <TextBox Text="{Binding RequestLogin}" PlaceholderText="np. j.kowalski" IsEnabled="{Binding CanRequestAccount}" />
 
-                            <TextBlock
-                                Text="Motyw aplikacji"
-                                FontWeight="SemiBold"
-                                Foreground="#374151"
-                                Margin="0,8,0,0" />
+                            <TextBlock Classes="field-label" Text="E-mail" Margin="0" />
+                            <TextBox Text="{Binding RequestEmail}" PlaceholderText="np. jan.kowalski@firma.pl" IsEnabled="{Binding CanRequestAccount}" />
 
+                            <TextBlock Classes="field-label" Text="Hasło" Margin="0" />
+                            <TextBox Text="{Binding RequestPassword}" PasswordChar="•" PlaceholderText="Hasło" IsEnabled="{Binding CanRequestAccount}" />
+
+                            <TextBlock Classes="field-label" Text="Potwierdzenie hasła" Margin="0" />
+                            <TextBox Text="{Binding RequestPasswordConfirmation}" PasswordChar="•" PlaceholderText="Powtórz hasło" IsEnabled="{Binding CanRequestAccount}" />
+
+                            <Button Classes="btn-primary" Content="Wyślij prośbę" Command="{Binding RequestAccountCommand}" HorizontalAlignment="Left" IsEnabled="{Binding CanRequestAccount}" />
+
+                            <TextBlock Text="{Binding RequestAccountStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" IsVisible="{Binding IsSettingsPageVisible}">
+                <StackPanel Classes="page-content" Spacing="20">
+                    <Border Classes="app-card">
+                        <StackPanel Spacing="14">
+                            <TextBlock Classes="section-title-large" Text="Ustawienia aplikacji" />
+                            <TextBlock Classes="section-subtitle" Text="Wygląd i zachowanie interfejsu." />
+
+                            <TextBlock Classes="field-label" Text="Motyw aplikacji" Margin="0" />
                             <ComboBox
                                 ItemsSource="{Binding ThemeModes}"
                                 SelectedItem="{Binding SelectedThemeMode}"
+                                MinHeight="38"
                                 HorizontalAlignment="Stretch" />
 
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Button
-                                    Content="Zapisz ustawienia"
-                                    Command="{Binding SaveSettingsCommand}" />
+                            <Button
+                                Classes="btn-primary"
+                                Content="Zapisz ustawienia"
+                                Command="{Binding SaveSettingsCommand}"
+                                HorizontalAlignment="Left"
+                                MinWidth="160" />
+                        </StackPanel>
+                    </Border>
 
+                    <Border Classes="app-card">
+                        <StackPanel Spacing="14">
+                            <TextBlock Classes="section-title-large" Text="Lokalny audyt aplikacji" />
+                            <TextBlock
+                                Classes="section-subtitle"
+                                Text="Lista akcji wykonanych lokalnie w aplikacji desktopowej." />
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
                                 <Button
-                                    Content="Testuj połączenie"
-                                    Command="{Binding TestApiConnectionCommand}"
-                                    IsEnabled="{Binding CanTestApiConnection}" />
+                                    Classes="btn-secondary"
+                                    Content="Odśwież audyt"
+                                    Command="{Binding LoadAuditLogsCommand}"
+                                    MinWidth="130"
+                                    MinHeight="36" />
+                                <Button
+                                    Classes="btn-secondary"
+                                    Content="Wyczyść audyt"
+                                    Command="{Binding ClearAuditLogsCommand}"
+                                    MinWidth="130"
+                                    MinHeight="36" />
                             </StackPanel>
 
-                            <TextBlock
-                                Text="{Binding SettingsStatusMessage}"
-                                TextWrapping="Wrap"
-                                Foreground="#374151" />
-                        </StackPanel>
-                    </Border>
-
-                    <Border
-                        Background="#FEF3C7"
-                        CornerRadius="12"
-                        Padding="16">
-
-                        <StackPanel Spacing="6">
-                            <TextBlock
-                                Text="Logi systemowe"
-                                FontSize="18"
-                                FontWeight="Bold"
-                                Foreground="#92400E" />
-
-                            <TextBlock
-                                Text="Funkcja zamrożona — aktualne API nie udostępnia endpointu GET /api/logs. Desktop nie pobiera logów, aby nie generować błędów 404."
-                                TextWrapping="Wrap"
-                                Foreground="#92400E" />
-                        </StackPanel>
-                    </Border>
-
-                    <Border
-                        Background="#E0F2FE"
-                        CornerRadius="12"
-                        Padding="16">
-
-                        <StackPanel Spacing="6">
-                            <TextBlock
-                                Text="Informacja"
-                                FontSize="18"
-                                FontWeight="Bold"
-                                Foreground="#075985" />
+                            <DataGrid
+                                ItemsSource="{Binding SettingsAuditLogEntries}"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="True"
+                                CanUserSortColumns="False"
+                                MinHeight="200"
+                                MaxHeight="420"
+                                GridLinesVisibility="Horizontal"
+                                HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Data i czas" Binding="{Binding Timestamp}" Width="180" />
+                                    <DataGridTextColumn Header="Użytkownik" Binding="{Binding UserLogin}" Width="160" />
+                                    <DataGridTextColumn Header="Akcja" Binding="{Binding Action}" Width="200" />
+                                    <DataGridTextColumn Header="ID zgłoszenia" Binding="{Binding TicketId}" Width="100" />
+                                    <DataGridTemplateColumn Header="Opis" Width="*" MinWidth="350">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock
+                                                    Text="{Binding Description}"
+                                                    TextWrapping="Wrap"
+                                                    MaxHeight="72"
+                                                    ToolTip.Tip="{Binding Description}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
 
                             <TextBlock
-                                Text="Zmiana adresu API wpływa na logowanie, pobieranie zgłoszeń, wiadomości oraz test połączenia. Po zmianie adresu najlepiej wykonać test połączenia."
-                                TextWrapping="Wrap"
-                                Foreground="#075985" />
+                                Classes="empty-state"
+                                Text="Brak lokalnych wpisów audytu."
+                                IsVisible="{Binding HasNoSettingsAuditLogEntries}" />
                         </StackPanel>
                     </Border>
                 </StackPanel>

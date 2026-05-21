@@ -1,0 +1,179 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="AppPageBackgroundBrush" Color="#EEF2F7" />
+            <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppCardBorderBrush" Color="#D8DEE6" />
+            <SolidColorBrush x:Key="AppPrimaryTextBrush" Color="#0F172A" />
+            <SolidColorBrush x:Key="AppSecondaryTextBrush" Color="#475569" />
+            <SolidColorBrush x:Key="AppMutedTextBrush" Color="#64748B" />
+
+            <SolidColorBrush x:Key="AppAccentBrush" Color="#2563EB" />
+            <SolidColorBrush x:Key="AppAccentForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#1D4ED8" />
+            <SolidColorBrush x:Key="AppDangerBrush" Color="#DC2626" />
+            <SolidColorBrush x:Key="AppDangerForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppDangerHoverBrush" Color="#B91C1C" />
+            <SolidColorBrush x:Key="AppWarningBrush" Color="#D97706" />
+            <SolidColorBrush x:Key="AppWarningForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppSuccessBrush" Color="#059669" />
+            <SolidColorBrush x:Key="AppSuccessForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppSecondaryButtonBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppSecondaryButtonBorderBrush" Color="#CBD5E1" />
+            <SolidColorBrush x:Key="AppSecondaryButtonHoverBrush" Color="#F8FAFC" />
+
+            <SolidColorBrush x:Key="AppChipBackgroundBrush" Color="#EFF6FF" />
+            <SolidColorBrush x:Key="AppChipForegroundBrush" Color="#1D4ED8" />
+            <SolidColorBrush x:Key="AppChipWarningBackgroundBrush" Color="#FFFBEB" />
+            <SolidColorBrush x:Key="AppChipWarningForegroundBrush" Color="#B45309" />
+
+            <SolidColorBrush x:Key="AppInputBackgroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppInputBackgroundPointerOverBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppInputBackgroundFocusedBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppInputBackgroundDisabledBrush" Color="#F1F5F9" />
+            <SolidColorBrush x:Key="AppInputForegroundBrush" Color="#0F172A" />
+            <SolidColorBrush x:Key="AppInputForegroundDisabledBrush" Color="#94A3B8" />
+            <SolidColorBrush x:Key="AppInputPlaceholderBrush" Color="#64748B" />
+            <SolidColorBrush x:Key="AppInputBorderBrush" Color="#CBD5E1" />
+            <SolidColorBrush x:Key="AppInputBorderPointerOverBrush" Color="#94A3B8" />
+            <SolidColorBrush x:Key="AppInputBorderFocusedBrush" Color="#2563EB" />
+            <SolidColorBrush x:Key="AppInputBorderDisabledBrush" Color="#E2E8F0" />
+            <SolidColorBrush x:Key="AppInputSelectionBrush" Color="#BFDBFE" />
+            <SolidColorBrush x:Key="AppInputSelectionForegroundBrush" Color="#0F172A" />
+            <SolidColorBrush x:Key="AppInputCaretBrush" Color="#0F172A" />
+
+            <SolidColorBrush x:Key="AppComboBoxPopupBackgroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppComboBoxItemPointerOverBrush" Color="#EFF6FF" />
+            <SolidColorBrush x:Key="AppComboBoxItemSelectedBrush" Color="#DBEAFE" />
+            <SolidColorBrush x:Key="AppComboBoxItemSelectedForegroundBrush" Color="#1E3A8A" />
+
+            <SolidColorBrush x:Key="AppButtonBackgroundBrush" Color="#475569" />
+            <SolidColorBrush x:Key="AppButtonForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppButtonBorderBrush" Color="#64748B" />
+            <SolidColorBrush x:Key="AppButtonPointerOverBrush" Color="#334155" />
+            <SolidColorBrush x:Key="AppButtonPressedBrush" Color="#1E293B" />
+            <SolidColorBrush x:Key="AppButtonDisabledBackgroundBrush" Color="#E2E8F0" />
+            <SolidColorBrush x:Key="AppButtonDisabledForegroundBrush" Color="#94A3B8" />
+
+            <SolidColorBrush x:Key="AppDataGridBackgroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppDataGridAlternateRowBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppDataGridHeaderBackgroundBrush" Color="#F1F5F9" />
+            <SolidColorBrush x:Key="AppDataGridHeaderForegroundBrush" Color="#0F172A" />
+            <SolidColorBrush x:Key="AppDataGridRowPointerOverBrush" Color="#EFF6FF" />
+            <SolidColorBrush x:Key="AppDataGridRowSelectedBrush" Color="#DBEAFE" />
+            <SolidColorBrush x:Key="AppDataGridRowSelectedForegroundBrush" Color="#0F172A" />
+            <SolidColorBrush x:Key="AppDataGridCellForegroundBrush" Color="#0F172A" />
+            <SolidColorBrush x:Key="AppDataGridGridLineBrush" Color="#E2E8F0" />
+            <SolidColorBrush x:Key="AppSubtlePanelBackgroundBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppMessageBubbleBackgroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppToolbarBackgroundBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppInfoPanelBackgroundBrush" Color="#EFF6FF" />
+            <SolidColorBrush x:Key="AppInfoPanelForegroundBrush" Color="#1E40AF" />
+            <SolidColorBrush x:Key="AppWarnPanelBackgroundBrush" Color="#FFFBEB" />
+            <SolidColorBrush x:Key="AppWarnPanelForegroundBrush" Color="#92400E" />
+            <SolidColorBrush x:Key="AppEmptyStateForegroundBrush" Color="#64748B" />
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="AppPageBackgroundBrush" Color="#0B1220" />
+            <SolidColorBrush x:Key="AppSurfaceBrush" Color="#151D2E" />
+            <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#1A2332" />
+            <SolidColorBrush x:Key="AppCardBorderBrush" Color="#334155" />
+            <SolidColorBrush x:Key="AppPrimaryTextBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppSecondaryTextBrush" Color="#CBD5E1" />
+            <SolidColorBrush x:Key="AppMutedTextBrush" Color="#94A3B8" />
+
+            <SolidColorBrush x:Key="AppAccentBrush" Color="#3B82F6" />
+            <SolidColorBrush x:Key="AppAccentForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#2563EB" />
+            <SolidColorBrush x:Key="AppDangerBrush" Color="#EF4444" />
+            <SolidColorBrush x:Key="AppDangerForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppDangerHoverBrush" Color="#DC2626" />
+            <SolidColorBrush x:Key="AppWarningBrush" Color="#F59E0B" />
+            <SolidColorBrush x:Key="AppWarningForegroundBrush" Color="#111827" />
+            <SolidColorBrush x:Key="AppSuccessBrush" Color="#10B981" />
+            <SolidColorBrush x:Key="AppSuccessForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppSecondaryButtonBrush" Color="#1A2332" />
+            <SolidColorBrush x:Key="AppSecondaryButtonBorderBrush" Color="#475569" />
+            <SolidColorBrush x:Key="AppSecondaryButtonHoverBrush" Color="#243044" />
+
+            <SolidColorBrush x:Key="AppChipBackgroundBrush" Color="#1E3A8A" />
+            <SolidColorBrush x:Key="AppChipForegroundBrush" Color="#BFDBFE" />
+            <SolidColorBrush x:Key="AppChipWarningBackgroundBrush" Color="#78350F" />
+            <SolidColorBrush x:Key="AppChipWarningForegroundBrush" Color="#FDE68A" />
+
+            <SolidColorBrush x:Key="AppInputBackgroundBrush" Color="#111827" />
+            <SolidColorBrush x:Key="AppInputBackgroundPointerOverBrush" Color="#1A2332" />
+            <SolidColorBrush x:Key="AppInputBackgroundFocusedBrush" Color="#111827" />
+            <SolidColorBrush x:Key="AppInputBackgroundDisabledBrush" Color="#1A2332" />
+            <SolidColorBrush x:Key="AppInputForegroundBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppInputForegroundDisabledBrush" Color="#64748B" />
+            <SolidColorBrush x:Key="AppInputPlaceholderBrush" Color="#94A3B8" />
+            <SolidColorBrush x:Key="AppInputBorderBrush" Color="#475569" />
+            <SolidColorBrush x:Key="AppInputBorderPointerOverBrush" Color="#64748B" />
+            <SolidColorBrush x:Key="AppInputBorderFocusedBrush" Color="#3B82F6" />
+            <SolidColorBrush x:Key="AppInputBorderDisabledBrush" Color="#334155" />
+            <SolidColorBrush x:Key="AppInputSelectionBrush" Color="#1D4ED8" />
+            <SolidColorBrush x:Key="AppInputSelectionForegroundBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppInputCaretBrush" Color="#F8FAFC" />
+
+            <SolidColorBrush x:Key="AppComboBoxPopupBackgroundBrush" Color="#1A2332" />
+            <SolidColorBrush x:Key="AppComboBoxItemPointerOverBrush" Color="#334155" />
+            <SolidColorBrush x:Key="AppComboBoxItemSelectedBrush" Color="#1E3A8A" />
+            <SolidColorBrush x:Key="AppComboBoxItemSelectedForegroundBrush" Color="#EFF6FF" />
+
+            <SolidColorBrush x:Key="AppButtonBackgroundBrush" Color="#475569" />
+            <SolidColorBrush x:Key="AppButtonForegroundBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppButtonBorderBrush" Color="#64748B" />
+            <SolidColorBrush x:Key="AppButtonPointerOverBrush" Color="#64748B" />
+            <SolidColorBrush x:Key="AppButtonPressedBrush" Color="#334155" />
+            <SolidColorBrush x:Key="AppButtonDisabledBackgroundBrush" Color="#334155" />
+            <SolidColorBrush x:Key="AppButtonDisabledForegroundBrush" Color="#64748B" />
+
+            <SolidColorBrush x:Key="AppDataGridBackgroundBrush" Color="#111827" />
+            <SolidColorBrush x:Key="AppDataGridAlternateRowBrush" Color="#151D2E" />
+            <SolidColorBrush x:Key="AppDataGridHeaderBackgroundBrush" Color="#1A2332" />
+            <SolidColorBrush x:Key="AppDataGridHeaderForegroundBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppDataGridRowPointerOverBrush" Color="#243044" />
+            <SolidColorBrush x:Key="AppDataGridRowSelectedBrush" Color="#1E3A8A" />
+            <SolidColorBrush x:Key="AppDataGridRowSelectedForegroundBrush" Color="#EFF6FF" />
+            <SolidColorBrush x:Key="AppDataGridCellForegroundBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppDataGridGridLineBrush" Color="#334155" />
+            <SolidColorBrush x:Key="AppSubtlePanelBackgroundBrush" Color="#111827" />
+            <SolidColorBrush x:Key="AppMessageBubbleBackgroundBrush" Color="#151D2E" />
+            <SolidColorBrush x:Key="AppToolbarBackgroundBrush" Color="#111827" />
+            <SolidColorBrush x:Key="AppInfoPanelBackgroundBrush" Color="#172554" />
+            <SolidColorBrush x:Key="AppInfoPanelForegroundBrush" Color="#BFDBFE" />
+            <SolidColorBrush x:Key="AppWarnPanelBackgroundBrush" Color="#78350F" />
+            <SolidColorBrush x:Key="AppWarnPanelForegroundBrush" Color="#FDE68A" />
+            <SolidColorBrush x:Key="AppEmptyStateForegroundBrush" Color="#94A3B8" />
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#0F172A" />
+    <SolidColorBrush x:Key="SidebarSurfaceBrush" Color="#1E293B" />
+    <SolidColorBrush x:Key="SidebarMutedTextBrush" Color="#94A3B8" />
+    <SolidColorBrush x:Key="SidebarPrimaryTextBrush" Color="#F8FAFC" />
+    <SolidColorBrush x:Key="SidebarNavBackgroundBrush" Color="#1E293B" />
+    <SolidColorBrush x:Key="SidebarNavPointerOverBrush" Color="#334155" />
+    <SolidColorBrush x:Key="SidebarNavPressedBrush" Color="#475569" />
+    <SolidColorBrush x:Key="SidebarNavActiveBackgroundBrush" Color="#1E3A8A" />
+    <SolidColorBrush x:Key="SidebarNavActiveAccentBrush" Color="#60A5FA" />
+    <SolidColorBrush x:Key="SidebarNavForegroundBrush" Color="#E2E8F0" />
+    <SolidColorBrush x:Key="SidebarNavActiveForegroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SidebarLogoutBackgroundBrush" Color="#334155" />
+    <SolidColorBrush x:Key="SidebarLogoutPointerOverBrush" Color="#475569" />
+    <SolidColorBrush x:Key="SidebarDividerBrush" Color="#334155" />
+
+    <Thickness x:Key="AppPagePadding">24,20</Thickness>
+    <Thickness x:Key="AppCardPadding">18</Thickness>
+    <Thickness x:Key="AppCardMargin">0,0,0,20</Thickness>
+    <CornerRadius x:Key="AppCardCornerRadius">12</CornerRadius>
+    <x:Double x:Key="AppContentMaxWidth">1500</x:Double>
+
+</ResourceDictionary>

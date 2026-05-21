@@ -48,6 +48,19 @@ public class AuthService
         return true;
     }
 
+    public async Task<bool> RefreshTokenAsync()
+    {
+        var response = await _apiService.PostAsync<object, LoginResponse>("refresh", new { });
+
+        if (response is null || string.IsNullOrWhiteSpace(response.AccessToken))
+            return false;
+
+        await _tokenStorage.SaveTokenAsync(response.AccessToken);
+        _apiService.SetToken(response.AccessToken);
+
+        return true;
+    }
+
     public async Task LogoutAsync()
     {
         try

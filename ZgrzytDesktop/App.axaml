@@ -3,9 +3,19 @@
              x:Class="ZgrzytDesktop.App"
              RequestedThemeVariant="Default">
 
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://ZgrzytDesktop/Styles/ThemeAwareBrushes.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://ZgrzytDesktop/Styles/AppControlStyles.axaml" />
+        <StyleInclude Source="avares://ZgrzytDesktop/Styles/AppLayoutStyles.axaml" />
     </Application.Styles>
 
 </Application>

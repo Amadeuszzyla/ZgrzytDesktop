@@ -60,4 +60,22 @@ public class Ticket
 
     [JsonPropertyName("updated_at")]
     public DateTime? UpdatedAt { get; set; }
+
+    [JsonPropertyName("closed_at")]
+    public DateTime? ClosedAt { get; set; }
+
+    [JsonPropertyName("category")]
+    public string? Category { get; set; }
+}
+
+/// <summary>
+/// Rozszerzony widok zgłoszenia z API (pełniejszy kontrakt niż lista).
+/// </summary>
+public class TicketFull : Ticket
+{
+    [JsonPropertyName("resolved_at")]
+    public DateTime? ResolvedAt { get; set; }
+
+    [JsonPropertyName("deleted_at")]
+    public DateTime? DeletedAt { get; set; }
 }

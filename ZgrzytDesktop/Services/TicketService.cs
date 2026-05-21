@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Models;
@@ -88,16 +89,19 @@ public class TicketService
 
     public async Task<Ticket?> GetTicketAsync(int id)
     {
-        return await _apiService.GetAsync<Ticket>($"tickets/{id}");
+        return await _apiService.GetAsync<TicketFull>($"tickets/{id}");
     }
 
     public async Task<List<Message>> GetTicketMessagesAsync(int ticketId)
     {
-        var messages = await _apiService.GetAsync<List<Message>>(
+        var messages = await _apiService.GetAsync<List<MessageFull>>(
             $"tickets/{ticketId}/messages"
         );
 
-        return messages ?? new List<Message>();
+        if (messages is null)
+            return new List<Message>();
+
+        return messages.Select(message => (Message)message).ToList();
     }
 
     public async Task<Ticket?> CreateTicketAsync(CreateTicketRequest request)

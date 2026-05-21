@@ -1,0 +1,309 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style Selector="Border.app-card">
+        <Setter Property="Background" Value="{DynamicResource AppCardBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource AppCardCornerRadius}" />
+        <Setter Property="Padding" Value="{DynamicResource AppCardPadding}" />
+        <Setter Property="Margin" Value="{DynamicResource AppCardMargin}" />
+    </Style>
+
+    <Style Selector="Border.app-card-compact">
+        <Setter Property="Background" Value="{DynamicResource AppCardBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource AppCardCornerRadius}" />
+        <Setter Property="Padding" Value="14" />
+    </Style>
+
+    <Style Selector="Border.app-toolbar">
+        <Setter Property="Background" Value="{DynamicResource AppToolbarBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,10" />
+    </Style>
+
+    <Style Selector="Border.app-subtle-panel">
+        <Setter Property="Background" Value="{DynamicResource AppSubtlePanelBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12" />
+    </Style>
+
+    <Style Selector="Border.app-chip">
+        <Setter Property="Background" Value="{DynamicResource AppChipBackgroundBrush}" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <Style Selector="Border.app-chip-warning">
+        <Setter Property="Background" Value="{DynamicResource AppChipWarningBackgroundBrush}" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <Style Selector="TextBlock.app-chip-text">
+        <Setter Property="Foreground" Value="{DynamicResource AppChipForegroundBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="TextBlock.app-chip-text-warning">
+        <Setter Property="Foreground" Value="{DynamicResource AppChipWarningForegroundBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="TextBlock.section-title">
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource AppPrimaryTextBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.section-title-large">
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource AppPrimaryTextBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.section-subtitle">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource AppMutedTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="18" />
+    </Style>
+
+    <Style Selector="TextBlock.field-label">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource AppSecondaryTextBrush}" />
+        <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+
+    <Style Selector="TextBlock.ticket-title">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource AppPrimaryTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style Selector="TextBlock.empty-state">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource AppEmptyStateForegroundBrush}" />
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="16" />
+    </Style>
+
+    <Style Selector="StackPanel.page-content">
+        <Setter Property="Spacing" Value="20" />
+        <Setter Property="Margin" Value="{DynamicResource AppPagePadding}" />
+        <Setter Property="MaxWidth" Value="{DynamicResource AppContentMaxWidth}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+    <Style Selector="Border.kpi-card">
+        <Setter Property="Background" Value="{DynamicResource AppSubtlePanelBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="14" />
+        <Setter Property="Margin" Value="0,0,10,0" />
+    </Style>
+
+    <!-- Sidebar navigation -->
+    <Style Selector="Button.sidebar-nav">
+        <Setter Property="Background" Value="{DynamicResource SidebarNavBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SidebarNavForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Margin" Value="0,3" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <Style Selector="Button.sidebar-nav:pointerover">
+        <Setter Property="Background" Value="{DynamicResource SidebarNavPointerOverBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SidebarPrimaryTextBrush}" />
+    </Style>
+
+    <Style Selector="Button.sidebar-nav:pressed">
+        <Setter Property="Background" Value="{DynamicResource SidebarNavPressedBrush}" />
+    </Style>
+
+    <Style Selector="Button.sidebar-nav:disabled">
+        <Setter Property="Opacity" Value="0.5" />
+        <Setter Property="Background" Value="{DynamicResource SidebarNavBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SidebarMutedTextBrush}" />
+    </Style>
+
+    <Style Selector="Button.sidebar-nav.active">
+        <Setter Property="Background" Value="{DynamicResource SidebarNavActiveBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SidebarNavActiveForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SidebarNavActiveAccentBrush}" />
+        <Setter Property="BorderThickness" Value="3,1,1,1" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="Button.sidebar-nav.active:pointerover">
+        <Setter Property="Background" Value="{DynamicResource SidebarNavActiveBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SidebarNavActiveForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SidebarNavActiveAccentBrush}" />
+        <Setter Property="BorderThickness" Value="3,1,1,1" />
+    </Style>
+
+    <Style Selector="Button.sidebar-logout">
+        <Setter Property="Background" Value="{DynamicResource SidebarLogoutBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SidebarNavForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SidebarDividerBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,8,0,0" />
+    </Style>
+
+    <Style Selector="Button.sidebar-logout:pointerover">
+        <Setter Property="Background" Value="{DynamicResource SidebarLogoutPointerOverBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SidebarPrimaryTextBrush}" />
+    </Style>
+
+    <Style Selector="Button.sidebar-logout:pressed">
+        <Setter Property="Background" Value="{DynamicResource SidebarNavPressedBrush}" />
+    </Style>
+
+    <!-- Action buttons -->
+    <Style Selector="Button.btn-primary">
+        <Setter Property="Background" Value="{DynamicResource AppAccentBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppAccentForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppAccentBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,9" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="Button.btn-primary:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppAccentHoverBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppAccentHoverBrush}" />
+    </Style>
+
+    <Style Selector="Button.btn-secondary">
+        <Setter Property="Background" Value="{DynamicResource AppSecondaryButtonBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppPrimaryTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppSecondaryButtonBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,9" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="Button.btn-secondary:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppSecondaryButtonHoverBrush}" />
+    </Style>
+
+    <Style Selector="Button.btn-secondary:disabled">
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundDisabledBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundDisabledBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderDisabledBrush}" />
+    </Style>
+
+    <Style Selector="Button.btn-primary:disabled">
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundDisabledBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundDisabledBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderDisabledBrush}" />
+    </Style>
+
+    <Style Selector="Button.btn-danger:disabled">
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundDisabledBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundDisabledBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderDisabledBrush}" />
+    </Style>
+
+    <Style Selector="Button.btn-secondary.active">
+        <Setter Property="Background" Value="{DynamicResource AppAccentBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppAccentForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppAccentBrush}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="Button.btn-warning">
+        <Setter Property="Background" Value="{DynamicResource AppWarningBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppWarningForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppWarningBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,9" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="Button.btn-danger">
+        <Setter Property="Background" Value="{DynamicResource AppDangerBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppDangerForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppDangerBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,9" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="Button.btn-danger:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppDangerHoverBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppDangerHoverBrush}" />
+    </Style>
+
+    <Style Selector="Button.btn-ghost">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource AppSecondaryTextBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="MinHeight" Value="34" />
+    </Style>
+
+    <Style Selector="Button.btn-ghost:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppSecondaryButtonHoverBrush}" />
+    </Style>
+
+    <Style Selector="Button.filter-action">
+        <Setter Property="MinWidth" Value="96" />
+        <Setter Property="MinHeight" Value="38" />
+        <Setter Property="Padding" Value="14,9" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="Border.message-bubble">
+        <Setter Property="Background" Value="{DynamicResource AppMessageBubbleBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Margin" Value="0,0,0,10" />
+    </Style>
+
+</Styles>

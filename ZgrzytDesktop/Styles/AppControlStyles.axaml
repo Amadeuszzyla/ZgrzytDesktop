@@ -1,0 +1,211 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- TextBox / PasswordBox (PasswordChar) -->
+    <Style Selector="TextBox">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="CaretBrush" Value="{DynamicResource AppInputCaretBrush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource AppInputSelectionBrush}" />
+        <Setter Property="SelectionForegroundBrush" Value="{DynamicResource AppInputSelectionForegroundBrush}" />
+        <Setter Property="PlaceholderForeground" Value="{DynamicResource AppInputPlaceholderBrush}" />
+    </Style>
+
+    <Style Selector="TextBox:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundPointerOverBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderPointerOverBrush}" />
+    </Style>
+
+    <Style Selector="TextBox:focus, TextBox:focus-within">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundFocusedBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderFocusedBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
+
+    <Style Selector="TextBox:disabled">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundDisabledBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundDisabledBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderDisabledBrush}" />
+        <Setter Property="Opacity" Value="0.85" />
+    </Style>
+
+    <Style Selector="TextBox /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderBrush}" />
+    </Style>
+
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundPointerOverBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderPointerOverBrush}" />
+    </Style>
+
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement, TextBox:focus-within /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundFocusedBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderFocusedBrush}" />
+    </Style>
+
+    <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
+        <Setter Property="Foreground" Value="{DynamicResource AppInputPlaceholderBrush}" />
+    </Style>
+
+    <!-- ComboBox -->
+    <Style Selector="ComboBox">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="10,8" />
+    </Style>
+
+    <Style Selector="ComboBox:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundPointerOverBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderPointerOverBrush}" />
+    </Style>
+
+    <Style Selector="ComboBox:focus, ComboBox:focus-within">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundFocusedBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderFocusedBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
+
+    <Style Selector="ComboBox:disabled">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundDisabledBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundDisabledBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderDisabledBrush}" />
+        <Setter Property="Opacity" Value="0.85" />
+    </Style>
+
+    <Style Selector="ComboBox /template/ Border#Background">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderBrush}" />
+    </Style>
+
+    <Style Selector="ComboBox:pointerover /template/ Border#Background">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundPointerOverBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderPointerOverBrush}" />
+    </Style>
+
+    <Style Selector="ComboBox:focus /template/ Border#Background, ComboBox:focus-within /template/ Border#Background">
+        <Setter Property="Background" Value="{DynamicResource AppInputBackgroundFocusedBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderFocusedBrush}" />
+    </Style>
+
+    <Style Selector="ComboBox /template/ Border#PopupBorder">
+        <Setter Property="Background" Value="{DynamicResource AppComboBoxPopupBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderBrush}" />
+    </Style>
+
+    <Style Selector="ComboBoxItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundBrush}" />
+        <Setter Property="Padding" Value="10,8" />
+    </Style>
+
+    <Style Selector="ComboBoxItem:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppComboBoxItemPointerOverBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundBrush}" />
+    </Style>
+
+    <Style Selector="ComboBoxItem:selected">
+        <Setter Property="Background" Value="{DynamicResource AppComboBoxItemSelectedBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppComboBoxItemSelectedForegroundBrush}" />
+    </Style>
+
+    <Style Selector="ComboBoxItem:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundDisabledBrush}" />
+        <Setter Property="Opacity" Value="0.7" />
+    </Style>
+
+    <!-- Button (local setters on nav buttons in sidebar remain valid) -->
+    <Style Selector="Button">
+        <Setter Property="Background" Value="{DynamicResource AppButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppButtonForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppButtonBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="10,8" />
+    </Style>
+
+    <Style Selector="Button:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppButtonPointerOverBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppButtonForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Button:pressed">
+        <Setter Property="Background" Value="{DynamicResource AppButtonPressedBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppButtonForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Button:disabled">
+        <Setter Property="Background" Value="{DynamicResource AppButtonDisabledBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppButtonDisabledForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderDisabledBrush}" />
+        <Setter Property="Opacity" Value="0.75" />
+    </Style>
+
+    <!-- DataGrid -->
+    <Style Selector="DataGrid">
+        <Setter Property="Background" Value="{DynamicResource AppDataGridBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppDataGridCellForegroundBrush}" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource AppDataGridGridLineBrush}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource AppDataGridGridLineBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource AppDataGridHeaderBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppDataGridHeaderForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppDataGridGridLineBrush}" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="DataGridColumnHeader:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppDataGridRowPointerOverBrush}" />
+    </Style>
+
+    <Style Selector="DataGridRow">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="DataGridRow:nth-child(2n)">
+        <Setter Property="Background" Value="{DynamicResource AppDataGridAlternateRowBrush}" />
+    </Style>
+
+    <Style Selector="DataGridRow:nth-child(2n):pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppDataGridRowPointerOverBrush}" />
+    </Style>
+
+    <Style Selector="DataGridRow:nth-child(2n):selected">
+        <Setter Property="Background" Value="{DynamicResource AppDataGridRowSelectedBrush}" />
+    </Style>
+
+    <Style Selector="DataGridRow:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AppDataGridRowPointerOverBrush}" />
+    </Style>
+
+    <Style Selector="DataGridRow:selected">
+        <Setter Property="Background" Value="{DynamicResource AppDataGridRowSelectedBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppDataGridRowSelectedForegroundBrush}" />
+    </Style>
+
+    <Style Selector="DataGridCell">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource AppDataGridCellForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppDataGridGridLineBrush}" />
+        <Setter Property="Padding" Value="10,6" />
+    </Style>
+
+    <Style Selector="DataGridRow:selected DataGridCell">
+        <Setter Property="Foreground" Value="{DynamicResource AppDataGridRowSelectedForegroundBrush}" />
+    </Style>
+
+</Styles>

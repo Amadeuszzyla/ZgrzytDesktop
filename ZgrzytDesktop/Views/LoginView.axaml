@@ -51,14 +51,11 @@
 
                 <TextBox
                     Text="{Binding Login, Mode=TwoWay}"
-                    Watermark="Wpisz login"
+                    PlaceholderText="Wpisz login"
                     Height="42"
                     FontSize="14"
                     Padding="10,9,10,5"
                     VerticalContentAlignment="Center"
-                    Background="#111827"
-                    Foreground="White"
-                    BorderBrush="#4B5563"
                     IsEnabled="{Binding IsNotLoading}" />
 
                 <TextBlock
@@ -66,84 +63,15 @@
                     FontWeight="SemiBold"
                     Foreground="#D1D5DB" />
 
-                <Grid>
-                    <TextBox
-                        Text="{Binding Password, Mode=TwoWay}"
-                        PasswordChar="•"
-                        Watermark="Wpisz hasło"
-                        Height="42"
-                        FontSize="14"
-                        Padding="10,9,42,5"
-                        VerticalContentAlignment="Center"
-                        Background="#111827"
-                        Foreground="White"
-                        BorderBrush="#4B5563"
-                        IsVisible="{Binding IsPasswordHidden}"
-                        IsEnabled="{Binding IsNotLoading}" />
-
-                    <TextBox
-                        Text="{Binding Password, Mode=TwoWay}"
-                        Watermark="Wpisz hasło"
-                        Height="42"
-                        FontSize="14"
-                        Padding="10,9,42,5"
-                        VerticalContentAlignment="Center"
-                        Background="#111827"
-                        Foreground="White"
-                        BorderBrush="#4B5563"
-                        IsVisible="{Binding IsPasswordVisible}"
-                        IsEnabled="{Binding IsNotLoading}" />
-
-                    <Button
-                        Command="{Binding TogglePasswordVisibilityCommand}"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Width="36"
-                        Height="36"
-                        Margin="0,0,3,0"
-                        Padding="0"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
-                        BorderThickness="0"
-                        IsVisible="{Binding IsPasswordHidden}"
-                        IsEnabled="{Binding IsNotLoading}">
-
-                        <PathIcon
-                            Width="19"
-                            Height="19"
-                            Foreground="#D1D5DB"
-                            Data="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 16.5C9.51 16.5 7.5 14.49 7.5 12C7.5 9.51 9.51 7.5 12 7.5C14.49 7.5 16.5 9.51 16.5 12C16.5 14.49 14.49 16.5 12 16.5ZM12 9.5C10.62 9.5 9.5 10.62 9.5 12C9.5 13.38 10.62 14.5 12 14.5C13.38 14.5 14.5 13.38 14.5 12C14.5 10.62 13.38 9.5 12 9.5Z" />
-                    </Button>
-
-                    <Button
-                        Command="{Binding TogglePasswordVisibilityCommand}"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Width="36"
-                        Height="36"
-                        Margin="0,0,3,0"
-                        Padding="0"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
-                        BorderThickness="0"
-                        IsVisible="{Binding IsPasswordVisible}"
-                        IsEnabled="{Binding IsNotLoading}">
-
-                        <Grid Width="22" Height="22">
-                            <PathIcon
-                                Width="19"
-                                Height="19"
-                                Foreground="#D1D5DB"
-                                Data="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 16.5C9.51 16.5 7.5 14.49 7.5 12C7.5 9.51 9.51 7.5 12 7.5C14.49 7.5 16.5 9.51 16.5 12C16.5 14.49 14.49 16.5 12 16.5ZM12 9.5C10.62 9.5 9.5 10.62 9.5 12C9.5 13.38 10.62 14.5 12 14.5C13.38 14.5 14.5 13.38 14.5 12C14.5 10.62 13.38 9.5 12 9.5Z" />
-
-                            <Path
-                                Data="M3,19 L19,3"
-                                Stroke="#D1D5DB"
-                                StrokeThickness="2.2"
-                                StrokeLineCap="Round" />
-                        </Grid>
-                    </Button>
-                </Grid>
+                <TextBox
+                    Text="{Binding Password, Mode=TwoWay}"
+                    PasswordChar="•"
+                    PlaceholderText="Wpisz hasło"
+                    Height="42"
+                    FontSize="14"
+                    Padding="10,9,10,5"
+                    VerticalContentAlignment="Center"
+                    IsEnabled="{Binding IsNotLoading}" />
 
                 <Button
                     Content="{Binding LoginButtonText}"
@@ -152,9 +80,6 @@
                     HorizontalContentAlignment="Center"
                     Padding="12"
                     Margin="0,8,0,0"
-                    Background="#374151"
-                    Foreground="White"
-                    BorderBrush="#4B5563"
                     FontWeight="SemiBold"
                     IsEnabled="{Binding IsNotLoading}" />
 

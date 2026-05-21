@@ -10,9 +10,19 @@ public class TokenStorage
     private readonly string _filePath;
 
     public TokenStorage()
+        : this(null)
     {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var directory = Path.Combine(appData, "ZgrzytDesktop");
+    }
+
+    public TokenStorage(string? customDirectory)
+    {
+        var directory = customDirectory;
+
+        if (string.IsNullOrWhiteSpace(directory))
+        {
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            directory = Path.Combine(appData, "ZgrzytDesktop");
+        }
 
         Directory.CreateDirectory(directory);
 
@@ -33,9 +43,7 @@ public class TokenStorage
                 return null;
 
             var stored = File.ReadAllText(_filePath);
-            var token = LocalDataProtector.UnprotectString(stored);
-
-            return string.IsNullOrWhiteSpace(token) ? null : token;
+            return ParseStoredToken(stored, migrateLegacyPlaintext: true);
         }
         catch
         {
@@ -51,13 +59,62 @@ public class TokenStorage
                 return null;
 
             var stored = await File.ReadAllTextAsync(_filePath);
-            var token = LocalDataProtector.UnprotectString(stored);
-
-            return string.IsNullOrWhiteSpace(token) ? null : token;
+            return ParseStoredToken(stored, migrateLegacyPlaintext: true);
         }
         catch
         {
             return null;
+        }
+    }
+
+    private string? ParseStoredToken(string stored, bool migrateLegacyPlaintext)
+    {
+        var trimmed = stored.Trim();
+
+        if (string.IsNullOrWhiteSpace(trimmed))
+            return null;
+
+        var protectedToken = LocalDataProtector.UnprotectString(trimmed);
+
+        if (!string.IsNullOrWhiteSpace(protectedToken))
+            return protectedToken;
+
+        if (!IsLikelyLegacyPlaintextToken(trimmed))
+            return null;
+
+        if (migrateLegacyPlaintext)
+        {
+            try
+            {
+                var protectedValue = LocalDataProtector.ProtectString(trimmed);
+
+                if (!string.IsNullOrWhiteSpace(protectedValue))
+                    File.WriteAllText(_filePath, protectedValue);
+            }
+            catch
+            {
+                // Migracja nie może zablokować logowania.
+            }
+        }
+
+        return trimmed;
+    }
+
+    private static bool IsLikelyLegacyPlaintextToken(string value)
+    {
+        if (value.Length < 8)
+            return false;
+
+        try
+        {
+            var bytes = Convert.FromBase64String(value);
+
+            // DPAPI blob jest zwykle dłuższy niż sam token JWT w plaintext.
+            return bytes.Length < 48;
+        }
+        catch
+        {
+            return true;
         }
     }
 

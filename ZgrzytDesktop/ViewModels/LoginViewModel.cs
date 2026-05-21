@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 
 namespace ZgrzytDesktop.ViewModels;
@@ -17,8 +18,6 @@ public partial class LoginViewModel : ViewModelBase
     private string _password = string.Empty;
     private string _errorMessage = string.Empty;
     private bool _isLoading;
-    private bool _isPasswordVisible;
-
     public string Login
     {
         get => _login;
@@ -62,23 +61,7 @@ public partial class LoginViewModel : ViewModelBase
 
     public string LoginButtonText => IsLoading ? "Logowanie..." : "Zaloguj";
 
-    public bool IsPasswordVisible
-    {
-        get => _isPasswordVisible;
-        set
-        {
-            if (SetProperty(ref _isPasswordVisible, value))
-            {
-                OnPropertyChanged(nameof(IsPasswordHidden));
-            }
-        }
-    }
-
-    public bool IsPasswordHidden => !IsPasswordVisible;
-
     public IAsyncRelayCommand LoginCommand { get; }
-
-    public IRelayCommand TogglePasswordVisibilityCommand { get; }
 
     public LoginViewModel(
         AuthService authService,
@@ -90,12 +73,6 @@ public partial class LoginViewModel : ViewModelBase
         _onLoginSuccess = onLoginSuccess;
 
         LoginCommand = new AsyncRelayCommand(LoginAsync);
-        TogglePasswordVisibilityCommand = new RelayCommand(TogglePasswordVisibility);
-    }
-
-    private void TogglePasswordVisibility()
-    {
-        IsPasswordVisible = !IsPasswordVisible;
     }
 
     private async Task LoginAsync()
@@ -104,13 +81,13 @@ public partial class LoginViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(Login))
         {
-            ErrorMessage = "Podaj login.";
+            ErrorMessage = AppStrings.Get("Login_ProvideLogin");
             return;
         }
 
         if (string.IsNullOrWhiteSpace(Password))
         {
-            ErrorMessage = "Podaj hasło.";
+            ErrorMessage = AppStrings.Get("Login_ProvidePassword");
             return;
         }
 
@@ -143,17 +120,17 @@ public partial class LoginViewModel : ViewModelBase
             ErrorMessage = ex.StatusCode switch
             {
                 System.Net.HttpStatusCode.Unauthorized =>
-                    "Nieprawidłowy login albo hasło.",
+                    AppStrings.Get("Login_InvalidCredentials"),
 
                 System.Net.HttpStatusCode.ServiceUnavailable =>
-                    "Brak połączenia z API. Sprawdź, czy backend jest uruchomiony.",
+                    AppStrings.Get("Login_Offline"),
 
                 _ => ex.Message
             };
         }
         catch
         {
-            ErrorMessage = "Wystąpił nieoczekiwany błąd podczas logowania.";
+            ErrorMessage = AppStrings.Get("Login_UnexpectedError");
         }
         finally
         {

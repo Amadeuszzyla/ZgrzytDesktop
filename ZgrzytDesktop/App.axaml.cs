@@ -262,7 +262,7 @@ public partial class App : Application
             {
                 Content = new TextBlock
                 {
-                    Text = "Błąd startu aplikacji:\n\n" + ex,
+                    Text = "Nie udało się uruchomić aplikacji. Sprawdź połączenie z API i ustawienia, a następnie uruchom program ponownie.",
                     TextWrapping = TextWrapping.Wrap
                 }
             }
