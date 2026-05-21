@@ -25,6 +25,7 @@ public partial class App : Application
     private LocalTicketCacheService? _ticketCacheService;
     private LocalUserCacheService? _userCacheService;
     private LocalAuditLogService? _auditLogService;
+    private UserAdminService? _userAdminService;
 
     private MainWindow? _mainWindow;
 
@@ -70,13 +71,18 @@ public partial class App : Application
         var tokenStorage = new TokenStorage();
 
         _settingsService = new SettingsService();
+        var settings = _settingsService.LoadSync();
+        ZgrzytDesktop.Resources.AppStrings.ApplyCulture(settings.UiCulture);
+
         _apiService = new ApiService(tokenStorage, _settingsService);
 
         _authService = new AuthService(_apiService, tokenStorage);
+        _apiService.TryRefreshSessionAsync = () => _authService.RefreshTokenAsync();
         _ticketService = new TicketService(_apiService);
         _ticketCacheService = new LocalTicketCacheService();
         _userCacheService = new LocalUserCacheService();
         _auditLogService = new LocalAuditLogService();
+        _userAdminService = new UserAdminService(_apiService);
     }
 
     private async Task LogLoginAsync(User user, string description)
@@ -192,6 +198,9 @@ public partial class App : Application
         if (_auditLogService is null)
             throw new InvalidOperationException("LocalAuditLogService nie został zainicjalizowany.");
 
+        if (_userAdminService is null)
+            throw new InvalidOperationException("UserAdminService nie został zainicjalizowany.");
+
         var dashboardViewModel = new DashboardViewModel(
             user,
             _authService!,
@@ -200,6 +209,7 @@ public partial class App : Application
             _settingsService,
             _ticketCacheService,
             _auditLogService,
+            _userAdminService,
             LogoutAsync
         );
 

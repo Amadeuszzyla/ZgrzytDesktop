@@ -1,36 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="Login_ProvideLogin" xml:space="preserve">
-    <value>Podaj login.</value>
-  </data>
-  <data name="Login_ProvidePassword" xml:space="preserve">
-    <value>Podaj hasło.</value>
-  </data>
-  <data name="Login_InvalidCredentials" xml:space="preserve">
-    <value>Nieprawidłowy login albo hasło.</value>
-  </data>
-  <data name="Login_Offline" xml:space="preserve">
-    <value>Brak połączenia z API. Sprawdź, czy backend jest uruchomiony.</value>
-  </data>
-  <data name="Login_UnexpectedError" xml:space="preserve">
-    <value>Wystąpił nieoczekiwany błąd podczas logowania.</value>
-  </data>
-  <data name="Api_Forbidden" xml:space="preserve">
-    <value>Brak uprawnień do wykonania tej operacji.</value>
-  </data>
-  <data name="Api_Unauthorized" xml:space="preserve">
-    <value>Sesja wygasła albo użytkownik nie jest zalogowany.</value>
-  </data>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Login_ProvideLogin" xml:space="preserve"><value>Podaj login.</value></data>
+  <data name="Login_ProvidePassword" xml:space="preserve"><value>Podaj hasło.</value></data>
+  <data name="Login_InvalidCredentials" xml:space="preserve"><value>Nieprawidłowy login albo hasło.</value></data>
+  <data name="Login_Offline" xml:space="preserve"><value>Brak połączenia z API. Sprawdź, czy backend jest uruchomiony.</value></data>
+  <data name="Login_UnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas logowania.</value></data>
+  <data name="Api_Forbidden" xml:space="preserve"><value>Brak uprawnień do wykonania tej operacji.</value></data>
+  <data name="Api_Unauthorized" xml:space="preserve"><value>Sesja wygasła albo użytkownik nie jest zalogowany.</value></data>
+  <data name="Api_NotFound" xml:space="preserve"><value>Nie znaleziono zasobu lub endpoint nie istnieje.</value></data>
+  <data name="Api_HtmlResponse" xml:space="preserve"><value>Serwer zwrócił stronę błędu zamiast danych API. Sprawdź endpoint lub uprawnienia.</value></data>
+  <data name="Api_Conflict" xml:space="preserve"><value>Operacja jest sprzeczna z aktualnym stanem danych.</value></data>
+  <data name="Api_ServiceUnavailable" xml:space="preserve"><value>Brak połączenia z API. Sprawdź, czy backend działa.</value></data>
+  <data name="Api_InternalServerError" xml:space="preserve"><value>Błąd serwera. Spróbuj ponownie później.</value></data>
+  <data name="Api_UnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas komunikacji z API.</value></data>
+  <data name="Api_SessionExpired" xml:space="preserve"><value>Sesja wygasła. Zaloguj się ponownie.</value></data>
+  <data name="Nav_Tickets" xml:space="preserve"><value>Zgłoszenia</value></data>
+  <data name="Nav_RequestAccount" xml:space="preserve"><value>Zgłoś nowe konto</value></data>
+  <data name="Nav_Statistics" xml:space="preserve"><value>Statystyki</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Ustawienia</value></data>
+  <data name="Nav_Admin" xml:space="preserve"><value>Administracja</value></data>
+  <data name="Nav_Logout" xml:space="preserve"><value>Wyloguj</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>Panel obsługi zgłoszeń technicznych</value></data>
+  <data name="Section_Tickets" xml:space="preserve"><value>Zgłoszenia</value></data>
+  <data name="Section_Details" xml:space="preserve"><value>Szczegóły zgłoszenia</value></data>
+  <data name="Section_Settings" xml:space="preserve"><value>Ustawienia</value></data>
+  <data name="Section_RequestAccount" xml:space="preserve"><value>Zgłoś nowe konto</value></data>
+  <data name="Section_Statistics" xml:space="preserve"><value>Statystyki</value></data>
+  <data name="Section_Admin" xml:space="preserve"><value>Administracja</value></data>
+  <data name="Section_Default" xml:space="preserve"><value>ZGRZYT Desktop</value></data>
+  <data name="Tickets_FiltersTitle" xml:space="preserve"><value>Wyszukiwanie i filtry</value></data>
+  <data name="Tickets_FiltersSubtitle" xml:space="preserve"><value>Filtruj listę zgłoszeń i zarządzaj paginacją wyników.</value></data>
+  <data name="Tickets_SearchPlaceholder" xml:space="preserve"><value>Szukaj po tytule lub opisie...</value></data>
+  <data name="Tickets_Search" xml:space="preserve"><value>Szukaj</value></data>
+  <data name="Tickets_Clear" xml:space="preserve"><value>Wyczyść</value></data>
+  <data name="Tickets_RefreshNow" xml:space="preserve"><value>Odśwież teraz</value></data>
+  <data name="Tickets_ListTitle" xml:space="preserve"><value>Lista zgłoszeń</value></data>
+  <data name="Tickets_NewTitle" xml:space="preserve"><value>Nowe zgłoszenie</value></data>
+  <data name="Tickets_SortField" xml:space="preserve"><value>Sortuj według</value></data>
+  <data name="Tickets_SortDirection" xml:space="preserve"><value>Kierunek</value></data>
+  <data name="SortField_CreatedAt" xml:space="preserve"><value>Data utworzenia</value></data>
+  <data name="SortField_Title" xml:space="preserve"><value>Tytuł</value></data>
+  <data name="SortField_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="SortField_Priority" xml:space="preserve"><value>Priorytet</value></data>
+  <data name="SortDirection_Asc" xml:space="preserve"><value>Rosnąco</value></data>
+  <data name="SortDirection_Desc" xml:space="preserve"><value>Malejąco</value></data>
+  <data name="Admin_UsersTitle" xml:space="preserve"><value>Użytkownicy systemu</value></data>
+  <data name="Admin_UsersSubtitle" xml:space="preserve"><value>Zarządzanie kontami: listy, ban, aktywacja i odbanowanie.</value></data>
+  <data name="Admin_Filter_All" xml:space="preserve"><value>Wszyscy</value></data>
+  <data name="Admin_Filter_Active" xml:space="preserve"><value>Aktywni</value></data>
+  <data name="Admin_Filter_Inactive" xml:space="preserve"><value>Nieaktywni</value></data>
+  <data name="Admin_Filter_Banned" xml:space="preserve"><value>Zbanowani</value></data>
+  <data name="Admin_RefreshList" xml:space="preserve"><value>Odśwież listę</value></data>
+  <data name="Admin_Activate" xml:space="preserve"><value>Aktywuj</value></data>
+  <data name="Admin_Ban" xml:space="preserve"><value>Zbanuj</value></data>
+  <data name="Admin_Unban" xml:space="preserve"><value>Odbanuj</value></data>
+  <data name="Admin_UnbanPassword" xml:space="preserve"><value>Hasło (odbanowanie)</value></data>
+  <data name="Admin_NoUsers" xml:space="preserve"><value>Brak użytkowników do wyświetlenia.</value></data>
+  <data name="Admin_LoadingUsers" xml:space="preserve"><value>Pobieranie użytkowników...</value></data>
+  <data name="Admin_TabUsers" xml:space="preserve"><value>Użytkownicy</value></data>
+  <data name="Admin_TabNewAccount" xml:space="preserve"><value>Nowe konto</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Ustawienia aplikacji</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>Wygląd, język i zachowanie interfejsu.</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>Motyw aplikacji</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Język interfejsu</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Zapisz ustawienia</value></data>
+  <data name="Settings_RefreshSession" xml:space="preserve"><value>Odśwież sesję (token)</value></data>
+  <data name="Stats_Title" xml:space="preserve"><value>Statystyki zgłoszeń</value></data>
+  <data name="Stats_LoadAll" xml:space="preserve"><value>Pobierz statystyki ze wszystkich stron</value></data>
+  <data name="Stats_KpiAll" xml:space="preserve"><value>Wszystkie</value></data>
+  <data name="Stats_KpiNew" xml:space="preserve"><value>Nowe</value></data>
+  <data name="Stats_KpiInProgress" xml:space="preserve"><value>W toku</value></data>
+  <data name="Stats_KpiClosed" xml:space="preserve"><value>Rozwiązane</value></data>
+  <data name="Stats_KpiHighPriority" xml:space="preserve"><value>Wysoki priorytet</value></data>
+  <data name="Toast_SettingsSaved" xml:space="preserve"><value>Ustawienia zapisane</value></data>
+  <data name="Toast_SettingsSaveFailed" xml:space="preserve"><value>Nie udało się zapisać ustawień.</value></data>
+  <data name="Toast_SessionRefreshed" xml:space="preserve"><value>Token sesji został odświeżony.</value></data>
+  <data name="Toast_SessionRefreshFailed" xml:space="preserve"><value>Nie udało się odświeżyć sesji.</value></data>
+  <data name="Toast_UserBanned" xml:space="preserve"><value>Użytkownik został zbanowany.</value></data>
+  <data name="Toast_UserActivated" xml:space="preserve"><value>Użytkownik został aktywowany.</value></data>
+  <data name="Toast_UserUnbanned" xml:space="preserve"><value>Użytkownik został odbanowany.</value></data>
+  <data name="Toast_AdminUsersLoadFailed" xml:space="preserve"><value>Nie udało się pobrać użytkowników.</value></data>
+  <data name="Toast_AdminBanFailed" xml:space="preserve"><value>Nie udało się zbanować użytkownika.</value></data>
+  <data name="Toast_AdminActivateFailed" xml:space="preserve"><value>Nie udało się aktywować użytkownika.</value></data>
+  <data name="Toast_AdminUnbanFailed" xml:space="preserve"><value>Nie udało się odbanować użytkownika.</value></data>
+  <data name="Toast_AdminUnbanPasswordRequired" xml:space="preserve"><value>Podaj hasło do odbanowania użytkownika.</value></data>
+  <data name="Lang_Polish" xml:space="preserve"><value>Polski</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
 </root>

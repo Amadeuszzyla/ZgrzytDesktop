@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Login_ProvideLogin" xml:space="preserve"><value>Enter login.</value></data>
+  <data name="Login_ProvidePassword" xml:space="preserve"><value>Enter password.</value></data>
+  <data name="Login_InvalidCredentials" xml:space="preserve"><value>Invalid login or password.</value></data>
+  <data name="Login_Offline" xml:space="preserve"><value>Cannot reach API. Check that the backend is running.</value></data>
+  <data name="Login_UnexpectedError" xml:space="preserve"><value>An unexpected error occurred during login.</value></data>
+  <data name="Api_Forbidden" xml:space="preserve"><value>You do not have permission to perform this action.</value></data>
+  <data name="Api_Unauthorized" xml:space="preserve"><value>Session expired or user is not logged in.</value></data>
+  <data name="Api_NotFound" xml:space="preserve"><value>Resource or endpoint not found.</value></data>
+  <data name="Api_HtmlResponse" xml:space="preserve"><value>Server returned an error page instead of API data. Check endpoint or permissions.</value></data>
+  <data name="Api_Conflict" xml:space="preserve"><value>Operation conflicts with current data state.</value></data>
+  <data name="Api_ServiceUnavailable" xml:space="preserve"><value>Cannot reach API. Check that the backend is running.</value></data>
+  <data name="Api_InternalServerError" xml:space="preserve"><value>Server error. Try again later.</value></data>
+  <data name="Api_UnexpectedError" xml:space="preserve"><value>An unexpected API communication error occurred.</value></data>
+  <data name="Api_SessionExpired" xml:space="preserve"><value>Session expired. Please sign in again.</value></data>
+  <data name="Nav_Tickets" xml:space="preserve"><value>Tickets</value></data>
+  <data name="Nav_RequestAccount" xml:space="preserve"><value>Request account</value></data>
+  <data name="Nav_Statistics" xml:space="preserve"><value>Statistics</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav_Admin" xml:space="preserve"><value>Administration</value></data>
+  <data name="Nav_Logout" xml:space="preserve"><value>Sign out</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>Technical support ticket panel</value></data>
+  <data name="Section_Tickets" xml:space="preserve"><value>Tickets</value></data>
+  <data name="Section_Details" xml:space="preserve"><value>Ticket details</value></data>
+  <data name="Section_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Section_RequestAccount" xml:space="preserve"><value>Request account</value></data>
+  <data name="Section_Statistics" xml:space="preserve"><value>Statistics</value></data>
+  <data name="Section_Admin" xml:space="preserve"><value>Administration</value></data>
+  <data name="Section_Default" xml:space="preserve"><value>ZGRZYT Desktop</value></data>
+  <data name="Tickets_FiltersTitle" xml:space="preserve"><value>Search and filters</value></data>
+  <data name="Tickets_FiltersSubtitle" xml:space="preserve"><value>Filter the ticket list and manage pagination.</value></data>
+  <data name="Tickets_SearchPlaceholder" xml:space="preserve"><value>Search by title or description...</value></data>
+  <data name="Tickets_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Tickets_Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="Tickets_RefreshNow" xml:space="preserve"><value>Refresh now</value></data>
+  <data name="Tickets_ListTitle" xml:space="preserve"><value>Ticket list</value></data>
+  <data name="Tickets_NewTitle" xml:space="preserve"><value>New ticket</value></data>
+  <data name="Tickets_SortField" xml:space="preserve"><value>Sort by</value></data>
+  <data name="Tickets_SortDirection" xml:space="preserve"><value>Direction</value></data>
+  <data name="SortField_CreatedAt" xml:space="preserve"><value>Created date</value></data>
+  <data name="SortField_Title" xml:space="preserve"><value>Title</value></data>
+  <data name="SortField_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="SortField_Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="SortDirection_Asc" xml:space="preserve"><value>Ascending</value></data>
+  <data name="SortDirection_Desc" xml:space="preserve"><value>Descending</value></data>
+  <data name="Admin_UsersTitle" xml:space="preserve"><value>System users</value></data>
+  <data name="Admin_UsersSubtitle" xml:space="preserve"><value>Manage accounts: lists, ban, activate and unban.</value></data>
+  <data name="Admin_Filter_All" xml:space="preserve"><value>All</value></data>
+  <data name="Admin_Filter_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Admin_Filter_Inactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="Admin_Filter_Banned" xml:space="preserve"><value>Banned</value></data>
+  <data name="Admin_RefreshList" xml:space="preserve"><value>Refresh list</value></data>
+  <data name="Admin_Activate" xml:space="preserve"><value>Activate</value></data>
+  <data name="Admin_Ban" xml:space="preserve"><value>Ban</value></data>
+  <data name="Admin_Unban" xml:space="preserve"><value>Unban</value></data>
+  <data name="Admin_UnbanPassword" xml:space="preserve"><value>Password (unban)</value></data>
+  <data name="Admin_NoUsers" xml:space="preserve"><value>No users to display.</value></data>
+  <data name="Admin_LoadingUsers" xml:space="preserve"><value>Loading users...</value></data>
+  <data name="Admin_TabUsers" xml:space="preserve"><value>Users</value></data>
+  <data name="Admin_TabNewAccount" xml:space="preserve"><value>New account</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Application settings</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>Appearance, language and UI behavior.</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>Application theme</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Interface language</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Save settings</value></data>
+  <data name="Settings_RefreshSession" xml:space="preserve"><value>Refresh session (token)</value></data>
+  <data name="Stats_Title" xml:space="preserve"><value>Ticket statistics</value></data>
+  <data name="Stats_LoadAll" xml:space="preserve"><value>Load statistics from all pages</value></data>
+  <data name="Stats_KpiAll" xml:space="preserve"><value>All</value></data>
+  <data name="Stats_KpiNew" xml:space="preserve"><value>New</value></data>
+  <data name="Stats_KpiInProgress" xml:space="preserve"><value>In progress</value></data>
+  <data name="Stats_KpiClosed" xml:space="preserve"><value>Resolved</value></data>
+  <data name="Stats_KpiHighPriority" xml:space="preserve"><value>High priority</value></data>
+  <data name="Toast_SettingsSaved" xml:space="preserve"><value>Settings saved</value></data>
+  <data name="Toast_SettingsSaveFailed" xml:space="preserve"><value>Could not save settings.</value></data>
+  <data name="Toast_SessionRefreshed" xml:space="preserve"><value>Session token refreshed.</value></data>
+  <data name="Toast_SessionRefreshFailed" xml:space="preserve"><value>Could not refresh session.</value></data>
+  <data name="Toast_UserBanned" xml:space="preserve"><value>User has been banned.</value></data>
+  <data name="Toast_UserActivated" xml:space="preserve"><value>User has been activated.</value></data>
+  <data name="Toast_UserUnbanned" xml:space="preserve"><value>User has been unbanned.</value></data>
+  <data name="Toast_AdminUsersLoadFailed" xml:space="preserve"><value>Could not load users.</value></data>
+  <data name="Toast_AdminBanFailed" xml:space="preserve"><value>Could not ban user.</value></data>
+  <data name="Toast_AdminActivateFailed" xml:space="preserve"><value>Could not activate user.</value></data>
+  <data name="Toast_AdminUnbanFailed" xml:space="preserve"><value>Could not unban user.</value></data>
+  <data name="Toast_AdminUnbanPasswordRequired" xml:space="preserve"><value>Enter password to unban the user.</value></data>
+  <data name="Lang_Polish" xml:space="preserve"><value>Polski</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
+</root>

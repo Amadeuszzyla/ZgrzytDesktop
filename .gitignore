@@ -31,8 +31,10 @@ project.assets.json
 *.userosscache
 *.sln.docstates
 
-# VS Code
-.vscode/
+# VS Code (launch/tasks są w repozytorium)
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 
 # Test results / coverage
 TestResults/

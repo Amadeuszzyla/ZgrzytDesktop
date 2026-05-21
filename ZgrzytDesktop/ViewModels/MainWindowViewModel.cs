@@ -17,6 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly LocalTicketCacheService _ticketCacheService;
     private readonly LocalUserCacheService _userCacheService;
     private readonly LocalAuditLogService _auditLogService;
+    private readonly UserAdminService _userAdminService;
 
     private ViewModelBase _currentViewModel;
 
@@ -31,13 +32,18 @@ public partial class MainWindowViewModel : ViewModelBase
         var tokenStorage = new TokenStorage();
 
         _settingsService = new SettingsService();
+        var settings = _settingsService.LoadSync();
+        ZgrzytDesktop.Resources.AppStrings.ApplyCulture(settings.UiCulture);
+
         _apiService = new ApiService(tokenStorage, _settingsService);
 
         _authService = new AuthService(_apiService, tokenStorage);
+        _apiService.TryRefreshSessionAsync = () => _authService.RefreshTokenAsync();
         _ticketService = new TicketService(_apiService);
         _ticketCacheService = new LocalTicketCacheService();
         _userCacheService = new LocalUserCacheService();
         _auditLogService = new LocalAuditLogService();
+        _userAdminService = new UserAdminService(_apiService);
 
         _currentViewModel = new LoginViewModel(_authService, _auditLogService, OnLoginSuccess);
 
@@ -99,6 +105,7 @@ public partial class MainWindowViewModel : ViewModelBase
             _settingsService,
             _ticketCacheService,
             _auditLogService,
+            _userAdminService,
             LogoutAsync
         );
     }

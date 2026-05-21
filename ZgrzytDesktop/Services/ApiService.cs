@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Storage;
 
 namespace ZgrzytDesktop.Services;
@@ -24,34 +25,18 @@ public class ApiService
 
     public string CurrentApiBaseUrl { get; private set; } = "http://127.0.0.1:9000/api/";
 
-    public ApiService()
-    {
-        _httpClient = new HttpClient
-        {
-            Timeout = TimeSpan.FromSeconds(15)
-        };
+    public Func<Task<bool>>? TryRefreshSessionAsync { get; set; }
 
-        SetBaseAddress(CurrentApiBaseUrl);
-    }
+    public Func<Task>? OnSessionExpiredAsync { get; set; }
 
-    public ApiService(string apiBaseUrl)
+    public ApiService(HttpMessageHandler handler, string apiBaseUrl = "http://127.0.0.1:9000/api/")
     {
-        _httpClient = new HttpClient
+        _httpClient = new HttpClient(handler, disposeHandler: false)
         {
             Timeout = TimeSpan.FromSeconds(15)
         };
 
         SetBaseAddress(apiBaseUrl);
-    }
-
-    public ApiService(AppSettings settings)
-    {
-        _httpClient = new HttpClient
-        {
-            Timeout = TimeSpan.FromSeconds(15)
-        };
-
-        SetBaseAddress(settings.ApiBaseUrl);
     }
 
     public ApiService(TokenStorage tokenStorage, SettingsService settingsService)
@@ -65,32 +50,6 @@ public class ApiService
 
         SetBaseAddress(settings.ApiBaseUrl);
         TryLoadStoredToken(tokenStorage);
-    }
-
-    // Kompatybilność ze starym kodem:
-    // new ApiService(apiBaseUrl, coś)
-    public ApiService(string apiBaseUrl, object? tokenOrStorage)
-    {
-        _httpClient = new HttpClient
-        {
-            Timeout = TimeSpan.FromSeconds(15)
-        };
-
-        SetBaseAddress(apiBaseUrl);
-        TryApplyTokenFromSecondArgument(tokenOrStorage);
-    }
-
-    // Kompatybilność ze starym kodem:
-    // new ApiService(settings, coś)
-    public ApiService(AppSettings settings, object? tokenOrStorage)
-    {
-        _httpClient = new HttpClient
-        {
-            Timeout = TimeSpan.FromSeconds(15)
-        };
-
-        SetBaseAddress(settings.ApiBaseUrl);
-        TryApplyTokenFromSecondArgument(tokenOrStorage);
     }
 
     public void SetBaseAddress(string apiBaseUrl)
@@ -130,201 +89,60 @@ public class ApiService
         SetToken(null);
     }
 
-    public async Task<T?> GetAsync<T>(string endpoint)
-    {
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, NormalizeEndpoint(endpoint));
-            AddAuthorizationHeader(request);
+    public Task<T?> GetAsync<T>(string endpoint) =>
+        SendAsync<T>(HttpMethod.Get, endpoint, null);
 
-            var response = await _httpClient.SendAsync(request);
+    public Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest data) =>
+        SendAsync<TResponse>(HttpMethod.Post, endpoint, data);
 
-            if (!response.IsSuccessStatusCode)
-                await ThrowApiExceptionAsync(response);
+    public Task<TResponse?> PostAsync<TResponse>(string endpoint) =>
+        SendAsync<TResponse>(HttpMethod.Post, endpoint, null);
 
-            return await response.Content.ReadFromJsonAsync<T>(_jsonOptions);
-        }
-        catch (ApiException)
-        {
-            throw;
-        }
-        catch (HttpRequestException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Brak połączenia z API: {ex.Message}"
-            );
-        }
-        catch (TaskCanceledException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Przekroczono czas oczekiwania na odpowiedź API: {ex.Message}"
-            );
-        }
-    }
-
-    public async Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest data)
-    {
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, NormalizeEndpoint(endpoint))
-            {
-                Content = JsonContent.Create(data)
-            };
-
-            AddAuthorizationHeader(request);
-
-            var response = await _httpClient.SendAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-                await ThrowApiExceptionAsync(response);
-
-            return await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions);
-        }
-        catch (ApiException)
-        {
-            throw;
-        }
-        catch (HttpRequestException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Brak połączenia z API: {ex.Message}"
-            );
-        }
-        catch (TaskCanceledException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Przekroczono czas oczekiwania na odpowiedź API: {ex.Message}"
-            );
-        }
-    }
-
-    public async Task<TResponse?> PostAsync<TResponse>(string endpoint)
-    {
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, NormalizeEndpoint(endpoint));
-            AddAuthorizationHeader(request);
-
-            var response = await _httpClient.SendAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-                await ThrowApiExceptionAsync(response);
-
-            return await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions);
-        }
-        catch (ApiException)
-        {
-            throw;
-        }
-        catch (HttpRequestException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Brak połączenia z API: {ex.Message}"
-            );
-        }
-        catch (TaskCanceledException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Przekroczono czas oczekiwania na odpowiedź API: {ex.Message}"
-            );
-        }
-    }
-
-    public async Task<TResponse?> PutAsync<TRequest, TResponse>(string endpoint, TRequest data)
-    {
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Put, NormalizeEndpoint(endpoint))
-            {
-                Content = JsonContent.Create(data)
-            };
-
-            AddAuthorizationHeader(request);
-
-            var response = await _httpClient.SendAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-                await ThrowApiExceptionAsync(response);
-
-            return await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions);
-        }
-        catch (ApiException)
-        {
-            throw;
-        }
-        catch (HttpRequestException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Brak połączenia z API: {ex.Message}"
-            );
-        }
-        catch (TaskCanceledException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Przekroczono czas oczekiwania na odpowiedź API: {ex.Message}"
-            );
-        }
-    }
-
-    public async Task<TResponse?> PatchAsync<TRequest, TResponse>(string endpoint, TRequest data)
-    {
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Patch, NormalizeEndpoint(endpoint))
-            {
-                Content = JsonContent.Create(data)
-            };
-
-            AddAuthorizationHeader(request);
-
-            var response = await _httpClient.SendAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-                await ThrowApiExceptionAsync(response);
-
-            return await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions);
-        }
-        catch (ApiException)
-        {
-            throw;
-        }
-        catch (HttpRequestException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Brak połączenia z API: {ex.Message}"
-            );
-        }
-        catch (TaskCanceledException ex)
-        {
-            throw new ApiException(
-                HttpStatusCode.ServiceUnavailable,
-                $"Przekroczono czas oczekiwania na odpowiedź API: {ex.Message}"
-            );
-        }
-    }
+    public Task<TResponse?> PutAsync<TRequest, TResponse>(string endpoint, TRequest data) =>
+        SendAsync<TResponse>(HttpMethod.Put, endpoint, data);
 
     public async Task<bool> DeleteAsync(string endpoint)
     {
+        await SendAsync<object>(HttpMethod.Delete, endpoint, null);
+        return true;
+    }
+
+    private async Task<T?> SendAsync<T>(HttpMethod method, string endpoint, object? body)
+    {
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Delete, NormalizeEndpoint(endpoint));
-            AddAuthorizationHeader(request);
+            for (var attempt = 0; attempt < 2; attempt++)
+            {
+                using var request = new HttpRequestMessage(method, NormalizeEndpoint(endpoint));
 
-            var response = await _httpClient.SendAsync(request);
+                if (body is not null)
+                    request.Content = JsonContent.Create(body);
 
-            if (!response.IsSuccessStatusCode)
-                await ThrowApiExceptionAsync(response);
+                AddAuthorizationHeader(request);
 
-            return true;
+                using var response = await _httpClient.SendAsync(request);
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                    attempt == 0 &&
+                    !IsAuthEndpoint(endpoint))
+                {
+                    if (await TryRefreshSessionOnceAsync())
+                        continue;
+
+                    await HandleSessionExpiredAsync();
+                    await ThrowApiExceptionAsync(response);
+                }
+
+                if (!response.IsSuccessStatusCode)
+                    await ThrowApiExceptionAsync(response);
+
+                if (method == HttpMethod.Delete)
+                    return default;
+
+                return await response.Content.ReadFromJsonAsync<T>(_jsonOptions);
+            }
+
+            return default;
         }
         catch (ApiException)
         {
@@ -334,16 +152,55 @@ public class ApiService
         {
             throw new ApiException(
                 HttpStatusCode.ServiceUnavailable,
-                $"Brak połączenia z API: {ex.Message}"
+                $"{AppStrings.Get("Api_ServiceUnavailable")} ({ex.Message})"
             );
         }
         catch (TaskCanceledException ex)
         {
             throw new ApiException(
                 HttpStatusCode.ServiceUnavailable,
-                $"Przekroczono czas oczekiwania na odpowiedź API: {ex.Message}"
+                $"{AppStrings.Get("Api_ServiceUnavailable")} ({ex.Message})"
             );
         }
+    }
+
+    private async Task<bool> TryRefreshSessionOnceAsync()
+    {
+        if (TryRefreshSessionAsync is null)
+            return false;
+
+        try
+        {
+            return await TryRefreshSessionAsync();
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private async Task HandleSessionExpiredAsync()
+    {
+        if (OnSessionExpiredAsync is null)
+            return;
+
+        try
+        {
+            await OnSessionExpiredAsync();
+        }
+        catch
+        {
+            // Wylogowanie nie może zablokować propagacji błędu API.
+        }
+    }
+
+    private static bool IsAuthEndpoint(string endpoint)
+    {
+        var normalized = endpoint.TrimStart('/').Split('?')[0];
+
+        return normalized.Equals("login", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Equals("refresh", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Equals("logout", StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<ApiConnectionTestResult> TestConnectionAsync()

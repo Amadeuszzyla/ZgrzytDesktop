@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
+using ZgrzytDesktop.Resources;
 
 namespace ZgrzytDesktop.Services;
 
@@ -36,7 +37,7 @@ public static class ApiErrorSanitizer
     {
         if (IsHtmlResponse(content))
         {
-            return "Serwer zwrócił stronę błędu zamiast danych API. Sprawdź endpoint lub uprawnienia.";
+            return AppStrings.Get("Api_HtmlResponse");
         }
 
         if (statusCode == HttpStatusCode.UnprocessableEntity &&
@@ -47,18 +48,12 @@ public static class ApiErrorSanitizer
 
         return statusCode switch
         {
-            HttpStatusCode.Unauthorized =>
-                "Sesja wygasła albo użytkownik nie jest zalogowany.",
-            HttpStatusCode.Forbidden =>
-                "Brak uprawnień do wykonania tej operacji.",
-            HttpStatusCode.NotFound =>
-                "Nie znaleziono zasobu lub endpoint nie istnieje.",
-            HttpStatusCode.Conflict =>
-                "Operacja jest sprzeczna z aktualnym stanem danych.",
-            HttpStatusCode.ServiceUnavailable =>
-                "Brak połączenia z API. Sprawdź, czy backend działa.",
-            HttpStatusCode.InternalServerError =>
-                "Błąd serwera. Spróbuj ponownie później.",
+            HttpStatusCode.Unauthorized => AppStrings.Get("Api_Unauthorized"),
+            HttpStatusCode.Forbidden => AppStrings.Get("Api_Forbidden"),
+            HttpStatusCode.NotFound => AppStrings.Get("Api_NotFound"),
+            HttpStatusCode.Conflict => AppStrings.Get("Api_Conflict"),
+            HttpStatusCode.ServiceUnavailable => AppStrings.Get("Api_ServiceUnavailable"),
+            HttpStatusCode.InternalServerError => AppStrings.Get("Api_InternalServerError"),
             _ => TruncatePlainText(content, 240)
         };
     }
@@ -124,7 +119,7 @@ public static class ApiErrorSanitizer
     private static string TruncatePlainText(string? content, int maxLength)
     {
         if (string.IsNullOrWhiteSpace(content))
-            return "Wystąpił nieoczekiwany błąd podczas komunikacji z API.";
+            return AppStrings.Get("Api_UnexpectedError");
 
         var trimmed = content.Trim();
 

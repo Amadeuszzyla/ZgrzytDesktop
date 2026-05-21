@@ -1,47 +1,88 @@
 # ZGRZYT Desktop — status i ograniczenia
 
-Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ograniczenia wynikające z API (bez zmian backendu).
+Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ograniczenia wynikające z API (bez zmian backendu). Ostatnia aktualizacja: po Fazie 3–4 (partial ViewModel, testy mock HTTP, dokumentacja wdrożenia).
 
 ## Co działa
 
-- Logowanie (`POST /api/login`), Bearer, `GET /api/user`, wylogowanie (`POST /api/logout`)
-- Prośba o konto (`POST /api/request-account`) — wymaga zalogowania
-- Lista zgłoszeń: `tickets`, `active-tickets`, `unassigned-tickets` (filtry, wyszukiwanie, paginacja)
-- Szczegóły zgłoszenia, wiadomości (`GET/POST .../messages`, pole JSON `body`)
-- Edycja statusu/priorytetu i przypisanie — role **it** / **admin**
-- Kategorie (Hardware, Software, Sieć) — zapis w tytule `[Kategoria]` i linii opisu `Kategoria: ...` (brak pola `category` w API)
-- Statusy UI: Nowe / W toku / Rozwiązane → API: `nowe` / `w trakcie` / `zamknięte`
-- Toast w aplikacji, tryb jasny/ciemny/system (zapis w ustawieniach)
-- Szyfrowanie lokalne (DPAPI): token, cache użytkownika, cache zgłoszeń, audyt lokalny
-- **Historia lokalnych zmian** w szczegółach zgłoszenia (audyt desktopowy, nie logi backendu)
+### Uwierzytelnianie i sesja
 
-## Ograniczenia API (świadome)
+- Logowanie (`POST /api/login`), Bearer, `GET /api/user`, wylogowanie (`POST /api/logout`)
+- Autologowanie z tokenu w `%AppData%` (DPAPI)
+- Przy odpowiedzi **401**: jedna próba `POST /api/refresh` (jeśli skonfigurowane w `ApiService.TryRefreshSessionAsync`), ponowienie żądania; przy ponownym 401 — wylogowanie
+- Ręczne odświeżenie sesji w ustawieniach (`POST /api/refresh`)
+
+### Zgłoszenia i wiadomości
+
+- Listy: `GET tickets`, `active-tickets`, `unassigned-tickets` (widoki kolejki wg roli)
+- Filtry: status, priorytet, wyszukiwanie tekstowe, paginacja
+- **Sortowanie**: dwa ComboBoxy (pole + kierunek) → query `sort_by` / `sort_direction` (np. `created_at`, `desc`) — sortowanie po stronie API, **nie** przez kliknięcie nagłówków DataGrid
+- Szczegóły zgłoszenia, wiadomości (`GET`/`POST .../messages`, pole JSON `body`)
+- Tworzenie zgłoszenia, auto-odświeżanie listy (timer)
+- Edycja statusu/priorytetu, przypisanie do siebie, zamknięcie, usunięcie — wg roli **it** / **admin** (i zamknięcie własnego zgłoszenia dla **user**, jeśli API pozwoli)
+
+### Kategorie i statusy
+
+- Kategorie UI: Hardware, Software, Sieć — zapis w tytule `[Kategoria]` i linii opisu `Kategoria: ...` (pole `category` **nie** jest wysyłane w body API)
+- Statusy w UI: Nowe / W toku / Rozwiązane → API: `nowe` / `w trakcie` / `zamknięte`
+
+### Administracja i konta
+
+- **Administracja** (role **admin**): `GET users`, `active-users`, `inactive-users`, `banned-users`; `POST ban`, `activate`, `unban` (odbanowanie z hasłem w body)
+- **Zgłoś nowe konto** (`POST /api/request-account`) — użytkownik w menu; it/admin w zakładce Administracja → Nowe konto
+
+### Statystyki, audyt, UX
+
+- Statystyki: domyślnie z **bieżącej strony** listy; przycisk agreguje wiele stron przez wielokrotne `GET tickets`
+- **Lokalny audyt** (historia w szczegółach zgłoszenia i w ustawieniach) — zapis desktopowy, szyfrowany DPAPI
+- Motyw: jasny / ciemny / system (`settings.json`)
+- Język: **pl** / **en** (`AppStrings.resx` + `AppStrings.en.resx`, `UiCulture` w ustawieniach)
+- Toasty w oknie aplikacji; tryb offline z cache zgłoszeń
+
+### Jakość kodu (Faza 3)
+
+- `DashboardViewModel` podzielony na pliki partial (Navigation, Tickets, TicketDetails, Admin, Settings, Statistics, Audit, Toast, Support, Localization)
+- Wspólna obsługa błędów API (`HandleApiError`, `ExecuteApiAsync`)
+- Stałe: `AppSections`, `AppRoles`, `TicketStatuses`, itd.
+- Testy: **91** scenariuszy z mockowanym HTTP (bez żywego API)
+
+## Ograniczenia API i produktu (świadome)
 
 | Obszar | Ograniczenie |
 |--------|----------------|
-| Logi systemowe (`GET /api/logs`) | Brak endpointu w OpenAPI — opis w tym pliku; dane z backendu nie są pobierane w UI |
-| Pole `category` | Nie wysyłane w requestach (uniknięcie 422); kategoria tylko w tytule/opisie |
-| Zamknięcie zgłoszenia przez **user** | Przycisk „Zamknij” widoczny także dla autora zgłoszenia; jeśli API zwróci **403**, desktop pokazuje komunikat — backend może nadal wymagać roli it/admin |
-| Panel administracji użytkowników | Sekcja **Administracja** (rola admin): `GET users`, `POST users/{id}/ban`, `POST users/{id}/activate` — przy braku uprawnień: **403** |
-| `POST /api/refresh` | Dostępne w serwisie; brak przycisku w uproszczonych ustawieniach UI |
-| Statystyki globalne | Domyślnie **bieżąca strona**; przycisk „Pobierz statystyki ze wszystkich stron” agreguje listę przez wielokrotne `GET tickets` (bez osobnego raportu) |
-| `DELETE /api/tickets/{id}` | Dostępne w serwisie; w UI tylko dla ról z uprawnieniem; przy braku uprawnień: 403 |
+| `GET /api/logs` | Brak w OpenAPI — UI **nie** pobiera logów systemowych z backendu |
+| Pole `category` | Nie w requestach tworzenia/edycji; tylko prefix/opis (unikanie 422) |
+| Zamknięcie przez **user** | Przycisk „Zamknij” dla autora; przy **403** z API — komunikat w UI (backend może wymagać it/admin) |
+| Czas pierwszej reakcji IT | Model `Ticket` ma `created_at`, `updated_at`, `closed_at` — **brak** `first_response_at` / SLA w API → desktop **nie** wyświetza prawdziwego czasu pierwszej odpowiedzi IT |
+| Statystyki globalne | Bez dedykowanego raportu API — agregacja przez wielokrotne listowanie `tickets` |
+| `DELETE /api/tickets/{id}` | W UI dla uprawnionych ról; przy braku uprawnień: **403** |
+| Adres API | Stały w kodzie / `settings.json`; **brak** edycji URL w panelu ustawień |
+| Powiadomienia Windows | **Brak** — nie używamy tray ani toastów systemowych (informacja tylko w aplikacji) |
+| Panel admin | Przy braku roli admin: **403** z API |
 
 ## Pliki lokalne (AppData)
 
-- `%AppData%/ZgrzytDesktop/token.txt` — token (DPAPI)
-- `%AppData%/ZgrzytDesktop/Cache/` — cache użytkownika i zgłoszeń (DPAPI)
-- `%AppData%/ZgrzytDesktop/audit-log.json` — lokalny audyt (DPAPI)
-- `%AppData%/ZgrzytDesktop/Settings/settings.json` — motyw aplikacji (adres API jest stały w kodzie, nie edytowany w UI)
+| Plik / folder | Zawartość |
+|---------------|-----------|
+| `token.txt` | Token dostępu (DPAPI) |
+| `Cache/` | Cache użytkownika i zgłoszeń (DPAPI) |
+| `audit-log.json` | Lokalny audyt działań (DPAPI) |
+| `Settings/settings.json` | `ThemeMode`, `UiCulture`; `ApiBaseUrl` zapisany, ale **nie edytowany w UI** |
 
 ## Role w UI
 
-- **user**: lista, szczegóły (po wyborze wiersza), wiadomości, tworzenie zgłoszeń, **Zgłoś nowe konto** w menu
-- **it** / **admin**: dodatkowo edycja statusu/priorytetu, przypisanie, zamknięcie, usuwanie; **Nowe konto** w panelu Administracja
-- **admin**: dodatkowo zakładka Użytkownicy (ban/aktywacja)
+| Rola | Uprawnienia w aplikacji |
+|------|-------------------------|
+| **user** | Lista, szczegóły, wiadomości, nowe zgłoszenia, zamknięcie własnego (jeśli API pozwoli), **Zgłoś nowe konto** |
+| **it** | Jak wyżej + edycja statusu/priorytetu, przypisanie, zamknięcie/usuwanie wg API, Administracja → Nowe konto |
+| **admin** | Jak it + zakładka **Użytkownicy** (filtry list, ban, aktywacja, odbanowanie) |
+
+Autoryzacja końcowa zawsze po stronie API (401/403).
 
 ## Dane testowe
 
-Tytuły i treści zgłoszeń na liście pochodzą z API backendu — aplikacja desktop nie filtruje ich treści. Przykładowe dane w środowisku dev należy czyścić po stronie bazy/API.
+Tytuły i treści zgłoszeń na liście pochodzą z API — desktop nie filtruje treści z bazy. Przykładowe dane w środowisku dev czyści się po stronie backendu/bazy.
 
-Autoryzacja końcowa zawsze po stronie API (401/403).
+## Powiązane dokumenty
+
+- [README.md](README.md) — uruchomienie, publish, skrót funkcji
+- [REQUIREMENTS.md](REQUIREMENTS.md) — wymagania środowiska

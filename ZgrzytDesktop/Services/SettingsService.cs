@@ -58,6 +58,7 @@ public class SettingsService
 
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
             settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
+            settings.UiCulture = NormalizeUiCulture(settings.UiCulture);
 
             return settings;
         }
@@ -96,6 +97,7 @@ public class SettingsService
 
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
             settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
+            settings.UiCulture = NormalizeUiCulture(settings.UiCulture);
 
             return settings;
         }
@@ -115,6 +117,7 @@ public class SettingsService
         {
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
             settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
+            settings.UiCulture = NormalizeUiCulture(settings.UiCulture);
 
             var json = JsonSerializer.Serialize(settings, _jsonOptions);
             File.WriteAllText(_filePath, json);
@@ -131,6 +134,7 @@ public class SettingsService
         {
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
             settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
+            settings.UiCulture = NormalizeUiCulture(settings.UiCulture);
 
             var json = JsonSerializer.Serialize(settings, _jsonOptions);
             await File.WriteAllTextAsync(_filePath, json);
@@ -174,6 +178,17 @@ public class SettingsService
             return "Dark";
 
         return "System";
+    }
+
+    public static string NormalizeUiCulture(string? uiCulture)
+    {
+        if (string.Equals(uiCulture, "en", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(uiCulture, "en-US", StringComparison.OrdinalIgnoreCase))
+        {
+            return "en";
+        }
+
+        return "pl";
     }
 
     public static void ApplyThemeMode(string? themeMode)

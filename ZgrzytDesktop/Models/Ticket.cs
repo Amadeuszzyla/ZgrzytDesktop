@@ -62,9 +62,11 @@ public class Ticket
     public DateTime? UpdatedAt { get; set; }
 
     [JsonPropertyName("closed_at")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]
     public DateTime? ClosedAt { get; set; }
 
     [JsonPropertyName("category")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]
     public string? Category { get; set; }
 }
 
