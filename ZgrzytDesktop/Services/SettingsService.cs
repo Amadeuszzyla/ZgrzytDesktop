@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Styling;
 using ZgrzytDesktop.Models;
 
 namespace ZgrzytDesktop.Services;
@@ -55,6 +57,7 @@ public class SettingsService
                            ?? new AppSettings();
 
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
+            settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
 
             return settings;
         }
@@ -62,7 +65,8 @@ public class SettingsService
         {
             return new AppSettings
             {
-                ApiBaseUrl = "http://127.0.0.1:9000/api/"
+                ApiBaseUrl = "http://127.0.0.1:9000/api/",
+                ThemeMode = "System"
             };
         }
     }
@@ -91,6 +95,7 @@ public class SettingsService
                            ?? new AppSettings();
 
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
+            settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
 
             return settings;
         }
@@ -98,7 +103,8 @@ public class SettingsService
         {
             return new AppSettings
             {
-                ApiBaseUrl = "http://127.0.0.1:9000/api/"
+                ApiBaseUrl = "http://127.0.0.1:9000/api/",
+                ThemeMode = "System"
             };
         }
     }
@@ -108,6 +114,7 @@ public class SettingsService
         try
         {
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
+            settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
 
             var json = JsonSerializer.Serialize(settings, _jsonOptions);
             File.WriteAllText(_filePath, json);
@@ -123,6 +130,7 @@ public class SettingsService
         try
         {
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
+            settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
 
             var json = JsonSerializer.Serialize(settings, _jsonOptions);
             await File.WriteAllTextAsync(_filePath, json);
@@ -155,5 +163,29 @@ public class SettingsService
         }
 
         return normalized;
+    }
+
+    public string NormalizeThemeMode(string? themeMode)
+    {
+        if (string.Equals(themeMode, "Light", StringComparison.OrdinalIgnoreCase))
+            return "Light";
+
+        if (string.Equals(themeMode, "Dark", StringComparison.OrdinalIgnoreCase))
+            return "Dark";
+
+        return "System";
+    }
+
+    public static void ApplyThemeMode(string? themeMode)
+    {
+        if (Application.Current is null)
+            return;
+
+        Application.Current.RequestedThemeVariant = themeMode switch
+        {
+            "Light" => ThemeVariant.Light,
+            "Dark" => ThemeVariant.Dark,
+            _ => ThemeVariant.Default
+        };
     }
 }

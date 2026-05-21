@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Security;
 
 namespace ZgrzytDesktop.Cache;
 
@@ -33,27 +34,50 @@ public class LocalUserCacheService
 
     public async Task SaveUserAsync(User user)
     {
-        var json = JsonSerializer.Serialize(user, _jsonOptions);
-        await File.WriteAllTextAsync(_filePath, json);
+        try
+        {
+            var json = JsonSerializer.Serialize(user, _jsonOptions);
+            var protectedJson = LocalDataProtector.ProtectString(json);
+            await File.WriteAllTextAsync(_filePath, protectedJson);
+        }
+        catch
+        {
+            // Brak zapisu cache nie powinien blokować aplikacji.
+        }
     }
 
     public async Task<User?> LoadUserAsync()
     {
-        if (!File.Exists(_filePath))
+        try
+        {
+            if (!File.Exists(_filePath))
+                return null;
+
+            var stored = await File.ReadAllTextAsync(_filePath);
+            var json = LocalDataProtector.UnprotectString(stored);
+
+            if (string.IsNullOrWhiteSpace(json))
+                return null;
+
+            return JsonSerializer.Deserialize<User>(json, _jsonOptions);
+        }
+        catch
+        {
             return null;
-
-        var json = await File.ReadAllTextAsync(_filePath);
-
-        if (string.IsNullOrWhiteSpace(json))
-            return null;
-
-        return JsonSerializer.Deserialize<User>(json, _jsonOptions);
+        }
     }
 
     public Task ClearAsync()
     {
-        if (File.Exists(_filePath))
-            File.Delete(_filePath);
+        try
+        {
+            if (File.Exists(_filePath))
+                File.Delete(_filePath);
+        }
+        catch
+        {
+            // Czyszczenie cache nie może zatrzymać aplikacji.
+        }
 
         return Task.CompletedTask;
     }

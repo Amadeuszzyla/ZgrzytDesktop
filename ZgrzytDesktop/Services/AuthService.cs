@@ -30,6 +30,7 @@ public class AuthService
             return null;
 
         await _tokenStorage.SaveTokenAsync(response.AccessToken);
+        _apiService.SetToken(response.AccessToken);
 
         var user = await _apiService.GetAsync<User>("user");
 
@@ -41,6 +42,12 @@ public class AuthService
         return await _apiService.GetAsync<User>("user");
     }
 
+    public async Task<bool> RequestAccountAsync(RequestAccountRequest request)
+    {
+        await _apiService.PostAsync<RequestAccountRequest, object?>("request-account", request);
+        return true;
+    }
+
     public async Task LogoutAsync()
     {
         try
@@ -50,6 +57,7 @@ public class AuthService
         finally
         {
             await _tokenStorage.ClearTokenAsync();
+            _apiService.ClearToken();
         }
     }
 }

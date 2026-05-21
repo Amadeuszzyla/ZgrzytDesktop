@@ -10,6 +10,7 @@ namespace ZgrzytDesktop.ViewModels;
 public partial class LoginViewModel : ViewModelBase
 {
     private readonly AuthService _authService;
+    private readonly LocalAuditLogService _auditLogService;
     private readonly Action<User> _onLoginSuccess;
 
     private string _login = string.Empty;
@@ -79,9 +80,13 @@ public partial class LoginViewModel : ViewModelBase
 
     public IRelayCommand TogglePasswordVisibilityCommand { get; }
 
-    public LoginViewModel(AuthService authService, Action<User> onLoginSuccess)
+    public LoginViewModel(
+        AuthService authService,
+        LocalAuditLogService auditLogService,
+        Action<User> onLoginSuccess)
     {
         _authService = authService;
+        _auditLogService = auditLogService;
         _onLoginSuccess = onLoginSuccess;
 
         LoginCommand = new AsyncRelayCommand(LoginAsync);
@@ -122,6 +127,15 @@ public partial class LoginViewModel : ViewModelBase
             }
 
             ErrorMessage = string.Empty;
+
+            await _auditLogService.AddAsync(new AuditLogEntry
+            {
+                Timestamp = DateTime.Now,
+                UserLogin = user.Login,
+                Action = "Login",
+                Description = "Zalogowano przez formularz logowania."
+            });
+
             _onLoginSuccess(user);
         }
         catch (ApiException ex)

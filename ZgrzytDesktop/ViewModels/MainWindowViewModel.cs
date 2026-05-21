@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ZgrzytDesktop.Cache;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
@@ -15,6 +16,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly SettingsService _settingsService;
     private readonly LocalTicketCacheService _ticketCacheService;
     private readonly LocalUserCacheService _userCacheService;
+    private readonly LocalAuditLogService _auditLogService;
 
     private ViewModelBase _currentViewModel;
 
@@ -35,8 +37,9 @@ public partial class MainWindowViewModel : ViewModelBase
         _ticketService = new TicketService(_apiService);
         _ticketCacheService = new LocalTicketCacheService();
         _userCacheService = new LocalUserCacheService();
+        _auditLogService = new LocalAuditLogService();
 
-        _currentViewModel = new LoginViewModel(_authService, OnLoginSuccess);
+        _currentViewModel = new LoginViewModel(_authService, _auditLogService, OnLoginSuccess);
 
         _ = TryAutoLoginAsync();
     }
@@ -50,6 +53,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (user is not null)
             {
                 await _userCacheService.SaveUserAsync(user);
+                await LogLoginAsync(user, "Automatyczne logowanie przy starcie aplikacji.");
                 CurrentViewModel = CreateDashboard(user);
             }
         }
@@ -89,16 +93,32 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         return new DashboardViewModel(
             user,
+            _authService,
             _ticketService,
             _apiService,
             _settingsService,
             _ticketCacheService,
+            _auditLogService,
             LogoutAsync
         );
     }
 
+    private async Task LogLoginAsync(User user, string description)
+    {
+        await _auditLogService.AddAsync(new AuditLogEntry
+        {
+            Timestamp = DateTime.Now,
+            UserLogin = user.Login,
+            Action = "Login",
+            Description = description
+        });
+    }
+
     private async Task LogoutAsync()
     {
+        var cachedUser = await _userCacheService.LoadUserAsync();
+        var userLogin = cachedUser?.Login ?? "unknown";
+
         try
         {
             await _authService.LogoutAsync();
@@ -109,9 +129,17 @@ public partial class MainWindowViewModel : ViewModelBase
             // lokalnie czyścimy dane i wracamy do logowania.
         }
 
+        await _auditLogService.AddAsync(new AuditLogEntry
+        {
+            Timestamp = DateTime.Now,
+            UserLogin = userLogin,
+            Action = "Logout",
+            Description = "Wylogowano użytkownika z aplikacji desktopowej."
+        });
+
         await _userCacheService.ClearAsync();
         await _ticketCacheService.ClearAsync();
 
-        CurrentViewModel = new LoginViewModel(_authService, OnLoginSuccess);
+        CurrentViewModel = new LoginViewModel(_authService, _auditLogService, OnLoginSuccess);
     }
 }

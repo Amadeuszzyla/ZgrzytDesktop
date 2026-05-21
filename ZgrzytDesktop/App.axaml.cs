@@ -24,6 +24,7 @@ public partial class App : Application
     private SettingsService? _settingsService;
     private LocalTicketCacheService? _ticketCacheService;
     private LocalUserCacheService? _userCacheService;
+    private LocalAuditLogService? _auditLogService;
 
     private MainWindow? _mainWindow;
 
@@ -48,6 +49,7 @@ public partial class App : Application
                 try
                 {
                     InitializeServices();
+                    ApplyThemeFromSettings();
 
                     ShowLoginView();
 
@@ -74,6 +76,30 @@ public partial class App : Application
         _ticketService = new TicketService(_apiService);
         _ticketCacheService = new LocalTicketCacheService();
         _userCacheService = new LocalUserCacheService();
+        _auditLogService = new LocalAuditLogService();
+    }
+
+    private async Task LogLoginAsync(User user, string description)
+    {
+        if (_auditLogService is null)
+            return;
+
+        await _auditLogService.AddAsync(new AuditLogEntry
+        {
+            Timestamp = DateTime.Now,
+            UserLogin = user.Login,
+            Action = "Login",
+            Description = description
+        });
+    }
+
+    private void ApplyThemeFromSettings()
+    {
+        if (_settingsService is null)
+            return;
+
+        var settings = _settingsService.LoadSync();
+        SettingsService.ApplyThemeMode(settings.ThemeMode);
     }
 
     private async Task TryAutoLoginAsync()
@@ -88,6 +114,7 @@ public partial class App : Application
             if (user is not null)
             {
                 await _userCacheService.SaveUserAsync(user);
+                await LogLoginAsync(user, "Automatyczne logowanie przy starcie aplikacji.");
                 ShowDashboardView(user);
             }
         }
@@ -125,6 +152,7 @@ public partial class App : Application
 
         var loginViewModel = new LoginViewModel(
             _authService,
+            _auditLogService!,
             user => _ = HandleLoginSuccessAsync(user)
         );
 
@@ -161,12 +189,17 @@ public partial class App : Application
         if (_ticketCacheService is null)
             throw new InvalidOperationException("LocalTicketCacheService nie został zainicjalizowany.");
 
+        if (_auditLogService is null)
+            throw new InvalidOperationException("LocalAuditLogService nie został zainicjalizowany.");
+
         var dashboardViewModel = new DashboardViewModel(
             user,
+            _authService!,
             _ticketService,
             _apiService,
             _settingsService,
             _ticketCacheService,
+            _auditLogService,
             LogoutAsync
         );
 

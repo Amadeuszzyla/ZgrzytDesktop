@@ -8,7 +8,7 @@ public class Message
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("message")]
+    [JsonPropertyName("body")]
     public string Content { get; set; } = string.Empty;
 
     [JsonPropertyName("ticket_id")]

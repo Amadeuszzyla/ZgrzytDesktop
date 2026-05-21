@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using ZgrzytDesktop.Helpers;
 
 namespace ZgrzytDesktop.Models;
 
@@ -18,6 +19,12 @@ public class Ticket
     [JsonPropertyName("status")]
     public string Status { get; set; } = string.Empty;
 
+    [JsonIgnore]
+    public string DisplayStatus => StatusDisplayHelper.ToDisplayStatus(Status);
+
+    [JsonIgnore]
+    public string DisplayCategory => TicketCategoryHelper.ExtractCategory(Title, Description);
+
     [JsonPropertyName("priority")]
     public string Priority { get; set; } = string.Empty;
 
@@ -30,8 +37,20 @@ public class Ticket
     [JsonPropertyName("user")]
     public User? User { get; set; }
 
-    [JsonPropertyName("assigned_to")]
+    [JsonPropertyName("assignedTo")]
     public User? AssignedTo { get; set; }
+
+    [JsonPropertyName("assigned_to")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]
+    public User? AssignedToLegacy
+    {
+        get => null;
+        set
+        {
+            if (AssignedTo is null)
+                AssignedTo = value;
+        }
+    }
 
     [JsonPropertyName("messages")]
     public List<Message> Messages { get; set; } = new();

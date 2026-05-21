@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Security;
 
 namespace ZgrzytDesktop.Storage;
 
@@ -20,23 +21,57 @@ public class TokenStorage
 
     public async Task SaveTokenAsync(string token)
     {
-        await File.WriteAllTextAsync(_filePath, token);
+        var protectedToken = LocalDataProtector.ProtectString(token);
+        await File.WriteAllTextAsync(_filePath, protectedToken);
+    }
+
+    public string? LoadTokenSync()
+    {
+        try
+        {
+            if (!File.Exists(_filePath))
+                return null;
+
+            var stored = File.ReadAllText(_filePath);
+            var token = LocalDataProtector.UnprotectString(stored);
+
+            return string.IsNullOrWhiteSpace(token) ? null : token;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     public async Task<string?> GetTokenAsync()
     {
-        if (!File.Exists(_filePath))
+        try
+        {
+            if (!File.Exists(_filePath))
+                return null;
+
+            var stored = await File.ReadAllTextAsync(_filePath);
+            var token = LocalDataProtector.UnprotectString(stored);
+
+            return string.IsNullOrWhiteSpace(token) ? null : token;
+        }
+        catch
+        {
             return null;
-
-        var token = await File.ReadAllTextAsync(_filePath);
-
-        return string.IsNullOrWhiteSpace(token) ? null : token;
+        }
     }
 
     public Task ClearTokenAsync()
     {
-        if (File.Exists(_filePath))
-            File.Delete(_filePath);
+        try
+        {
+            if (File.Exists(_filePath))
+                File.Delete(_filePath);
+        }
+        catch
+        {
+            // Usunięcie tokena nie może zatrzymać aplikacji.
+        }
 
         return Task.CompletedTask;
     }
