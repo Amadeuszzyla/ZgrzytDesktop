@@ -86,6 +86,7 @@ Testy jednostkowe i headless używają mock HTTP / fake serwisów — **nie** wy
 | Adres API | Stały w kodzie / `settings.json`; **brak** edycji URL w panelu ustawień |
 | Powiadomienia Windows | **Brak** — nie używamy tray ani toastów systemowych (informacja tylko w aplikacji) |
 | Panel admin | Przy braku roli admin: **403** z API |
+| Live test `POST /api/logout` | Po wylogowaniu stary Bearer **nie** może dawać 200 na `GET /api/user`; test integracyjny akceptuje **401** / **403**; **500** po unieważnieniu tokena to znane niespójne zachowanie backendu (nie fail desktopu) — [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) |
 
 ## Pliki lokalne (AppData)
 

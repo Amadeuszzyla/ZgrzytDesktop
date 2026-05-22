@@ -46,6 +46,14 @@ public sealed class IntegrationApiTestHost : IAsyncLifetime, IDisposable
 
     public User? User { get; private set; }
 
+    internal async Task<string?> GetStoredAccessTokenAsync()
+    {
+        if (string.IsNullOrEmpty(_tempDirectory))
+            return null;
+
+        return await new TokenStorage(_tempDirectory).GetTokenAsync();
+    }
+
     public async Task InitializeAsync()
     {
         if (!IsConfigured || _settings is null)

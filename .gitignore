@@ -1,83 +1,34 @@
-# Build output
+﻿# Build outputs
 bin/
 obj/
-_audit_build/
-*.pdb
-[Bb]uild/
-[Dd]ebug/
-[Rr]elease/
-x64/
-x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
+[Bb]in/
+[Oo]bj/
 
-# .NET / NuGet
-*.nupkg
-*.snupkg
-packages/
-.nuget/
-project.lock.json
-project.assets.json
-*.nuget.props
-*.nuget.targets
-
-# Rider / JetBrains
-.idea/
-*.sln.iml
-
-# Visual Studio
-.vs/
-*.user
-*.rsuser
-*.suo
-*.userosscache
-*.sln.docstates
-
-# VS Code (launch/tasks są w repozytorium)
-.vscode/*
-!.vscode/launch.json
-!.vscode/tasks.json
-
-# Test results / coverage
-TestResults/
-coverage/
-coverage.cobertura.xml
-*.coverage
-*.coveragexml
-*.trx
-
-# Logs
-*.log
-logs/
-
-# Publish output
+# Publish / release artifacts
 publish/
-artifacts/
-out/
+**/publish/
+*.pdb
 
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
+# Audit / generated artifacts
+_audit_build/
+ZgrzytDesktop/obj/Generated/
 
-# Local app/cache/settings data - should not be committed
-*.local.json
-settings.json
-user-cache.json
-tickets-cache.json
-token.json
-
-# Environment / secrets
+# Local env / secrets
 .env
 .env.*
-*.secret.json
-secrets.json
-integration.local.env
-*.integration.env
+!.env.example
 
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.orig
-~$*
+# Local app/user settings
+settings.json
+*.user
+*.suo
+*.rsuser
+
+# Rider / Visual Studio
+.idea/
+.vs/
+*.sln.DotSettings.user
+
+# OS
+Thumbs.db
+Desktop.ini

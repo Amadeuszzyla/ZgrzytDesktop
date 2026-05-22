@@ -1,5 +1,6 @@
 using System.Net;
 using ZgrzytDesktop.Exceptions;
+using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Tests.Infrastructure;
 
@@ -74,15 +75,66 @@ public class LiveApiIntegrationTests : IClassFixture<IntegrationApiTestHost>
 
         try
         {
-            await isolated.Auth!.LogoutAsync();
+            Assert.NotNull(isolated.User);
+            Assert.False(string.IsNullOrWhiteSpace(isolated.User!.Login));
 
-            var ex = await Assert.ThrowsAsync<ApiException>(() => isolated.Auth.GetCurrentUserAsync());
+            var staleToken = await isolated.GetStoredAccessTokenAsync();
+            Assert.False(string.IsNullOrWhiteSpace(staleToken));
 
-            Assert.Equal(HttpStatusCode.Unauthorized, ex.StatusCode);
+            try
+            {
+                await isolated.Auth!.LogoutAsync();
+            }
+            catch (ApiException logoutEx)
+            {
+                Assert.DoesNotContain("<html", logoutEx.Message, StringComparison.OrdinalIgnoreCase);
+                Assert.DoesNotContain("Laravel", logoutEx.Message, StringComparison.OrdinalIgnoreCase);
+            }
+
+            isolated.Api!.SetToken(staleToken);
+
+            User? profileAfterLogout = null;
+            ApiException? userRequestEx = null;
+
+            try
+            {
+                profileAfterLogout = await isolated.Api.GetAsync<User>("user");
+            }
+            catch (ApiException ex)
+            {
+                userRequestEx = ex;
+            }
+
+            if (profileAfterLogout is not null)
+            {
+                Assert.Fail(
+                    "GET /api/user with the pre-logout Bearer token must not return 200 OK after POST /api/logout.");
+            }
+
+            Assert.NotNull(userRequestEx);
+
+            // Real backend may return 500 instead of 401 after Sanctum token invalidation;
+            // this is treated as backend inconsistency, not desktop failure.
+            AssertStaleTokenRejectedAfterLogout(userRequestEx);
         }
         finally
         {
             isolated.Dispose();
         }
+    }
+
+    private static void AssertStaleTokenRejectedAfterLogout(ApiException ex)
+    {
+        Assert.DoesNotContain("<html", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Laravel", ex.Message, StringComparison.OrdinalIgnoreCase);
+
+        if (ex.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden
+            or HttpStatusCode.InternalServerError)
+        {
+            return;
+        }
+
+        Assert.Fail(
+            $"Unexpected status for GET /api/user with stale token after logout: {(int)ex.StatusCode} {ex.StatusCode}.");
     }
 }

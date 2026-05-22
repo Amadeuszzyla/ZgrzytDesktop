@@ -97,7 +97,9 @@ Filtry list: `/api/active-users`, `/api/inactive-users`, `/api/banned-users`.
 
 ```powershell
 Invoke-RestMethod -Method Post -Uri "$base/logout" -Headers $headers -Body "{}" -ContentType "application/json"
-# Po wylogowaniu GET /api/user powinien zwrócić 401
+# Po wylogowaniu GET /api/user ze starym tokenem nie powinien zwrócić 200 OK.
+# Oczekiwane: 401 Unauthorized lub 403 Forbidden.
+# Na produkcji (Render) często występuje 500 InternalServerError zamiast 401 — znane niespójne zachowanie backendu (Sanctum), nie błąd desktopu.
 ```
 
 ## Testy automatyczne (opcjonalne)
@@ -111,7 +113,7 @@ Atrybut: `[Trait("Category", "Integration")]`
 | `GetUser_ReturnsProfileAfterLogin` | `GET /api/user` |
 | `GetTickets_ReturnsPaginatedList` | `GET /api/tickets` |
 | `GetUsers_AsStaffRole_ReturnsUserList` | `GET /api/users` (pomijany dla roli `user`) |
-| `PostLogout_InvalidatesBearerSession` | `POST /api/logout`, potem `GET /api/user` → 401 |
+| `PostLogout_InvalidatesBearerSession` | `POST /api/login`, `POST /api/logout`, potem `GET /api/user` ze starym tokenem → **nie** 200; akceptowane 401 / 403 / 500 (500 = znany kontrakt backendu) |
 
 - Bez zmiennych środowiskowych testy są **pomijane** (Skipped), nie Failed.
 - Testy **nie** wypisują tokenów w output.
