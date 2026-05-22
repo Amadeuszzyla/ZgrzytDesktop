@@ -1,0 +1,72 @@
+﻿<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.RequestAccountPanelView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:CompileBindings="False">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                <StackPanel Classes="page-content" MaxWidth="760">
+
+                    <Border Classes="app-card">
+
+                        <StackPanel Spacing="12">
+                            <TextBlock Classes="section-title-large" Text="Zg┼éo┼Ť nowe konto" />
+
+                            <TextBlock
+                                Classes="section-subtitle"
+                                Text="Wype┼énij dane nowego u┼╝ytkownika. Pro┼Ťba zostanie wys┼éana do administratora." />
+
+                            <TextBlock Classes="field-label" Text="Imi─Ö i nazwisko" Margin="0" />
+
+                            <TextBox
+                                Text="{Binding RequestName}"
+                                PlaceholderText="np. Jan Kowalski"
+                                IsEnabled="{Binding CanRequestAccount}" />
+
+                            <TextBlock Classes="field-label" Text="Login" Margin="0" />
+
+                            <TextBox
+                                Text="{Binding RequestLogin}"
+                                PlaceholderText="np. j.kowalski"
+                                IsEnabled="{Binding CanRequestAccount}" />
+
+                            <TextBlock Classes="field-label" Text="E-mail" Margin="0" />
+
+                            <TextBox
+                                Text="{Binding RequestEmail}"
+                                PlaceholderText="np. jan.kowalski@firma.pl"
+                                IsEnabled="{Binding CanRequestAccount}" />
+
+                            <TextBlock Classes="field-label" Text="Hasło" Margin="0" />
+
+                            <TextBox
+                                Text="{Binding RequestPassword}"
+                                PasswordChar="•"
+                                PlaceholderText="Hasło"
+                                IsEnabled="{Binding CanRequestAccount}" />
+
+                            <TextBlock Classes="field-label" Text="Potwierdzenie hasła" Margin="0" />
+
+                            <TextBox
+                                Text="{Binding RequestPasswordConfirmation}"
+                                PasswordChar="•"
+                                PlaceholderText="Powtórz hasło"
+                                IsEnabled="{Binding CanRequestAccount}" />
+
+                            <Button
+                                Classes="btn-primary"
+                                Content="Wyślij prośbę"
+                                Command="{Binding RequestAccountCommand}"
+                                HorizontalAlignment="Left"
+                                IsEnabled="{Binding CanRequestAccount}" />
+
+                            <TextBlock
+                                Text="{Binding RequestAccountStatusMessage}"
+                                TextWrapping="Wrap"
+                                Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+</UserControl>

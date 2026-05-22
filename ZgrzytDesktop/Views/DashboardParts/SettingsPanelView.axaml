@@ -1,0 +1,104 @@
+<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.SettingsPanelView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:CompileBindings="False">
+<ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Classes="page-content" Spacing="20">
+                    <Border Classes="app-card">
+                        <StackPanel Spacing="14">
+                            <TextBlock Classes="section-title-large" Text="{Binding LblSettingsTitle}" />
+                            <TextBlock Classes="section-subtitle" Text="{Binding LblSettingsSubtitle}" />
+
+                            <TextBlock Classes="field-label" Text="{Binding LblSettingsTheme}" Margin="0" />
+                            <ComboBox
+                                ItemsSource="{Binding ThemeModes}"
+                                SelectedItem="{Binding SelectedThemeMode}"
+                                MinHeight="38"
+                                HorizontalAlignment="Stretch" />
+
+                            <TextBlock Classes="field-label" Text="{Binding LblSettingsLanguage}" Margin="0,8,0,0" />
+                            <ComboBox
+                                ItemsSource="{Binding UiCultures}"
+                                SelectedItem="{Binding SelectedUiCulture}"
+                                MinHeight="38"
+                                HorizontalAlignment="Stretch" />
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button
+                                    Classes="btn-primary"
+                                    Content="{Binding LblSettingsSave}"
+                                    Command="{Binding SaveSettingsCommand}"
+                                    MinWidth="160"
+                                    MinHeight="36" />
+                                <Button
+                                    Classes="btn-secondary"
+                                    Content="{Binding LblSettingsRefreshSession}"
+                                    Command="{Binding RefreshSessionCommand}"
+                                    MinWidth="180"
+                                    MinHeight="36" />
+                            </StackPanel>
+
+                            <TextBlock Text="{Binding SettingsStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="app-card">
+                        <StackPanel Spacing="14">
+                            <TextBlock Classes="section-title-large" Text="Lokalny audyt aplikacji" />
+                            <TextBlock
+                                Classes="section-subtitle"
+                                Text="Lista akcji wykonanych lokalnie w aplikacji desktopowej." />
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button
+                                    Classes="btn-secondary"
+                                    Content="Odśwież audyt"
+                                    Command="{Binding LoadAuditLogsCommand}"
+                                    MinWidth="130"
+                                    MinHeight="36" />
+                                <Button
+                                    Classes="btn-secondary"
+                                    Content="Wyczyść audyt"
+                                    Command="{Binding ClearAuditLogsCommand}"
+                                    MinWidth="130"
+                                    MinHeight="36" />
+                            </StackPanel>
+
+                            <DataGrid
+                                ItemsSource="{Binding SettingsAuditLogEntries}"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="True"
+                                CanUserSortColumns="False"
+                                MinHeight="200"
+                                MaxHeight="420"
+                                GridLinesVisibility="Horizontal"
+                                HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Data i czas" Binding="{Binding Timestamp}" Width="180" />
+                                    <DataGridTextColumn Header="U┼╝ytkownik" Binding="{Binding UserLogin}" Width="160" />
+                                    <DataGridTextColumn Header="Akcja" Binding="{Binding Action}" Width="200" />
+                                    <DataGridTextColumn Header="ID zg┼éoszenia" Binding="{Binding TicketId}" Width="100" />
+                                    <DataGridTemplateColumn Header="Opis" Width="*" MinWidth="350">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock
+                                                    Text="{Binding Description}"
+                                                    TextWrapping="Wrap"
+                                                    MaxHeight="72"
+                                                    ToolTip.Tip="{Binding Description}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <TextBlock
+                                Classes="empty-state"
+                                Text="Brak lokalnych wpis├│w audytu."
+                                IsVisible="{Binding HasNoSettingsAuditLogEntries}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+</UserControl>

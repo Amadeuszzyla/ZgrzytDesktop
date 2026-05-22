@@ -28,6 +28,8 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            desktop.Exit += OnDesktopExit;
+
             try
             {
                 _serviceProvider = BuildServiceProvider();
@@ -47,6 +49,22 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
+    private void OnDesktopExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+    {
+        try
+        {
+            _serviceProvider?.Dispose();
+        }
+        catch
+        {
+            // Dispose nie może blokować zamknięcia aplikacji.
+        }
+        finally
+        {
+            _serviceProvider = null;
+        }
+    }
+
     private static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<ITokenStorage, TokenStorage>();
@@ -57,8 +75,8 @@ public partial class App : Application
         services.AddSingleton<ITicketService, TicketService>();
         services.AddSingleton<IUserAdminService, UserAdminService>();
         services.AddSingleton<ILocalAuditLogService, LocalAuditLogService>();
-        services.AddSingleton<LocalTicketCacheService>();
-        services.AddSingleton<LocalUserCacheService>();
+        services.AddSingleton<ILocalTicketCacheService, LocalTicketCacheService>();
+        services.AddSingleton<ILocalUserCacheService, LocalUserCacheService>();
         services.AddSingleton<MainWindowViewModel>();
     }
 

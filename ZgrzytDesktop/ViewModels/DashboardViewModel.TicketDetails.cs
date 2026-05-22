@@ -303,60 +303,48 @@ public partial class DashboardViewModel
                 Status = TicketStatuses.Zamkniete
             };
 
-            var updatedTicket = await _ticketService.UpdateTicketAsync(ticketId, request);
+            var closed = await ExecuteApiAsync(
+                async () =>
+                {
+                    var updatedTicket = await _ticketService.UpdateTicketAsync(ticketId, request);
 
-            if (updatedTicket is not null && !IsValidTicketForDisplay(updatedTicket))
+                    if (updatedTicket is not null && !IsValidTicketForDisplay(updatedTicket))
+                    {
+                        throw new ApiException(
+                            HttpStatusCode.InternalServerError,
+                            "Serwer zwrócił stronę błędu zamiast danych API. Sprawdź endpoint lub uprawnienia.");
+                    }
+
+                    IsOffline = false;
+
+                    await LoadTicketDetailsAsync(ticketId);
+                    await LoadTicketsAsync();
+
+                    DetailsStatusMessage = "Zgłoszenie zostało zamknięte.";
+
+                    ShowToast("Zgłoszenie zostało zamknięte.", ToastTypes.Success);
+
+                    await LogAuditAsync(
+                        "CloseTicket",
+                        ticketId,
+                        "Zamknięto zgłoszenie.");
+                },
+                setStatusMessage: message => DetailsStatusMessage = message,
+                unexpectedStatusMessage: "Wystąpił błąd podczas zamykania zgłoszenia.",
+                unexpectedToastMessage: "Nie udało się zamknąć zgłoszenia.",
+                showApiErrorToast: true);
+
+            if (!closed)
             {
-                throw new ApiException(
-                    System.Net.HttpStatusCode.InternalServerError,
-                    "Serwer zwrócił stronę błędu zamiast danych API. Sprawdź endpoint lub uprawnienia.");
+                TicketDetails = previousDetails;
+                SelectedStatus = previousStatus;
+                SelectedPriority = previousPriority;
+
+                await LogAuditAsync(
+                    "CloseTicket",
+                    ticketId,
+                    "Nie udało się zamknąć zgłoszenia: brak uprawnień lub błąd serwera.");
             }
-
-            IsOffline = false;
-
-            await LoadTicketDetailsAsync(ticketId);
-            await LoadTicketsAsync();
-
-            DetailsStatusMessage = "Zgłoszenie zostało zamknięte.";
-
-            ShowToast("Zgłoszenie zostało zamknięte.", ToastTypes.Success);
-
-            await LogAuditAsync(
-                "CloseTicket",
-                ticketId,
-                "Zamknięto zgłoszenie.");
-        }
-        catch (ApiException ex)
-        {
-            TicketDetails = previousDetails;
-            SelectedStatus = previousStatus;
-            SelectedPriority = previousPriority;
-
-            var errorMessage = GetApiErrorMessage(ex);
-
-            DetailsStatusMessage = errorMessage;
-
-            ShowToast(errorMessage, ToastTypes.Error);
-
-            await LogAuditAsync(
-                "CloseTicket",
-                ticketId,
-                "Nie udało się zamknąć zgłoszenia: brak uprawnień lub błąd serwera.");
-        }
-        catch
-        {
-            TicketDetails = previousDetails;
-            SelectedStatus = previousStatus;
-            SelectedPriority = previousPriority;
-
-            DetailsStatusMessage = "Wystąpił błąd podczas zamykania zgłoszenia.";
-
-            ShowToast("Nie udało się zamknąć zgłoszenia.", ToastTypes.Error);
-
-            await LogAuditAsync(
-                "CloseTicket",
-                ticketId,
-                "Nie udało się zamknąć zgłoszenia: brak uprawnień lub błąd serwera.");
         }
         finally
         {

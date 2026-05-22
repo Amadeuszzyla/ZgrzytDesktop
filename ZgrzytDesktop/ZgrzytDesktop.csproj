@@ -6,10 +6,21 @@
 	<UseWindowsForms>true</UseWindowsForms>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AvaloniaXaml Update="Views\**\*.axaml;App.axaml;Styles\**\*.axaml">
+            <SubType>Designer</SubType>
+        </AvaloniaXaml>
+        <Compile Update="Views\**\*.axaml.cs;App.axaml.cs">
+            <DependentUpon>%(Filename).axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>

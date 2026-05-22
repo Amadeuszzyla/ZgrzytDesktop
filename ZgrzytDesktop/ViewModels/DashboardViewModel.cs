@@ -36,7 +36,7 @@ public partial class DashboardViewModel : ViewModelBase
 
     private readonly ISettingsService _settingsService;
 
-    private readonly LocalTicketCacheService _ticketCacheService;
+    private readonly ILocalTicketCacheService _ticketCacheService;
 
     private readonly ILocalAuditLogService _auditLogService;
 
@@ -70,7 +70,7 @@ public partial class DashboardViewModel : ViewModelBase
 
         ISettingsService settingsService,
 
-        LocalTicketCacheService ticketCacheService,
+        ILocalTicketCacheService ticketCacheService,
 
         ILocalAuditLogService auditLogService,
 
@@ -114,7 +114,7 @@ public partial class DashboardViewModel : ViewModelBase
 
         ISettingsService settingsService,
 
-        LocalTicketCacheService ticketCacheService,
+        ILocalTicketCacheService ticketCacheService,
 
         ILocalAuditLogService auditLogService,
 

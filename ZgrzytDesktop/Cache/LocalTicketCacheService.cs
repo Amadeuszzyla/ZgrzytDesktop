@@ -5,10 +5,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Security;
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Cache;
 
-public class LocalTicketCacheService
+public class LocalTicketCacheService : ILocalTicketCacheService
 {
     private readonly string _filePath;
 

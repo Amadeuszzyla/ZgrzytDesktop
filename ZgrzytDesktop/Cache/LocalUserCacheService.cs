@@ -4,10 +4,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Security;
+using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Cache;
 
-public class LocalUserCacheService
+public class LocalUserCacheService : ILocalUserCacheService
 {
     private readonly string _filePath;
 

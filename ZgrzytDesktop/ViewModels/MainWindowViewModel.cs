@@ -12,8 +12,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IAuthService _authService;
     private readonly ITicketService _ticketService;
     private readonly ISettingsService _settingsService;
-    private readonly LocalTicketCacheService _ticketCacheService;
-    private readonly LocalUserCacheService _userCacheService;
+    private readonly ILocalTicketCacheService _ticketCacheService;
+    private readonly ILocalUserCacheService _userCacheService;
     private readonly ILocalAuditLogService _auditLogService;
     private readonly IUserAdminService _userAdminService;
 
@@ -29,8 +29,8 @@ public partial class MainWindowViewModel : ViewModelBase
         IAuthService authService,
         ITicketService ticketService,
         ISettingsService settingsService,
-        LocalTicketCacheService ticketCacheService,
-        LocalUserCacheService userCacheService,
+        ILocalTicketCacheService ticketCacheService,
+        ILocalUserCacheService userCacheService,
         ILocalAuditLogService auditLogService,
         IUserAdminService userAdminService)
         : this(
@@ -72,8 +72,8 @@ public partial class MainWindowViewModel : ViewModelBase
             IAuthService authService,
             ITicketService ticketService,
             ISettingsService settingsService,
-            LocalTicketCacheService ticketCacheService,
-            LocalUserCacheService userCacheService,
+            ILocalTicketCacheService ticketCacheService,
+            ILocalUserCacheService userCacheService,
             ILocalAuditLogService auditLogService,
             IUserAdminService userAdminService)
         {
@@ -92,9 +92,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
         public ISettingsService SettingsService { get; }
 
-        public LocalTicketCacheService TicketCacheService { get; }
+        public ILocalTicketCacheService TicketCacheService { get; }
 
-        public LocalUserCacheService UserCacheService { get; }
+        public ILocalUserCacheService UserCacheService { get; }
 
         public ILocalAuditLogService AuditLogService { get; }
 

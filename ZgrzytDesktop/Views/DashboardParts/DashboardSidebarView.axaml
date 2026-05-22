@@ -1,0 +1,106 @@
+﻿<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.DashboardSidebarView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:CompileBindings="False">
+
+    <Border
+            Background="{DynamicResource SidebarBackgroundBrush}"
+            Padding="16,18">
+
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                <StackPanel Grid.Row="0" Spacing="4">
+                    <TextBlock
+                        Text="ZGRZYT"
+                        FontSize="28"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource SidebarPrimaryTextBrush}" />
+
+                    <TextBlock
+                        Text="Desktop"
+                        FontSize="14"
+                        Foreground="{DynamicResource SidebarMutedTextBrush}" />
+                </StackPanel>
+
+                <Border
+                    Grid.Row="1"
+                    Background="{DynamicResource SidebarSurfaceBrush}"
+                    CornerRadius="12"
+                    Padding="12"
+                    Margin="0,24,0,20">
+
+                    <StackPanel Spacing="4">
+                        <TextBlock
+                            Text="{Binding CurrentUser.Name}"
+                        Foreground="{DynamicResource SidebarPrimaryTextBrush}"
+                        FontWeight="SemiBold"
+                        TextWrapping="Wrap" />
+
+                        <TextBlock
+                            Text="{Binding CurrentUser.Role}"
+                            Foreground="{DynamicResource SidebarMutedTextBrush}"
+                            FontSize="12" />
+
+                        <Border
+                            Background="{DynamicResource SidebarNavPointerOverBrush}"
+                            CornerRadius="10"
+                            Padding="8,4"
+                            HorizontalAlignment="Left"
+                            Margin="0,8,0,0">
+
+                            <TextBlock
+                                Text="{Binding ConnectionStatusText}"
+                                Foreground="{DynamicResource SidebarPrimaryTextBrush}"
+                                FontSize="12" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Row="2" Spacing="4" Margin="0,4,0,0">
+
+                    <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsTicketsNavActive}"
+                        Content="{Binding LblNavTickets}"
+                        Command="{Binding ShowTicketsPageCommand}" />
+
+                    <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsRequestAccountNavActive}"
+                        Content="{Binding LblNavRequestAccount}"
+                        Command="{Binding ShowRequestAccountPageCommand}"
+                        IsVisible="{Binding ShowRequestAccountNav}" />
+
+                    <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsStatisticsNavActive}"
+                        Content="{Binding LblNavStatistics}"
+                        Command="{Binding ShowStatisticsPageCommand}" />
+
+                    <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsSettingsNavActive}"
+                        Content="{Binding LblNavSettings}"
+                        Command="{Binding ShowSettingsPageCommand}" />
+
+                    <Button
+                        Classes="sidebar-nav"
+                        Classes.active="{Binding IsAdminNavActive}"
+                        Content="{Binding LblNavAdmin}"
+                        Command="{Binding ShowAdminPageCommand}"
+                        IsVisible="{Binding ShowAdministrationNav}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="3" Spacing="10" Margin="0,8,0,0">
+                    <Separator Background="{DynamicResource SidebarDividerBrush}" />
+
+                    <Button
+                        Classes="sidebar-logout"
+                        Content="{Binding LblNavLogout}"
+                        Command="{Binding LogoutCommand}" />
+                </StackPanel>
+
+            </Grid>
+        </Border>
+</UserControl>

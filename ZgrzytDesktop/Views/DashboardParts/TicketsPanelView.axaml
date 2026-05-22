@@ -1,0 +1,202 @@
+﻿<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.TicketsPanelView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:CompileBindings="False">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                <StackPanel Classes="page-content">
+
+                    <Border Classes="app-card" Margin="0,0,0,20">
+
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section-title" Text="{Binding LblTicketsFiltersTitle}" />
+                                <TextBlock
+                                    Classes="section-subtitle"
+                                    Text="{Binding LblTicketsFiltersSubtitle}" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="2*,140,140,140,150,120,100,100" ColumnSpacing="10">
+                                <TextBox
+                                    Grid.Column="0"
+                                    MinHeight="38"
+                                    VerticalContentAlignment="Center"
+                                    Text="{Binding SearchText}"
+                                    PlaceholderText="{Binding LblTicketsSearchPlaceholder}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <ComboBox
+                                    Grid.Column="1"
+                                    MinHeight="38"
+                                    ItemsSource="{Binding FilterStatuses}"
+                                    SelectedItem="{Binding SelectedFilterStatus}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <ComboBox
+                                    Grid.Column="2"
+                                    MinHeight="38"
+                                    ItemsSource="{Binding FilterPriorities}"
+                                    SelectedItem="{Binding SelectedFilterPriority}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <ComboBox
+                                    Grid.Column="3"
+                                    MinHeight="38"
+                                    ItemsSource="{Binding TicketQueueViews}"
+                                    SelectedItem="{Binding SelectedTicketQueueView}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <ComboBox
+                                    Grid.Column="4"
+                                    MinHeight="38"
+                                    ItemsSource="{Binding TicketSortFields}"
+                                    SelectedItem="{Binding SelectedTicketSortField}"
+                                    IsEnabled="{Binding IsNotLoading}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Label}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <ComboBox
+                                    Grid.Column="5"
+                                    MinHeight="38"
+                                    ItemsSource="{Binding TicketSortDirections}"
+                                    SelectedItem="{Binding SelectedTicketSortDirection}"
+                                    IsEnabled="{Binding IsNotLoading}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Label}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <Button
+                                    Grid.Column="6"
+                                    Classes="btn-primary filter-action"
+                                    Content="{Binding LblTicketsSearch}"
+                                    Command="{Binding SearchTicketsCommand}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+
+                                <Button
+                                    Grid.Column="7"
+                                    Classes="btn-secondary filter-action"
+                                    Content="{Binding LblTicketsClear}"
+                                    Command="{Binding ClearFiltersCommand}"
+                                    IsEnabled="{Binding IsNotLoading}" />
+                            </Grid>
+
+                            <Separator Background="{DynamicResource AppCardBorderBrush}" />
+
+                            <Grid ColumnDefinitions="Auto,88,44,44,Auto,88,44,44,Auto,Auto" ColumnSpacing="8">
+                                <TextBlock Grid.Column="0" Text="Na stron─Ö:" VerticalAlignment="Center" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                <ComboBox Grid.Column="1" MinHeight="36" VerticalAlignment="Center" ItemsSource="{Binding PageSizeOptions}" SelectedItem="{Binding SelectedPageSize}" IsEnabled="{Binding IsNotLoading}" />
+                                <Button Grid.Column="2" Classes="btn-secondary" Content="┬ź" VerticalAlignment="Center" Command="{Binding FirstPageCommand}" IsEnabled="{Binding CanGoPreviousPage}" MinHeight="36" />
+                                <Button Grid.Column="3" Classes="btn-secondary" Content="ÔÇ╣" VerticalAlignment="Center" Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoPreviousPage}" MinHeight="36" />
+                                <TextBlock Grid.Column="4" Text="Strona:" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                <ComboBox Grid.Column="5" MinHeight="36" VerticalAlignment="Center" ItemsSource="{Binding PageNumbers}" SelectedItem="{Binding SelectedPageNumber}" IsEnabled="{Binding IsNotLoading}" />
+                                <Button Grid.Column="6" Classes="btn-secondary" Content="ÔÇ║" VerticalAlignment="Center" Command="{Binding NextPageCommand}" IsEnabled="{Binding CanGoNextPage}" MinHeight="36" />
+                                <Button Grid.Column="7" Classes="btn-secondary" Content="┬╗" VerticalAlignment="Center" Command="{Binding LastPageCommand}" IsEnabled="{Binding CanGoNextPage}" MinHeight="36" />
+                                <TextBlock Grid.Column="8" Text="{Binding PagePositionText}" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                <TextBlock Grid.Column="9" Text="{Binding PageTotalText}" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource AppSecondaryTextBrush}" TextWrapping="Wrap" />
+                                    <TextBlock Text="{Binding AutoRefreshStatusText}" Foreground="{DynamicResource AppMutedTextBrush}" FontSize="12" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <Button
+                                    Grid.Column="1"
+                                    Classes="btn-secondary"
+                                    Content="{Binding LblTicketsRefreshNow}"
+                                    Command="{Binding RefreshTicketsNowCommand}"
+                                    IsEnabled="{Binding CanRefreshTicketsNow}"
+                                    VerticalAlignment="Center"
+                                    MinWidth="130"
+                                    MinHeight="36" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="app-card" Margin="0,0,0,20" Padding="14">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="section-title" Text="{Binding LblTicketsListTitle}" />
+                            <DataGrid
+                                ItemsSource="{Binding Tickets}"
+                                SelectedItem="{Binding SelectedTicket}"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="True"
+                                IsEnabled="{Binding IsNotLoading}"
+                                MinHeight="260"
+                                MaxHeight="420"
+                                GridLinesVisibility="Horizontal"
+                                HeadersVisibility="Column"
+                                CanUserSortColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" />
+                                    <DataGridTextColumn Header="Kategoria" Binding="{Binding DisplayCategory}" Width="140" />
+                                    <DataGridTemplateColumn Header="Tytu┼é" Width="3*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Status" Binding="{Binding DisplayStatus}" Width="140" />
+                                    <DataGridTextColumn Header="Priorytet" Binding="{Binding Priority}" Width="120" />
+                                    <DataGridTextColumn Header="Utworzono" Binding="{Binding CreatedAt}" Width="190" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="app-card" Margin="0,0,0,0">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section-title" Text="Nowe zg┼éoszenie" />
+                                <TextBlock Classes="section-subtitle" Text="Uzupe┼énij pola i utw├│rz zg┼éoszenie w systemie." />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <StackPanel Grid.Column="0" Spacing="6">
+                                    <TextBlock Classes="field-label" Text="Kategoria" Margin="0" />
+                                    <ComboBox MinHeight="38" ItemsSource="{Binding NewTicketCategories}" SelectedItem="{Binding SelectedNewTicketCategory}" IsEnabled="{Binding CanUseOnlineActions}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="6">
+                                    <TextBlock Classes="field-label" Text="Priorytet" Margin="0" />
+                                    <ComboBox MinHeight="38" ItemsSource="{Binding AvailablePriorities}" SelectedItem="{Binding NewTicketPriority}" IsEnabled="{Binding CanUseOnlineActions}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="field-label" Text="Tytu┼é" Margin="0" />
+                                <TextBox MinHeight="38" Text="{Binding NewTicketTitle}" PlaceholderText="Tytu┼é zg┼éoszenia" IsEnabled="{Binding CanUseOnlineActions}" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="field-label" Text="Opis" Margin="0" />
+                                <TextBox MinHeight="100" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding NewTicketDescription}" PlaceholderText="Opis problemu" IsEnabled="{Binding CanUseOnlineActions}" />
+                            </StackPanel>
+
+                            <TextBlock Text="{Binding CreateTicketStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" FontSize="12" />
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Button
+                                    Grid.Column="1"
+                                    Classes="btn-primary"
+                                    Content="Utw├│rz zg┼éoszenie"
+                                    Command="{Binding CreateTicketCommand}"
+                                    HorizontalAlignment="Right"
+                                    MinWidth="200"
+                                    MinHeight="38"
+                                    IsEnabled="{Binding CanUseOnlineActions}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+</UserControl>
