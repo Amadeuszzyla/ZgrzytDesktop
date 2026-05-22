@@ -30,20 +30,6 @@ public partial class DashboardViewModel
     public string LblAdminUnbanPassword => AppStrings.Get("Admin_UnbanPassword");
     public string LblAdminTabUsers => AppStrings.Get("Admin_TabUsers");
     public string LblAdminTabNewAccount => AppStrings.Get("Admin_TabNewAccount");
-    public string LblSettingsTitle => AppStrings.Get("Settings_Title");
-    public string LblSettingsSubtitle => AppStrings.Get("Settings_Subtitle");
-    public string LblSettingsTheme => AppStrings.Get("Settings_Theme");
-    public string LblSettingsLanguage => AppStrings.Get("Settings_Language");
-    public string LblSettingsSave => AppStrings.Get("Settings_Save");
-    public string LblSettingsRefreshSession => AppStrings.Get("Settings_RefreshSession");
-    public string LblStatsTitle => AppStrings.Get("Stats_Title");
-    public string LblStatsLoadAll => AppStrings.Get("Stats_LoadAll");
-    public string LblStatsKpiAll => AppStrings.Get("Stats_KpiAll");
-    public string LblStatsKpiNew => AppStrings.Get("Stats_KpiNew");
-    public string LblStatsKpiInProgress => AppStrings.Get("Stats_KpiInProgress");
-    public string LblStatsKpiClosed => AppStrings.Get("Stats_KpiClosed");
-    public string LblStatsKpiHighPriority => AppStrings.Get("Stats_KpiHighPriority");
-
     private void NotifyLocalizationProperties()
     {
         OnPropertyChanged(nameof(LblNavTickets));
@@ -73,19 +59,8 @@ public partial class DashboardViewModel
         OnPropertyChanged(nameof(LblAdminUnbanPassword));
         OnPropertyChanged(nameof(LblAdminTabUsers));
         OnPropertyChanged(nameof(LblAdminTabNewAccount));
-        OnPropertyChanged(nameof(LblSettingsTitle));
-        OnPropertyChanged(nameof(LblSettingsSubtitle));
-        OnPropertyChanged(nameof(LblSettingsTheme));
-        OnPropertyChanged(nameof(LblSettingsLanguage));
-        OnPropertyChanged(nameof(LblSettingsSave));
-        OnPropertyChanged(nameof(LblSettingsRefreshSession));
-        OnPropertyChanged(nameof(LblStatsTitle));
-        OnPropertyChanged(nameof(LblStatsLoadAll));
-        OnPropertyChanged(nameof(LblStatsKpiAll));
-        OnPropertyChanged(nameof(LblStatsKpiNew));
-        OnPropertyChanged(nameof(LblStatsKpiInProgress));
-        OnPropertyChanged(nameof(LblStatsKpiClosed));
-        OnPropertyChanged(nameof(LblStatsKpiHighPriority));
+        SettingsPanel.NotifyLocalization();
+        StatisticsPanel.NotifyLocalization();
         OnPropertyChanged(nameof(TicketSortFields));
         OnPropertyChanged(nameof(TicketSortDirections));
         OnPropertyChanged(nameof(AdminUserListFilterOptions));

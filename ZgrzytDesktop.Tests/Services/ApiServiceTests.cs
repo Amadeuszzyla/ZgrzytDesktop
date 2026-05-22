@@ -1,12 +1,46 @@
 using System.Net;
 using Xunit;
+using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Exceptions;
+using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Tests.Infrastructure;
 
 namespace ZgrzytDesktop.Tests.Services;
 
 public class ApiServiceTests
 {
+    [Theory]
+    [InlineData("/api/login")]
+    [InlineData("api/login")]
+    public async Task PostAsync_LoginEndpoint_ShouldComposeUrlWithoutDuplicateApiPrefix(string endpoint)
+    {
+        var handler = new MockHttpMessageHandler();
+        var api = new ApiService(handler, ApiDefaults.ProductionApiBaseUrl);
+        try
+        {
+            handler.EnqueueJson(HttpStatusCode.OK, "{}");
+
+            await api.PostAsync<object, object>(endpoint, new { });
+
+            var requestUri = handler.Requests[0].Uri!;
+            Assert.Equal("/api/login", requestUri.AbsolutePath, StringComparer.OrdinalIgnoreCase);
+            Assert.DoesNotContain("/api/api/", requestUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            // handler disposed with api? ApiService doesn't dispose handler in test ctor - ok
+        }
+    }
+
+    [Fact]
+    public void SetBaseAddress_ShouldNormalizeProductionUrl()
+    {
+        var handler = new MockHttpMessageHandler();
+        var api = new ApiService(handler, "https://zgrzyt-api.onrender.com");
+
+        Assert.Equal(ApiDefaults.ProductionApiBaseUrl, api.CurrentApiBaseUrl);
+    }
+
     [Fact]
     public async Task GetAsync_WhenResponseIsHtml_ShouldThrowSanitizedMessageWithoutHtml()
     {

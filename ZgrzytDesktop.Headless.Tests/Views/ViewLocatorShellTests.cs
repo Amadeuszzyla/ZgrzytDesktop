@@ -58,6 +58,35 @@ public class ViewLocatorShellTests
     }
 
     [Fact]
+    public void MainWindow_ContentControl_BindsToCurrentViewModel()
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var deps = ViewModelTestFactory.CreateMainWindowDependencies();
+            var shell = new MainWindowViewModel(deps, runStartup: false);
+
+            var window = new MainWindow
+            {
+                DataContext = shell,
+                Width = 1200,
+                Height = 750
+            };
+
+            window.Show();
+
+            var contentControl = window.GetVisualDescendants()
+                .OfType<ContentControl>()
+                .FirstOrDefault();
+
+            Assert.NotNull(contentControl);
+            Assert.Same(shell.CurrentViewModel, contentControl!.Content);
+
+            shell.CurrentViewModel = ViewModelTestFactory.CreateLoginViewModel();
+            Assert.Same(shell.CurrentViewModel, contentControl.Content);
+        });
+    }
+
+    [Fact]
     public void MainWindow_WithShellViewModel_RendersLoginViewThroughViewLocator()
     {
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>

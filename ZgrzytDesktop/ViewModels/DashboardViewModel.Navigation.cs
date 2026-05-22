@@ -17,7 +17,7 @@ public partial class DashboardViewModel
     private void ShowSettingsPage()
     {
         CurrentSection = AppSections.Settings;
-        _ = RefreshSettingsAuditLogAsync();
+        _ = AuditPanel.RefreshAsync();
     }
 
     private void ConfigureTicketQueueViewsForRole()

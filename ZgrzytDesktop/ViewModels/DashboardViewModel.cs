@@ -144,19 +144,19 @@ public partial class DashboardViewModel : ViewModelBase
 
 
 
+        InitializeDashboardPanels();
+
         InitializeCommands();
 
         InitializeTicketCollections();
 
         InitializeAdminCollections();
 
-        InitializeSettingsCollections();
+        SettingsPanel.ApplyBootstrapFromSettings();
 
-        InitializeStatisticsCollections();
+        AppStrings.ApplyCulture(SettingsPanel.SelectedUiCulture);
 
-
-
-        ApplyBootstrapFromSettings();
+        SettingsService.ApplyThemeMode(SettingsPanel.SelectedThemeMode);
 
         ApplyDefaultSortAndAdminFilter();
 
@@ -191,24 +191,6 @@ public partial class DashboardViewModel : ViewModelBase
         if (bootstrap.RunInitialLoad)
 
             _ = LoadTicketsAsync();
-
-    }
-
-
-
-    private void ApplyBootstrapFromSettings()
-
-    {
-
-        var appSettings = _settingsService.LoadSync();
-
-        SelectedThemeMode = appSettings.ThemeMode;
-
-        SelectedUiCulture = SettingsService.NormalizeUiCulture(appSettings.UiCulture);
-
-        AppStrings.ApplyCulture(SelectedUiCulture);
-
-        SettingsService.ApplyThemeMode(appSettings.ThemeMode);
 
     }
 
@@ -276,4 +258,3 @@ public partial class DashboardViewModel : ViewModelBase
     }
 
 }
-

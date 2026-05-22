@@ -8,17 +8,17 @@ public sealed class FakeUserAdminService : IUserAdminService
 {
     public int GetUsersCallCount { get; private set; }
 
-    public Task<List<User>?> GetUsersAsync(UserAdminListFilter filter = UserAdminListFilter.All)
+    public Task<UserAdminListResult> GetUsersAsync(UserAdminListFilter filter = UserAdminListFilter.All)
     {
         GetUsersCallCount++;
-        return Task.FromResult<List<User>?>(new List<User>());
+        return Task.FromResult(new UserAdminListResult { Users = [] });
     }
 
-    public Task<List<User>?> GetActiveUsersAsync() => GetUsersAsync(UserAdminListFilter.Active);
+    public Task<UserAdminListResult> GetActiveUsersAsync() => GetUsersAsync(UserAdminListFilter.Active);
 
-    public Task<List<User>?> GetInactiveUsersAsync() => GetUsersAsync(UserAdminListFilter.Inactive);
+    public Task<UserAdminListResult> GetInactiveUsersAsync() => GetUsersAsync(UserAdminListFilter.Inactive);
 
-    public Task<List<User>?> GetBannedUsersAsync() => GetUsersAsync(UserAdminListFilter.Banned);
+    public Task<UserAdminListResult> GetBannedUsersAsync() => GetUsersAsync(UserAdminListFilter.Banned);
 
     public Task BanUserAsync(int userId) => Task.CompletedTask;
 

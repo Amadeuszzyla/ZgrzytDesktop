@@ -60,7 +60,7 @@ public partial class DashboardViewModel
             ShowToast(toastMessage, ToastTypes.Error);
     }
 
-    private async Task<bool> ExecuteApiAsync(
+    internal async Task<bool> ExecuteApiAsync(
         Func<Task> action,
         Action<string>? setStatusMessage = null,
         string? unexpectedStatusMessage = null,

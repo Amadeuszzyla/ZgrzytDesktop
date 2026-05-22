@@ -311,6 +311,7 @@ public partial class DashboardViewModel
             if (SetProperty(ref _isLoading, value))
             {
                 OnPropertyChanged(nameof(IsNotLoading));
+                StatisticsPanel.NotifyTicketsLoadingChanged();
                 OnPropertyChanged(nameof(CanUseOnlineActions));
                 OnPropertyChanged(nameof(CanRequestAccount));
                 RefreshPaginationProperties();

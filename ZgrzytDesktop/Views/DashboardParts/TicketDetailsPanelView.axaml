@@ -13,7 +13,7 @@
 
                         <Border Classes="app-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Classes="section-title-large" Text="Informacje o zg┼éoszeniu" />
+                                <TextBlock Classes="section-title-large" Text="Informacje o zgłoszeniu" />
 
                                 <Border Classes="app-subtle-panel">
                                     <TextBlock Text="{Binding DetailsStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
@@ -33,7 +33,7 @@
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="8">
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-label" Text="Zg┼éaszaj─ůcy" Margin="0" />
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-label" Text="Zgłaszający" Margin="0" />
                                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TicketDetails.User.Name}" Foreground="{DynamicResource AppPrimaryTextBrush}" />
                                     <TextBlock Grid.Row="1" Grid.Column="0" Classes="field-label" Text="Przypisany IT" Margin="0" />
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TicketDetails.AssignedTo.Name}" Foreground="{DynamicResource AppPrimaryTextBrush}" />
@@ -50,18 +50,18 @@
 
                         <Border Background="{DynamicResource AppInfoPanelBackgroundBrush}" CornerRadius="10" Padding="12" IsVisible="{Binding IsRegularUser}">
                             <StackPanel Spacing="6">
-                                <TextBlock Text="Mo┼╝esz zamkn─ů─ç w┼éasne zg┼éoszenie, je┼Ťli backend na to pozwala. Przy b┼é─Ödzie 403 operacja jest zablokowana po stronie API." TextWrapping="Wrap" Foreground="{DynamicResource AppInfoPanelForegroundBrush}" FontSize="12" IsVisible="{Binding CanCloseOwnTicket}" />
-                                <TextBlock Text="Masz dost─Öp do podgl─ůdu zg┼éoszenia i wiadomo┼Ťci. Edycja statusu, priorytetu oraz przypisywanie s─ů dost─Öpne dla r├│l admin/it." TextWrapping="Wrap" Foreground="{DynamicResource AppInfoPanelForegroundBrush}" FontSize="12" />
+                                <TextBlock Text="Możesz zamknąć własne zgłoszenie, jeśli backend na to pozwala. Przy błędzie 403 operacja jest zablokowana po stronie API." TextWrapping="Wrap" Foreground="{DynamicResource AppInfoPanelForegroundBrush}" FontSize="12" IsVisible="{Binding CanCloseOwnTicket}" />
+                                <TextBlock Text="Masz dostęp do podglądu zgłoszenia i wiadomości. Edycja statusu, priorytetu oraz przypisywanie są dostępne dla ról admin/it." TextWrapping="Wrap" Foreground="{DynamicResource AppInfoPanelForegroundBrush}" FontSize="12" />
                             </StackPanel>
                         </Border>
 
                         <Border Background="{DynamicResource AppWarnPanelBackgroundBrush}" CornerRadius="10" Padding="12" IsVisible="{Binding IsOffline}">
-                            <TextBlock Text="Tryb offline ÔÇö edycja, przypisywanie i wiadomo┼Ťci s─ů niedost─Öpne." TextWrapping="Wrap" Foreground="{DynamicResource AppWarnPanelForegroundBrush}" />
+                            <TextBlock Text="Tryb offline — edycja, przypisywanie i wiadomości są niedostępne." TextWrapping="Wrap" Foreground="{DynamicResource AppWarnPanelForegroundBrush}" />
                         </Border>
 
                         <Border Classes="app-card" IsVisible="{Binding CanManageTickets}">
                             <StackPanel Spacing="14">
-                                <TextBlock Classes="section-title-large" Text="Zarz─ůdzanie zg┼éoszeniem" />
+                                <TextBlock Classes="section-title-large" Text="Zarządzanie zgłoszeniem" />
 
                                 <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                                     <StackPanel Grid.Column="0" Spacing="6">
@@ -77,8 +77,8 @@
                                 <UniformGrid Columns="2" Rows="2" Margin="0,4,0,0">
                                     <Button Classes="btn-primary" Content="Zapisz zmiany" Command="{Binding UpdateTicketCommand}" IsEnabled="{Binding CanEditTicket}" Margin="0,0,6,6" HorizontalAlignment="Stretch" />
                                     <Button Classes="btn-secondary" Content="Przypisz do mnie" Command="{Binding AssignToMeCommand}" IsEnabled="{Binding CanAssignTicket}" Margin="6,0,0,6" HorizontalAlignment="Stretch" />
-                                    <Button Classes="btn-warning" Content="Zamknij zg┼éoszenie" Command="{Binding CloseTicketCommand}" IsEnabled="{Binding CanCloseTicket}" Margin="0,0,6,0" HorizontalAlignment="Stretch" />
-                                    <Button Classes="btn-danger" Content="Usu┼ä zg┼éoszenie" Command="{Binding DeleteTicketCommand}" IsEnabled="{Binding CanDeleteTicket}" Margin="6,0,0,0" HorizontalAlignment="Stretch" />
+                                    <Button Classes="btn-warning" Content="Zamknij zgłoszenie" Command="{Binding CloseTicketCommand}" IsEnabled="{Binding CanCloseTicket}" Margin="0,0,6,0" HorizontalAlignment="Stretch" />
+                                    <Button Classes="btn-danger" Content="Usuń zgłoszenie" Command="{Binding DeleteTicketCommand}" IsEnabled="{Binding CanDeleteTicket}" Margin="6,0,0,0" HorizontalAlignment="Stretch" />
                                 </UniformGrid>
                             </StackPanel>
                         </Border>
@@ -86,7 +86,7 @@
                         <Border Classes="app-card">
                             <StackPanel Spacing="10">
                                 <TextBlock Classes="section-title-large" Text="Historia lokalnych zmian" />
-                                <TextBlock Classes="section-subtitle" Text="Historia dzia┼éa┼ä wykonanych w tej aplikacji." />
+                                <TextBlock Classes="section-subtitle" Text="Historia działań wykonanych w tej aplikacji." />
 
                                 <Border MaxHeight="220" Classes="app-subtle-panel" Padding="8">
                                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -99,7 +99,7 @@
                                                             <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
                                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                                 <TextBlock Text="{Binding UserLogin}" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
-                                                                <TextBlock Text="┬Ě" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                                <TextBlock Text="·" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
                                                                 <TextBlock Text="{Binding Timestamp}" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
                                                             </StackPanel>
                                                         </StackPanel>
@@ -110,7 +110,7 @@
                                     </ScrollViewer>
                                 </Border>
 
-                                <TextBlock Classes="empty-state" Text="Brak lokalnych wpis├│w dla tego zg┼éoszenia." IsVisible="{Binding HasNoTicketAuditLogEntries}" />
+                                <TextBlock Classes="empty-state" Text="Brak lokalnych wpisów dla tego zgłoszenia." IsVisible="{Binding HasNoTicketAuditLogEntries}" />
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -120,7 +120,7 @@
                     <DockPanel LastChildFill="True">
                         <StackPanel DockPanel.Dock="Top" Margin="18,18,18,12" Spacing="4">
                             <TextBlock Classes="section-title-large" Text="Wiadomości" />
-                            <TextBlock Classes="section-subtitle" Text="Korespondencja w ramach zg┼éoszenia." />
+                            <TextBlock Classes="section-subtitle" Text="Korespondencja w ramach zgłoszenia." />
                         </StackPanel>
 
                         <Border
@@ -142,7 +142,7 @@
                                 <Button
                                     Grid.Column="1"
                                     Classes="btn-primary"
-                                    Content="Wy┼Ťlij"
+                                    Content="Wyślij"
                                     Command="{Binding SendMessageCommand}"
                                     IsEnabled="{Binding CanSendMessage}"
                                     VerticalAlignment="Bottom"
@@ -171,7 +171,7 @@
 
                             <TextBlock
                                 Classes="empty-state"
-                                Text="Brak wiadomo┼Ťci w tym zg┼éoszeniu."
+                                Text="Brak wiadomości w tym zgłoszeniu."
                                 IsVisible="{Binding HasNoMessages}" />
                         </Panel>
                     </DockPanel>

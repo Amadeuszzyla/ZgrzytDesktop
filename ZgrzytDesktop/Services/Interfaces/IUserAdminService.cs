@@ -7,13 +7,13 @@ namespace ZgrzytDesktop.Services.Interfaces;
 
 public interface IUserAdminService
 {
-    Task<List<User>?> GetUsersAsync(UserAdminListFilter filter = UserAdminListFilter.All);
+    Task<UserAdminListResult> GetUsersAsync(UserAdminListFilter filter = UserAdminListFilter.All);
 
-    Task<List<User>?> GetActiveUsersAsync();
+    Task<UserAdminListResult> GetActiveUsersAsync();
 
-    Task<List<User>?> GetInactiveUsersAsync();
+    Task<UserAdminListResult> GetInactiveUsersAsync();
 
-    Task<List<User>?> GetBannedUsersAsync();
+    Task<UserAdminListResult> GetBannedUsersAsync();
 
     Task BanUserAsync(int userId);
 

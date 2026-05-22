@@ -82,10 +82,10 @@
 
                     <Border Classes="app-card" IsVisible="{Binding IsAdminNewAccountPanelVisible}">
                         <StackPanel Spacing="12">
-                            <TextBlock Classes="section-title-large" Text="Rejestracja u┼╝ytkownika" />
-                            <TextBlock Classes="section-subtitle" Text="Utw├│rz pro┼Ťb─Ö o nowe konto w systemie (POST /api/request-account)." />
+                            <TextBlock Classes="section-title-large" Text="Rejestracja użytkownika" />
+                            <TextBlock Classes="section-subtitle" Text="Utwórz prośbę o nowe konto w systemie (POST /api/request-account)." />
 
-                            <TextBlock Classes="field-label" Text="Imi─Ö i nazwisko" Margin="0" />
+                            <TextBlock Classes="field-label" Text="Imię i nazwisko" Margin="0" />
                             <TextBox Text="{Binding RequestName}" PlaceholderText="np. Jan Kowalski" IsEnabled="{Binding CanRequestAccount}" />
 
                             <TextBlock Classes="field-label" Text="Login" Margin="0" />

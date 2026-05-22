@@ -1,6 +1,7 @@
 using ZgrzytDesktop.Cache;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services;
+using ZgrzytDesktop.Services.Interfaces;
 using ZgrzytDesktop.Tests.Infrastructure.Fakes;
 using ZgrzytDesktop.ViewModels;
 
@@ -40,7 +41,7 @@ public static class ViewModelTestFactory
         var (_, _, tempDir) = TestApiFactory.CreateApi();
         try
         {
-            var ticketCache = new LocalTicketCacheService(tempDir);
+            ILocalTicketCacheService ticketCache = new LocalTicketCacheService(tempDir);
             var user = new User
             {
                 Id = 1,
@@ -84,12 +85,15 @@ public static class ViewModelTestFactory
         audit ??= new FakeAuditLogService();
 
         var (_, _, tempDir) = TestApiFactory.CreateApi();
+        ILocalTicketCacheService ticketCache = new LocalTicketCacheService(tempDir);
+        ILocalUserCacheService userCache = new LocalUserCacheService(tempDir);
+
         return new MainWindowViewModel.MainWindowDependencies(
             auth,
             tickets,
             settings,
-            new LocalTicketCacheService(tempDir),
-            new LocalUserCacheService(tempDir),
+            ticketCache,
+            userCache,
             audit,
             new FakeUserAdminService());
     }

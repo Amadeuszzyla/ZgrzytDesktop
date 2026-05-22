@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
@@ -23,13 +24,13 @@ public class ApiService : IApiService
         PropertyNameCaseInsensitive = true
     };
 
-    public string CurrentApiBaseUrl { get; private set; } = "http://127.0.0.1:9000/api/";
+    public string CurrentApiBaseUrl { get; private set; } = ApiDefaults.ProductionApiBaseUrl;
 
     public Func<Task<bool>>? TryRefreshSessionAsync { get; set; }
 
     public Func<Task>? OnSessionExpiredAsync { get; set; }
 
-    public ApiService(HttpMessageHandler handler, string apiBaseUrl = "http://127.0.0.1:9000/api/")
+    public ApiService(HttpMessageHandler handler, string apiBaseUrl = ApiDefaults.ProductionApiBaseUrl)
     {
         _httpClient = new HttpClient(handler, disposeHandler: false)
         {
@@ -333,15 +334,15 @@ public class ApiService : IApiService
 
     private static string NormalizeApiBaseUrl(string apiBaseUrl)
     {
-        if (string.IsNullOrWhiteSpace(apiBaseUrl))
-            return "http://127.0.0.1:9000/api/";
+        if (ApiDefaults.ShouldMigrateToProduction(apiBaseUrl))
+            return ApiDefaults.ProductionApiBaseUrl;
 
         var normalized = apiBaseUrl.Trim();
 
         if (!normalized.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
             !normalized.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
-            normalized = "http://" + normalized;
+            normalized = "https://" + normalized;
         }
 
         if (!normalized.EndsWith('/'))
@@ -349,6 +350,8 @@ public class ApiService : IApiService
 
         if (!normalized.EndsWith("api/", StringComparison.OrdinalIgnoreCase))
             normalized += "api/";
+
+        normalized = normalized.Replace("api/api/", "api/", StringComparison.OrdinalIgnoreCase);
 
         return normalized;
     }

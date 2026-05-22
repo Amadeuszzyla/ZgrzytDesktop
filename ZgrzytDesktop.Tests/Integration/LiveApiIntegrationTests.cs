@@ -59,9 +59,9 @@ public class LiveApiIntegrationTests : IClassFixture<IntegrationApiTestHost>
             _host.IsStaffRole,
             "ZGRZYT_LOGIN must be an admin or it account to call GET /api/users.");
 
-        var users = await _host.UserAdmin!.GetUsersAsync();
+        var result = await _host.UserAdmin!.GetUsersAsync();
 
-        Assert.NotNull(users);
+        Assert.NotNull(result.Users);
     }
 
     [SkippableFact]

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
@@ -41,22 +40,4 @@ public partial class DashboardViewModel
         OnPropertyChanged(nameof(HasNoTicketAuditLogEntries));
     }
 
-    private async Task RefreshSettingsAuditLogAsync()
-    {
-        var entries = await _auditLogService.LoadAsync();
-
-        SettingsAuditLogEntries.Clear();
-
-        foreach (var entry in entries.OrderByDescending(e => e.Timestamp))
-            SettingsAuditLogEntries.Add(entry);
-
-        OnPropertyChanged(nameof(HasNoSettingsAuditLogEntries));
-    }
-
-    private async Task ClearSettingsAuditLogAsync()
-    {
-        await _auditLogService.ClearAsync();
-        await RefreshSettingsAuditLogAsync();
-        ShowToast("Lokalny audyt został wyczyszczony.", ToastTypes.Info);
-    }
 }

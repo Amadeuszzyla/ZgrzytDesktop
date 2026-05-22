@@ -2,7 +2,7 @@ namespace ZgrzytDesktop.Models;
 
 public class AppSettings
 {
-    public string ApiBaseUrl { get; set; } = "http://127.0.0.1:9000/api/";
+    public string ApiBaseUrl { get; set; } = ZgrzytDesktop.Constants.ApiDefaults.ProductionApiBaseUrl;
 
     public string ThemeMode { get; set; } = "System";
 

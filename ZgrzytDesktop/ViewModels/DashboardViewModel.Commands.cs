@@ -37,10 +37,6 @@ public partial class DashboardViewModel
 
     public IAsyncRelayCommand DeleteTicketCommand { get; private set; } = null!;
 
-    public IAsyncRelayCommand LoadAllPagesStatisticsCommand { get; private set; } = null!;
-
-    public IAsyncRelayCommand RefreshSessionCommand { get; private set; } = null!;
-
     public IAsyncRelayCommand LoadAdminUsersCommand { get; private set; } = null!;
 
     public IAsyncRelayCommand BanAdminUserCommand { get; private set; } = null!;
@@ -50,12 +46,6 @@ public partial class DashboardViewModel
     public IAsyncRelayCommand UnbanAdminUserCommand { get; private set; } = null!;
 
     public IRelayCommand ShowAdminPageCommand { get; private set; } = null!;
-
-    public IAsyncRelayCommand SaveSettingsCommand { get; private set; } = null!;
-
-    public IAsyncRelayCommand LoadAuditLogsCommand { get; private set; } = null!;
-
-    public IAsyncRelayCommand ClearAuditLogsCommand { get; private set; } = null!;
 
     public IAsyncRelayCommand FirstPageCommand { get; private set; } = null!;
 
@@ -90,16 +80,10 @@ public partial class DashboardViewModel
         AssignToMeCommand = new AsyncRelayCommand(AssignToMeAsync);
         CloseTicketCommand = new AsyncRelayCommand(CloseTicketAsync);
         DeleteTicketCommand = new AsyncRelayCommand(DeleteTicketAsync);
-        LoadAllPagesStatisticsCommand = new AsyncRelayCommand(LoadAllPagesStatisticsAsync);
-        RefreshSessionCommand = new AsyncRelayCommand(RefreshSessionAsync);
         LoadAdminUsersCommand = new AsyncRelayCommand(LoadAdminUsersAsync);
         BanAdminUserCommand = new AsyncRelayCommand(BanAdminUserAsync, () => CanBanAdminUser);
         ActivateAdminUserCommand = new AsyncRelayCommand(ActivateAdminUserAsync, () => CanActivateAdminUser);
         UnbanAdminUserCommand = new AsyncRelayCommand(UnbanAdminUserAsync, () => CanUnbanAdminUser);
-
-        SaveSettingsCommand = new AsyncRelayCommand(SaveSettingsAsync);
-        LoadAuditLogsCommand = new AsyncRelayCommand(RefreshSettingsAuditLogAsync);
-        ClearAuditLogsCommand = new AsyncRelayCommand(ClearSettingsAuditLogAsync);
 
         FirstPageCommand = new AsyncRelayCommand(GoToFirstPageAsync);
         PreviousPageCommand = new AsyncRelayCommand(GoToPreviousPageAsync);

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
+using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services;
 
@@ -10,12 +11,14 @@ namespace ZgrzytDesktop.Tests.Services;
 public class SettingsServiceTests
 {
     [Theory]
-    [InlineData("", "http://127.0.0.1:9000/api/")]
-    [InlineData("127.0.0.1:9000", "http://127.0.0.1:9000/api/")]
-    [InlineData("http://127.0.0.1:9000", "http://127.0.0.1:9000/api/")]
-    [InlineData("http://127.0.0.1:9000/", "http://127.0.0.1:9000/api/")]
-    [InlineData("http://127.0.0.1:9000/api", "http://127.0.0.1:9000/api/")]
-    [InlineData("http://127.0.0.1:9000/api/", "http://127.0.0.1:9000/api/")]
+    [InlineData("", ApiDefaults.ProductionApiBaseUrl)]
+    [InlineData("127.0.0.1:9000", ApiDefaults.ProductionApiBaseUrl)]
+    [InlineData("http://127.0.0.1:9000", ApiDefaults.ProductionApiBaseUrl)]
+    [InlineData("http://localhost:9000/api/", ApiDefaults.ProductionApiBaseUrl)]
+    [InlineData("https://zgrzyt-api.onrender.com", "https://zgrzyt-api.onrender.com/api/")]
+    [InlineData("https://zgrzyt-api.onrender.com/", "https://zgrzyt-api.onrender.com/api/")]
+    [InlineData("https://zgrzyt-api.onrender.com/api", "https://zgrzyt-api.onrender.com/api/")]
+    [InlineData("https://zgrzyt-api.onrender.com/api/", "https://zgrzyt-api.onrender.com/api/")]
     public void NormalizeApiBaseUrl_ShouldReturnCorrectApiUrl(string input, string expected)
     {
         var directory = CreateTempDirectory();
@@ -27,6 +30,26 @@ public class SettingsServiceTests
             var result = service.NormalizeApiBaseUrl(input);
 
             Assert.Equal(expected, result);
+            Assert.DoesNotContain("api/api/", result, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public void NormalizeApiBaseUrl_CustomHost_ShouldNotMigrateToProduction()
+    {
+        var directory = CreateTempDirectory();
+
+        try
+        {
+            var service = new SettingsService(directory);
+
+            var result = service.NormalizeApiBaseUrl("https://staging.example.com");
+
+            Assert.Equal("https://staging.example.com/api/", result);
         }
         finally
         {
@@ -45,14 +68,14 @@ public class SettingsServiceTests
 
             var settings = new AppSettings
             {
-                ApiBaseUrl = "127.0.0.1:9000"
+                ApiBaseUrl = "https://zgrzyt-api.onrender.com"
             };
 
             await service.SaveAsync(settings);
 
             var loaded = await service.LoadAsync();
 
-            Assert.Equal("http://127.0.0.1:9000/api/", loaded.ApiBaseUrl);
+            Assert.Equal(ApiDefaults.ProductionApiBaseUrl, loaded.ApiBaseUrl);
             Assert.Equal("System", loaded.ThemeMode);
         }
         finally
@@ -72,8 +95,34 @@ public class SettingsServiceTests
 
             var loaded = await service.LoadAsync();
 
-            Assert.Equal("http://127.0.0.1:9000/api/", loaded.ApiBaseUrl);
+            Assert.Equal(ApiDefaults.ProductionApiBaseUrl, loaded.ApiBaseUrl);
             Assert.Equal("System", loaded.ThemeMode);
+        }
+        finally
+        {
+            DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public async Task LoadAsync_WithLegacyLocalhost_ShouldMigrateToProduction()
+    {
+        var directory = CreateTempDirectory();
+
+        try
+        {
+            var service = new SettingsService(directory);
+            var legacy = new AppSettings
+            {
+                ApiBaseUrl = "http://127.0.0.1:9000/api/",
+                ThemeMode = "System"
+            };
+
+            await service.SaveAsync(legacy);
+
+            var loaded = await service.LoadAsync();
+
+            Assert.Equal(ApiDefaults.ProductionApiBaseUrl, loaded.ApiBaseUrl);
         }
         finally
         {
@@ -113,7 +162,7 @@ public class SettingsServiceTests
 
             var settings = new AppSettings
             {
-                ApiBaseUrl = "http://127.0.0.1:9000/api/",
+                ApiBaseUrl = ApiDefaults.ProductionApiBaseUrl,
                 ThemeMode = "Dark"
             };
 

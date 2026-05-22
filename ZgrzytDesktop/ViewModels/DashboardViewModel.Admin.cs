@@ -22,21 +22,29 @@ public partial class DashboardViewModel
                 AdminStatusMessage = AppStrings.Get("Admin_LoadingUsers");
 
                 var filter = GetSelectedAdminUserListFilter();
-                var users = await _userAdminService.GetUsersAsync(filter);
+                var result = await _userAdminService.GetUsersAsync(filter);
 
                 AdminUsers.Clear();
 
-                if (users is null || users.Count == 0)
+                if (result.Users.Count == 0)
                 {
-                    AdminStatusMessage = AppStrings.Get("Admin_NoUsers");
+                    AdminStatusMessage = string.IsNullOrWhiteSpace(result.InformationalMessage)
+                        ? AppStrings.Get("Admin_NoUsers")
+                        : result.InformationalMessage;
                     return;
                 }
 
-                foreach (var user in users.OrderBy(user => user.Login))
+                foreach (var user in result.Users.OrderBy(user => user.Login))
                     AdminUsers.Add(user);
 
                 var filterLabel = SelectedAdminUserListFilterOption?.Label ?? AppStrings.Get("Admin_Filter_All");
                 AdminStatusMessage = $"{AdminUsers.Count} — {filterLabel}";
+
+                if (!string.IsNullOrWhiteSpace(result.InformationalMessage) &&
+                    result.UsedLocalFilterFallback)
+                {
+                    AdminStatusMessage += $" {result.InformationalMessage}";
+                }
             },
             setStatusMessage: message => AdminStatusMessage = message,
             unexpectedStatusMessage: AppStrings.Get("Toast_AdminUsersLoadFailed"),

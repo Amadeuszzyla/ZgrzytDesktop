@@ -1,7 +1,7 @@
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using Xunit;
+using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Tests.Infrastructure;
@@ -127,15 +127,168 @@ public class UserAdminServiceTests
                 """);
             var service = TestApiFactory.CreateUserAdmin(api);
 
-            var users = await service.GetUsersAsync(UserAdminListFilter.Active);
+            var result = await service.GetUsersAsync(UserAdminListFilter.Active);
 
-            Assert.NotNull(users);
-            Assert.Single(users!);
-            Assert.Equal("jan", users![0].Login);
+            Assert.Single(result.Users);
+            Assert.Equal("jan", result.Users[0].Login);
         }
         finally
         {
             TestApiFactory.Cleanup(tempDir);
         }
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WhenActiveUsersReturns404_ShouldFallbackToUsersAndFilterLocally()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.Enqueue(statusCode: HttpStatusCode.NotFound, content: """{ "message": "Not Found" }""", mediaType: "application/json");
+            handler.EnqueueJson(HttpStatusCode.OK, """
+                [
+                  { "id": 1, "login": "active-user", "active": true, "ban": false },
+                  { "id": 2, "login": "inactive-user", "active": false, "ban": false }
+                ]
+                """);
+            var service = TestApiFactory.CreateUserAdmin(api);
+
+            var result = await service.GetUsersAsync(UserAdminListFilter.Active);
+
+            Assert.Single(result.Users);
+            Assert.Equal("active-user", result.Users[0].Login);
+            Assert.True(result.UsedLocalFilterFallback);
+            Assert.Equal(UserAdminService.LocalFilterFallbackMessage, result.InformationalMessage);
+            Assert.Equal(2, handler.Requests.Count);
+            Assert.EndsWith("/api/users", handler.Requests[1].Uri!.AbsolutePath, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WhenInactiveUsersReturns404_ShouldFallbackToUsersAndFilterLocally()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.Enqueue(statusCode: HttpStatusCode.NotFound, content: """{ "message": "Not Found" }""", mediaType: "application/json");
+            handler.EnqueueJson(HttpStatusCode.OK, """
+                [
+                  { "id": 1, "login": "active-user", "active": true, "ban": false },
+                  { "id": 2, "login": "inactive-user", "active": false, "ban": false }
+                ]
+                """);
+            var service = TestApiFactory.CreateUserAdmin(api);
+
+            var result = await service.GetUsersAsync(UserAdminListFilter.Inactive);
+
+            Assert.Single(result.Users);
+            Assert.Equal("inactive-user", result.Users[0].Login);
+            Assert.True(result.UsedLocalFilterFallback);
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WhenBannedUsersReturns404_ShouldFallbackToUsers()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.Enqueue(statusCode: HttpStatusCode.NotFound, content: """{ "message": "Not Found" }""", mediaType: "application/json");
+            handler.EnqueueJson(HttpStatusCode.OK, """
+                [
+                  { "id": 1, "login": "banned-user", "active": false, "ban": true },
+                  { "id": 2, "login": "clean-user", "active": true, "ban": false }
+                ]
+                """);
+            var service = TestApiFactory.CreateUserAdmin(api);
+
+            var result = await service.GetUsersAsync(UserAdminListFilter.Banned);
+
+            Assert.Single(result.Users);
+            Assert.Equal("banned-user", result.Users[0].Login);
+            Assert.True(result.UsedLocalFilterFallback);
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WhenBannedFallbackAndBanFieldMissing_ShouldReturnInformationalMessage()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.Enqueue(statusCode: HttpStatusCode.NotFound, content: """{ "message": "Not Found" }""", mediaType: "application/json");
+            handler.EnqueueJson(HttpStatusCode.OK, """
+                [
+                  { "id": 1, "login": "jan", "active": true, "ban": false },
+                  { "id": 2, "login": "adam", "active": false, "ban": false }
+                ]
+                """);
+            var service = TestApiFactory.CreateUserAdmin(api);
+
+            var result = await service.GetUsersAsync(UserAdminListFilter.Banned);
+
+            Assert.Empty(result.Users);
+            Assert.Equal(UserAdminService.BannedListNotSupportedMessage, result.InformationalMessage);
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
+    public async Task BanUserAsync_WhenEndpointReturns404_ShouldThrowFriendlyMessage()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.Enqueue(statusCode: HttpStatusCode.NotFound, content: "<html>404</html>", mediaType: "text/html");
+            var service = TestApiFactory.CreateUserAdmin(api);
+
+            var ex = await Assert.ThrowsAsync<ApiException>(() => service.BanUserAsync(3));
+
+            Assert.Equal(UserAdminService.ActionNotSupportedMessage, ex.Message);
+            Assert.DoesNotContain("<html", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Theory]
+    [InlineData(UserAdminListFilter.Active, true, false, true)]
+    [InlineData(UserAdminListFilter.Inactive, false, false, true)]
+    [InlineData(UserAdminListFilter.Banned, true, true, true)]
+    public void FilterUsersLocally_ShouldApplyExpectedRules(
+        UserAdminListFilter filter,
+        bool active,
+        bool ban,
+        bool expectedIncluded)
+    {
+        var users = new List<User>
+        {
+            new() { Id = 1, Login = "target", Active = active, Ban = ban },
+            new() { Id = 2, Login = "other", Active = true, Ban = false }
+        };
+
+        var filtered = UserAdminService.FilterUsersLocally(users, filter);
+
+        if (expectedIncluded)
+            Assert.Contains(filtered, user => user.Login == "target");
+        else
+            Assert.DoesNotContain(filtered, user => user.Login == "target");
     }
 }

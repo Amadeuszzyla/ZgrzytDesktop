@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services.Interfaces;
 
@@ -68,7 +69,7 @@ public class SettingsService : ISettingsService
         {
             return new AppSettings
             {
-                ApiBaseUrl = "http://127.0.0.1:9000/api/",
+                ApiBaseUrl = ApiDefaults.ProductionApiBaseUrl,
                 ThemeMode = "System"
             };
         }
@@ -107,7 +108,7 @@ public class SettingsService : ISettingsService
         {
             return new AppSettings
             {
-                ApiBaseUrl = "http://127.0.0.1:9000/api/",
+                ApiBaseUrl = ApiDefaults.ProductionApiBaseUrl,
                 ThemeMode = "System"
             };
         }
@@ -149,24 +150,24 @@ public class SettingsService : ISettingsService
 
     public string NormalizeApiBaseUrl(string apiBaseUrl)
     {
-        if (string.IsNullOrWhiteSpace(apiBaseUrl))
-            return "http://127.0.0.1:9000/api/";
+        if (ApiDefaults.ShouldMigrateToProduction(apiBaseUrl))
+            return ApiDefaults.ProductionApiBaseUrl;
 
         var normalized = apiBaseUrl.Trim();
 
         if (!normalized.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
             !normalized.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
-            normalized = "http://" + normalized;
+            normalized = "https://" + normalized;
         }
 
         if (!normalized.EndsWith('/'))
             normalized += "/";
 
         if (!normalized.EndsWith("api/", StringComparison.OrdinalIgnoreCase))
-        {
             normalized += "api/";
-        }
+
+        normalized = normalized.Replace("api/api/", "api/", StringComparison.OrdinalIgnoreCase);
 
         return normalized;
     }

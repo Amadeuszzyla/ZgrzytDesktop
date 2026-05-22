@@ -1,6 +1,6 @@
 # ZGRZYT Desktop — status i ograniczenia
 
-Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ograniczenia wynikające z API (bez zmian backendu). Ostatnia aktualizacja: po Fazie 9E (DI, shell, cache interfaces).
+Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ograniczenia wynikające z API (bez zmian backendu). Ostatnia aktualizacja: po Fazie 10 (SOLID, podział widoków, DI).
 
 ## Co działa
 
@@ -42,10 +42,11 @@ Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ogran
 
 - `DashboardViewModel` podzielony na **19** plików partial (Navigation, Tickets, TicketDetails, Admin, Settings, Statistics, Audit, Toast, Support, Localization, …)
 - Główny plik `DashboardViewModel.cs`: ok. **289** linii fizycznie, ok. **126** niepustych; **partiale łącznie:** ok. **2427** linii
-- Wspólna obsługa błędów API (`HandleApiError`, `ExecuteApiAsync`) — mutacje admin/ustawienia/szczegóły (w tym zamknięcie zgłoszenia); listy, auto-refresh, statystyki wielostronicowe i offline nadal z dedykowanym `catch`
+- Wspólna obsługa błędów API (`HandleApiError`, `ExecuteApiAsync`) — admin, szczegóły (update/assign/message/delete/close), ustawienia, prośba o konto, tworzenie zgłoszenia, agregacja statystyk wielostronicowych; `LoadTickets`, auto-refresh, `LoadTicketDetails` (offline/HTML) — dedykowany `catch`
+- **Widoki:** `DashboardView.axaml` + `Views/DashboardParts/*.axaml` (7 UserControl, ten sam `DataContext` co dashboard)
 - Stałe: `AppSections`, `AppRoles`, `TicketStatuses`, `TicketPriorities`, `FilterLabels`, `AdminTabs`, `ToastTypes`
 - **Interfejsy** (`Services/Interfaces/`): `IApiService`, `IAuthService`, `ITicketService`, `ISettingsService`, `ILocalAuditLogService`, `ITokenStorage`, `IUserAdminService`, `ILocalTicketCacheService`, `ILocalUserCacheService`
-- **DI:** `App.axaml.cs` rejestruje singletony i tworzy `MainWindowViewModel`; `ServiceProvider.Dispose()` przy zamknięciu aplikacji
+- **DI:** `App.axaml.cs` rejestruje singletony i tworzy `MainWindowViewModel`; `ServiceProvider.Dispose()` przy `Exit` / `ShutdownRequested` (flaga jednorazowego dispose)
 - **Nawigacja:** `MainWindowViewModel` + `ViewLocator` (`LoginView` / `DashboardView`); App nie ustawia widoków ręcznie na `MainWindow.Content`
 - **Test helper:** `MainWindowDependencies` — tylko testy (`ViewModelTestFactory`), bez produkcyjnego `CreateProductionDependencies`
 
@@ -54,9 +55,9 @@ Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ogran
 | Krok | Wynik |
 |------|--------|
 | `dotnet build` | OK — 0 błędów, 0 ostrzeżeń |
-| `dotnet test` | **157** passed, **5** skipped (integracja), **162** łącznie |
+| `dotnet test` | **158** passed, **5** skipped (integracja), **163** łącznie |
 | `ZgrzytDesktop.Tests` | **147** passed, **5** skipped |
-| `ZgrzytDesktop.Headless.Tests` | **10** passed |
+| `ZgrzytDesktop.Headless.Tests` | **11** passed |
 | `dotnet publish` `-c Release -r win-x64 --self-contained false` | OK |
 
 **Projekty testowe:**
@@ -67,7 +68,7 @@ Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ogran
 | Audyt | `LocalAuditLogServiceTests` |
 | i18n | `AppStringsTests` |
 | Serwisy, helpery, modele | m.in. `AuthServiceTests`, `TicketServiceTests`, `UserAdminServiceTests`, `ApiErrorSanitizerTests`, `StatusDisplayHelperTests`, … |
-| UI headless | `HeadlessViewsTests` (6) + `ViewLocatorShellTests` (4) — ViewLocator, MainWindow shell |
+| UI headless | `HeadlessViewsTests` (6) + `ViewLocatorShellTests` (5) — `ViewLocator.Build`, `MainWindow` + `ContentControl` |
 | Integracja API (opcjonalna) | `LiveApiIntegrationTests` — skip bez env; [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) |
 
 Testy jednostkowe i headless używają mock HTTP / fake serwisów — **nie** wymagają żywego API domyślnie.

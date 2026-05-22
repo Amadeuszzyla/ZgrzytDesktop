@@ -11,13 +11,13 @@
                     <Border Classes="app-card">
 
                         <StackPanel Spacing="12">
-                            <TextBlock Classes="section-title-large" Text="Zg┼éo┼Ť nowe konto" />
+                            <TextBlock Classes="section-title-large" Text="Zgłoś nowe konto" />
 
                             <TextBlock
                                 Classes="section-subtitle"
-                                Text="Wype┼énij dane nowego u┼╝ytkownika. Pro┼Ťba zostanie wys┼éana do administratora." />
+                                Text="Wypełnij dane nowego użytkownika. Prośba zostanie wysłana do administratora." />
 
-                            <TextBlock Classes="field-label" Text="Imi─Ö i nazwisko" Margin="0" />
+                            <TextBlock Classes="field-label" Text="Imię i nazwisko" Margin="0" />
 
                             <TextBox
                                 Text="{Binding RequestName}"

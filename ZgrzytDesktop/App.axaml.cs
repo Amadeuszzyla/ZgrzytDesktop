@@ -18,6 +18,7 @@ namespace ZgrzytDesktop;
 public partial class App : Application
 {
     private ServiceProvider? _serviceProvider;
+    private bool _serviceProviderDisposed;
 
     public override void Initialize()
     {
@@ -29,6 +30,7 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.Exit += OnDesktopExit;
+            desktop.ShutdownRequested += OnDesktopShutdownRequested;
 
             try
             {
@@ -49,8 +51,19 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void OnDesktopExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+    private void OnDesktopShutdownRequested(object? sender, ShutdownRequestedEventArgs e) =>
+        DisposeServiceProvider();
+
+    private void OnDesktopExit(object? sender, ControlledApplicationLifetimeExitEventArgs e) =>
+        DisposeServiceProvider();
+
+    private void DisposeServiceProvider()
     {
+        if (_serviceProviderDisposed)
+            return;
+
+        _serviceProviderDisposed = true;
+
         try
         {
             _serviceProvider?.Dispose();

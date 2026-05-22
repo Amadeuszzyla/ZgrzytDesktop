@@ -92,14 +92,14 @@
                             <Separator Background="{DynamicResource AppCardBorderBrush}" />
 
                             <Grid ColumnDefinitions="Auto,88,44,44,Auto,88,44,44,Auto,Auto" ColumnSpacing="8">
-                                <TextBlock Grid.Column="0" Text="Na stron─Ö:" VerticalAlignment="Center" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                <TextBlock Grid.Column="0" Text="Na stronę:" VerticalAlignment="Center" Foreground="{DynamicResource AppSecondaryTextBrush}" />
                                 <ComboBox Grid.Column="1" MinHeight="36" VerticalAlignment="Center" ItemsSource="{Binding PageSizeOptions}" SelectedItem="{Binding SelectedPageSize}" IsEnabled="{Binding IsNotLoading}" />
-                                <Button Grid.Column="2" Classes="btn-secondary" Content="┬ź" VerticalAlignment="Center" Command="{Binding FirstPageCommand}" IsEnabled="{Binding CanGoPreviousPage}" MinHeight="36" />
-                                <Button Grid.Column="3" Classes="btn-secondary" Content="ÔÇ╣" VerticalAlignment="Center" Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoPreviousPage}" MinHeight="36" />
+                                <Button Grid.Column="2" Classes="btn-secondary" Content="Pierwsza" VerticalAlignment="Center" Command="{Binding FirstPageCommand}" IsEnabled="{Binding CanGoPreviousPage}" MinHeight="36" />
+                                <Button Grid.Column="3" Classes="btn-secondary" Content="Poprzednia" VerticalAlignment="Center" Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoPreviousPage}" MinHeight="36" />
                                 <TextBlock Grid.Column="4" Text="Strona:" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
                                 <ComboBox Grid.Column="5" MinHeight="36" VerticalAlignment="Center" ItemsSource="{Binding PageNumbers}" SelectedItem="{Binding SelectedPageNumber}" IsEnabled="{Binding IsNotLoading}" />
-                                <Button Grid.Column="6" Classes="btn-secondary" Content="ÔÇ║" VerticalAlignment="Center" Command="{Binding NextPageCommand}" IsEnabled="{Binding CanGoNextPage}" MinHeight="36" />
-                                <Button Grid.Column="7" Classes="btn-secondary" Content="┬╗" VerticalAlignment="Center" Command="{Binding LastPageCommand}" IsEnabled="{Binding CanGoNextPage}" MinHeight="36" />
+                                <Button Grid.Column="6" Classes="btn-secondary" Content="Następna" VerticalAlignment="Center" Command="{Binding NextPageCommand}" IsEnabled="{Binding CanGoNextPage}" MinHeight="36" />
+                                <Button Grid.Column="7" Classes="btn-secondary" Content="Ostatnia" VerticalAlignment="Center" Command="{Binding LastPageCommand}" IsEnabled="{Binding CanGoNextPage}" MinHeight="36" />
                                 <TextBlock Grid.Column="8" Text="{Binding PagePositionText}" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
                                 <TextBlock Grid.Column="9" Text="{Binding PageTotalText}" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppSecondaryTextBrush}" />
                             </Grid>
@@ -139,7 +139,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" />
                                     <DataGridTextColumn Header="Kategoria" Binding="{Binding DisplayCategory}" Width="140" />
-                                    <DataGridTemplateColumn Header="Tytu┼é" Width="3*">
+                                    <DataGridTemplateColumn Header="Tytuł" Width="3*">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}" />
@@ -157,8 +157,8 @@
                     <Border Classes="app-card" Margin="0,0,0,0">
                         <StackPanel Spacing="14">
                             <StackPanel Spacing="4">
-                                <TextBlock Classes="section-title" Text="Nowe zg┼éoszenie" />
-                                <TextBlock Classes="section-subtitle" Text="Uzupe┼énij pola i utw├│rz zg┼éoszenie w systemie." />
+                                <TextBlock Classes="section-title" Text="Nowe zgłoszenie" />
+                                <TextBlock Classes="section-subtitle" Text="Uzupełnij pola i utwórz zgłoszenie w systemie." />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
@@ -173,8 +173,8 @@
                             </Grid>
 
                             <StackPanel Spacing="6">
-                                <TextBlock Classes="field-label" Text="Tytu┼é" Margin="0" />
-                                <TextBox MinHeight="38" Text="{Binding NewTicketTitle}" PlaceholderText="Tytu┼é zg┼éoszenia" IsEnabled="{Binding CanUseOnlineActions}" />
+                                <TextBlock Classes="field-label" Text="Tytuł" Margin="0" />
+                                <TextBox MinHeight="38" Text="{Binding NewTicketTitle}" PlaceholderText="Tytuł zgłoszenia" IsEnabled="{Binding CanUseOnlineActions}" />
                             </StackPanel>
 
                             <StackPanel Spacing="6">
@@ -188,7 +188,7 @@
                                 <Button
                                     Grid.Column="1"
                                     Classes="btn-primary"
-                                    Content="Utw├│rz zg┼éoszenie"
+                                    Content="Utwórz zgłoszenie"
                                     Command="{Binding CreateTicketCommand}"
                                     HorizontalAlignment="Right"
                                     MinWidth="200"
