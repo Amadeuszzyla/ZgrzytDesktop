@@ -3,37 +3,103 @@ bin/
 obj/
 [Bb]in/
 [Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# IDE / editor
+.vs/
+.idea/
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# Optional local VS Code settings
+.vscode/
+!.vscode/extensions.json
+
+# Test results / coverage
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+.coverage/
+coveragereport/
+*.lcov
 
 # Publish / release artifacts
 publish/
 **/publish/
-*.pdb
-
-# Release archives (do not commit)
 *.zip
 *.7z
 *.rar
-
-# Audit / generated artifacts
+*.tar
+*.tar.gz
+*.nupkg
+*.snupkg
+_zip_verify/
 _audit_build/
-ZgrzytDesktop/obj/Generated/
+_release_smoke/
 
-# Local env / secrets
+# Runtime / generated files
+*.log
+*.tmp
+*.temp
+*.cache
+*.bak
+*.orig
+*.pdb
+*.ilk
+*.idb
+
+# Environment / secrets
 .env
 .env.*
 !.env.example
+*.secret
+*.secrets
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
 
-# Local app/user settings
+# Local app data / cache accidentally copied into repo
+AppData/
+Cache/
+Settings/
+audit-log.json
+token.txt
+tickets-cache.json
+user-cache.json
 settings.json
-*.user
-*.suo
-*.rsuser
 
-# Rider / Visual Studio
-.idea/
-.vs/
-*.sln.DotSettings.user
+# ZGRZYT generated helper files
+i18n_*_keys.txt
+scripts/phase15_*_snippet.xml
 
-# OS
+# OS files
+.DS_Store
 Thumbs.db
-Desktop.ini
+desktop.ini
+
+# NuGet
+.nuget/
+packages/
+*.nuget.props
+*.nuget.targets
+project.assets.json
+project.nuget.cache
+
+# Avalonia generated files
+ZgrzytDesktop/obj/Generated/
+
+# Keep useful scripts, ignore temporary script outputs
+scripts/*.tmp
+scripts/*.log
