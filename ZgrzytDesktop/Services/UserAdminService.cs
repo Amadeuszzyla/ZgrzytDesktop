@@ -4,21 +4,13 @@ using System.Net;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
 
 public class UserAdminService : IUserAdminService
 {
-    public const string LocalFilterFallbackMessage =
-        "Lista została pobrana z /api/users i przefiltrowana lokalnie.";
-
-    public const string BannedListNotSupportedMessage =
-        "Backend nie udostępnia listy zbanowanych użytkowników.";
-
-    public const string ActionNotSupportedMessage =
-        "Backend nie obsługuje tej akcji dla wybranego użytkownika.";
-
     private readonly IApiService _apiService;
 
     public UserAdminService(IApiService apiService)
@@ -54,6 +46,13 @@ public class UserAdminService : IUserAdminService
         {
             return await FetchWithLocalFilterFallbackAsync(filter);
         }
+        catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+        {
+            throw new ApiException(
+                HttpStatusCode.Forbidden,
+                AppStrings.Get("Admin_ListForbidden"),
+                ex.ResponseContent);
+        }
     }
 
     public Task<UserAdminListResult> GetActiveUsersAsync() =>
@@ -73,7 +72,10 @@ public class UserAdminService : IUserAdminService
         }
         catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            throw new ApiException(ex.StatusCode, ActionNotSupportedMessage, ex.ResponseContent);
+            throw new ApiException(
+                ex.StatusCode,
+                AppStrings.Get("Admin_ActionNotSupported"),
+                ex.ResponseContent);
         }
     }
 
@@ -85,7 +87,10 @@ public class UserAdminService : IUserAdminService
         }
         catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            throw new ApiException(ex.StatusCode, ActionNotSupportedMessage, ex.ResponseContent);
+            throw new ApiException(
+                ex.StatusCode,
+                AppStrings.Get("Admin_ActionNotSupported"),
+                ex.ResponseContent);
         }
     }
 
@@ -102,7 +107,10 @@ public class UserAdminService : IUserAdminService
         }
         catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            throw new ApiException(ex.StatusCode, ActionNotSupportedMessage, ex.ResponseContent);
+            throw new ApiException(
+                ex.StatusCode,
+                AppStrings.Get("Admin_ActionNotSupported"),
+                ex.ResponseContent);
         }
     }
 
@@ -116,7 +124,7 @@ public class UserAdminService : IUserAdminService
             {
                 Users = [],
                 UsedLocalFilterFallback = true,
-                InformationalMessage = BannedListNotSupportedMessage
+                InfoKind = UserAdminListInfoKind.BannedListNotSupported
             };
         }
 
@@ -126,7 +134,7 @@ public class UserAdminService : IUserAdminService
         {
             Users = filtered,
             UsedLocalFilterFallback = true,
-            InformationalMessage = LocalFilterFallbackMessage
+            InfoKind = UserAdminListInfoKind.LocalFilterFallback
         };
     }
 

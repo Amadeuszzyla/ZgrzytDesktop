@@ -59,20 +59,39 @@ public partial class LoginViewModel : ViewModelBase
 
     public bool IsNotLoading => !IsLoading;
 
-    public string LoginButtonText => IsLoading ? "Logowanie..." : "Zaloguj";
+    public string LoginButtonText =>
+        IsLoading ? AppStrings.Get("Login_ButtonLoading") : AppStrings.Get("Login_Button");
+
+    public string LblAppTitle => AppStrings.Get("Login_AppTitle");
+
+    public string LblAppSubtitle => AppStrings.Get("Login_AppSubtitle");
+
+    public string LblLoginTitle => AppStrings.Get("Login_Title");
+
+    public string LblLoginLabel => AppStrings.Get("Login_LabelLogin");
+
+    public string LblPasswordLabel => AppStrings.Get("Login_LabelPassword");
+
+    public string LblLoginPlaceholder => AppStrings.Get("Login_PlaceholderLogin");
+
+    public string LblPasswordPlaceholder => AppStrings.Get("Login_PlaceholderPassword");
 
     public IAsyncRelayCommand LoginCommand { get; }
 
     public LoginViewModel(
         IAuthService authService,
         ILocalAuditLogService auditLogService,
-        Action<User> onLoginSuccess)
+        Action<User> onLoginSuccess,
+        string? initialErrorMessage = null)
     {
         _authService = authService;
         _auditLogService = auditLogService;
         _onLoginSuccess = onLoginSuccess;
 
         LoginCommand = new AsyncRelayCommand(LoginAsync);
+
+        if (!string.IsNullOrWhiteSpace(initialErrorMessage))
+            ErrorMessage = initialErrorMessage;
     }
 
     private async Task LoginAsync()
@@ -99,20 +118,11 @@ public partial class LoginViewModel : ViewModelBase
 
             if (user is null)
             {
-                ErrorMessage = "Nie udało się zalogować. Sprawdź login i hasło.";
+                ErrorMessage = AppStrings.Get("Login_InvalidCredentials");
                 return;
             }
 
             ErrorMessage = string.Empty;
-
-            await _auditLogService.AddAsync(new AuditLogEntry
-            {
-                Timestamp = DateTime.Now,
-                UserLogin = user.Login,
-                Action = "Login",
-                Description = "Zalogowano przez formularz logowania."
-            });
-
             _onLoginSuccess(user);
         }
         catch (ApiException ex)

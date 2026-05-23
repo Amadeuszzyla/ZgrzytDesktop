@@ -3,5 +3,5 @@ namespace ZgrzytDesktop.ViewModels;
 public partial class DashboardViewModel
 {
     private void UpdateTicketStatistics() =>
-        StatisticsPanel.ApplyFromTickets(_allTickets, TotalTickets, fromCurrentPageOnly: true);
+        StatisticsPanel.ApplyFromTickets(TicketsPanel.AllTickets, TicketsPanel.TotalTickets, fromCurrentPageOnly: true);
 }

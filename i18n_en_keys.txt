@@ -1,0 +1,165 @@
+﻿  <data name="Status_New" xml:space="preserve"><value>New</value></data>
+  <data name="Status_InProgress" xml:space="preserve"><value>In progress</value></data>
+  <data name="Status_Resolved" xml:space="preserve"><value>Resolved</value></data>
+  <data name="Status_Closed" xml:space="preserve"><value>Closed</value></data>
+  <data name="Status_Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Priority_Low" xml:space="preserve"><value>Low</value></data>
+  <data name="Priority_Medium" xml:space="preserve"><value>Medium</value></data>
+  <data name="Priority_High" xml:space="preserve"><value>High</value></data>
+  <data name="Priority_Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>All</value></data>
+  <data name="Filter_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Filter_Unassigned" xml:space="preserve"><value>Unassigned</value></data>
+  <data name="Filter_Closed" xml:space="preserve"><value>Closed</value></data>
+  <data name="Filter_Banned" xml:space="preserve"><value>Banned</value></data>
+  <data name="Filter_Inactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="Tickets_Filter_StatusAll" xml:space="preserve"><value>All statuses</value></data>
+  <data name="Tickets_Filter_PriorityAll" xml:space="preserve"><value>All priorities</value></data>
+  <data name="Category_Hardware" xml:space="preserve"><value>Hardware</value></data>
+  <data name="Category_Software" xml:space="preserve"><value>Software</value></data>
+  <data name="Category_Network" xml:space="preserve"><value>Network</value></data>
+  <data name="Category_DescriptionPrefix" xml:space="preserve"><value>Category:</value></data>
+  <data name="Stats_Scope_NoData" xml:space="preserve"><value>No tickets loaded yet.</value></data>
+  <data name="Stats_Scope_NoTickets" xml:space="preserve"><value>No tickets to analyze.</value></data>
+  <data name="Stats_Scope_CurrentPage" xml:space="preserve"><value>Statistics for {0} tickets on the current list page (total in system: {1}).</value></data>
+  <data name="Stats_Scope_AllPages" xml:space="preserve"><value>Statistics for {0} tickets (total in system: {1}).</value></data>
+  <data name="Stats_AllPagesRequiresOnline" xml:space="preserve"><value>Multi-page statistics require an API connection.</value></data>
+  <data name="Stats_LoadAllPagesFailed" xml:space="preserve"><value>Could not load statistics from all pages.</value></data>
+  <data name="Stats_LoadAllFailed" xml:space="preserve"><value>Could not load statistics.</value></data>
+  <data name="Stats_Loaded" xml:space="preserve"><value>Statistics updated ({0} tickets).</value></data>
+  <data name="Settings_StatusReady" xml:space="preserve"><value>Settings ready.</value></data>
+  <data name="Settings_StatusSessionRefreshing" xml:space="preserve"><value>Refreshing session...</value></data>
+  <data name="Settings_StatusSessionRefreshed" xml:space="preserve"><value>Session refreshed.</value></data>
+  <data name="Settings_StatusSessionNoToken" xml:space="preserve"><value>Server did not return a new token (check POST /api/refresh).</value></data>
+  <data name="Settings_StatusSessionRefreshFailed" xml:space="preserve"><value>Could not refresh session.</value></data>
+  <data name="Tickets_StatusReady" xml:space="preserve"><value>Ready.</value></data>
+  <data name="Tickets_Loading" xml:space="preserve"><value>Loading tickets...</value></data>
+  <data name="Tickets_Loaded" xml:space="preserve"><value>Loaded {0} of {1} tickets.</value></data>
+  <data name="Tickets_NoTickets" xml:space="preserve"><value>No tickets.</value></data>
+  <data name="Tickets_OfflineShowingCache" xml:space="preserve"><value>Cannot reach API. Showing offline data: {0} tickets.</value></data>
+  <data name="Tickets_OfflineNoCache" xml:space="preserve"><value>Cannot reach API and no saved offline data.</value></data>
+  <data name="Tickets_AutoRefreshStatus" xml:space="preserve"><value>The app automatically refreshes the list every {0} seconds.</value></data>
+  <data name="Tickets_OfflineAutoRefreshPaused" xml:space="preserve"><value>Cannot reach API. Automatic refresh paused.</value></data>
+  <data name="Tickets_AutoRefreshFailed" xml:space="preserve"><value>Could not automatically refresh the list.</value></data>
+  <data name="Tickets_CreateOffline" xml:space="preserve"><value>Cannot create a ticket while offline.</value></data>
+  <data name="Tickets_ValidationTitle" xml:space="preserve"><value>Enter a ticket title.</value></data>
+  <data name="Tickets_ValidationDescription" xml:space="preserve"><value>Enter a ticket description.</value></data>
+  <data name="Tickets_ValidationCategory" xml:space="preserve"><value>Select a ticket category.</value></data>
+  <data name="Tickets_Creating" xml:space="preserve"><value>Creating ticket...</value></data>
+  <data name="Tickets_Created" xml:space="preserve"><value>Ticket created.</value></data>
+  <data name="Tickets_CreateError" xml:space="preserve"><value>An error occurred while creating the ticket.</value></data>
+  <data name="Tickets_CreateUnexpectedError" xml:space="preserve"><value>An unexpected error occurred while creating the ticket.</value></data>
+  <data name="Tickets_CreateOfflineError" xml:space="preserve"><value>Cannot reach API. Cannot create ticket offline.</value></data>
+  <data name="Details_SelectFromList" xml:space="preserve"><value>Select a ticket from the list.</value></data>
+  <data name="Details_SelectFirst" xml:space="preserve"><value>Select a ticket first.</value></data>
+  <data name="Details_SelectStatus" xml:space="preserve"><value>Select ticket status.</value></data>
+  <data name="Details_SelectPriority" xml:space="preserve"><value>Select ticket priority.</value></data>
+  <data name="Details_Saving" xml:space="preserve"><value>Saving changes...</value></data>
+  <data name="Details_Saved" xml:space="preserve"><value>Changes saved.</value></data>
+  <data name="Details_Loading" xml:space="preserve"><value>Loading ticket details...</value></data>
+  <data name="Details_Selected" xml:space="preserve"><value>Selected ticket #{0}.</value></data>
+  <data name="Details_OfflineCacheSelected" xml:space="preserve"><value>Selected ticket #{0} from offline cache.</value></data>
+  <data name="Details_NotFoundOffline" xml:space="preserve"><value>Ticket not found in offline data.</value></data>
+  <data name="Details_LoadFailed" xml:space="preserve"><value>Could not load ticket details.</value></data>
+  <data name="Details_InvalidServerData" xml:space="preserve"><value>Server returned invalid ticket data. Previous data remains on screen.</value></data>
+  <data name="Details_NoEditPermission" xml:space="preserve"><value>You do not have permission to edit this ticket.</value></data>
+  <data name="Details_OfflineEdit" xml:space="preserve"><value>Cannot edit ticket while offline.</value></data>
+  <data name="Details_NoClosePermission" xml:space="preserve"><value>You do not have permission to close this ticket.</value></data>
+  <data name="Details_OfflineClose" xml:space="preserve"><value>Cannot close ticket while offline.</value></data>
+  <data name="Details_Closing" xml:space="preserve"><value>Closing ticket...</value></data>
+  <data name="Details_Closed" xml:space="preserve"><value>Ticket closed.</value></data>
+  <data name="Details_CloseFailed" xml:space="preserve"><value>Could not close ticket.</value></data>
+  <data name="Details_CloseForbidden" xml:space="preserve"><value>Could not close ticket: insufficient permissions or server error.</value></data>
+  <data name="Details_NoDeletePermission" xml:space="preserve"><value>You do not have permission to delete this ticket.</value></data>
+  <data name="Details_Deleting" xml:space="preserve"><value>Deleting ticket...</value></data>
+  <data name="Details_Deleted" xml:space="preserve"><value>Ticket deleted.</value></data>
+  <data name="Details_DeleteFailed" xml:space="preserve"><value>Could not delete ticket.</value></data>
+  <data name="Details_NoAssignPermission" xml:space="preserve"><value>You do not have permission to assign this ticket.</value></data>
+  <data name="Details_OfflineAssign" xml:space="preserve"><value>Cannot assign ticket while offline.</value></data>
+  <data name="Details_Assigning" xml:space="preserve"><value>Assigning ticket...</value></data>
+  <data name="Details_Assigned" xml:space="preserve"><value>Ticket assigned to you.</value></data>
+  <data name="Details_AssignFailed" xml:space="preserve"><value>An error occurred while assigning the ticket.</value></data>
+  <data name="Details_AssignUnexpectedError" xml:space="preserve"><value>An unexpected error occurred while assigning the ticket.</value></data>
+  <data name="Details_OfflineAssignFailed" xml:space="preserve"><value>Cannot reach API. Cannot assign ticket offline.</value></data>
+  <data name="Details_OfflineSend" xml:space="preserve"><value>Cannot send messages while offline.</value></data>
+  <data name="Details_EmptyMessage" xml:space="preserve"><value>Message body cannot be empty.</value></data>
+  <data name="Details_Sending" xml:space="preserve"><value>Sending message...</value></data>
+  <data name="Details_MessageSent" xml:space="preserve"><value>Message sent.</value></data>
+  <data name="Details_MessageSendFailed" xml:space="preserve"><value>An error occurred while sending the message.</value></data>
+  <data name="Details_MessageSendUnexpectedError" xml:space="preserve"><value>An unexpected error occurred while sending the message.</value></data>
+  <data name="Details_OfflineSendFailed" xml:space="preserve"><value>Cannot reach API. Cannot send message offline.</value></data>
+  <data name="Details_OfflineDetails" xml:space="preserve"><value>Cannot reach API. Ticket details are available offline.</value></data>
+  <data name="Details_LoadUnexpectedError" xml:space="preserve"><value>An unexpected error occurred while loading ticket details.</value></data>
+  <data name="Details_SaveUnexpectedError" xml:space="preserve"><value>An unexpected error occurred while saving changes.</value></data>
+  <data name="Details_SaveFailed" xml:space="preserve"><value>An error occurred while saving changes.</value></data>
+  <data name="Details_OfflineSaveFailed" xml:space="preserve"><value>Cannot reach API. Cannot save changes offline.</value></data>
+  <data name="Details_CloseUnexpectedError" xml:space="preserve"><value>An error occurred while closing the ticket.</value></data>
+  <data name="Details_UpdateAuditDesc" xml:space="preserve"><value>Changed status to "{0}", priority to "{1}".</value></data>
+  <data name="Details_CloseAuditDesc" xml:space="preserve"><value>Ticket closed.</value></data>
+  <data name="Details_DeleteAuditDesc" xml:space="preserve"><value>Ticket deleted.</value></data>
+  <data name="Details_AssignAuditDesc" xml:space="preserve"><value>Ticket assigned to user {0}.</value></data>
+  <data name="Details_MessageAuditDesc" xml:space="preserve"><value>Message sent in ticket.</value></data>
+  <data name="Details_NotAssignedHint" xml:space="preserve"><value>No one is assigned to this task</value></data>
+  <data name="Details_AssignedHint" xml:space="preserve"><value>Assigned to:</value></data>
+  <data name="RequestAccount_Offline" xml:space="preserve"><value>Cannot submit request while offline.</value></data>
+  <data name="RequestAccount_ValidationName" xml:space="preserve"><value>Enter full name.</value></data>
+  <data name="RequestAccount_ValidationPassword" xml:space="preserve"><value>Enter password.</value></data>
+  <data name="RequestAccount_ValidationPasswordConfirm" xml:space="preserve"><value>Confirm password.</value></data>
+  <data name="RequestAccount_ValidationPasswordMismatch" xml:space="preserve"><value>Passwords do not match.</value></data>
+  <data name="RequestAccount_Sending" xml:space="preserve"><value>Submitting request...</value></data>
+  <data name="RequestAccount_Failed" xml:space="preserve"><value>Could not submit account request.</value></data>
+  <data name="RequestAccount_Sent" xml:space="preserve"><value>Account request submitted.</value></data>
+  <data name="RequestAccount_UnexpectedError" xml:space="preserve"><value>An unexpected error occurred while submitting the request.</value></data>
+  <data name="RequestAccount_OfflineError" xml:space="preserve"><value>Cannot reach API. Cannot submit request offline.</value></data>
+  <data name="RequestAccount_AuditDesc" xml:space="preserve"><value>Submitted account request: {0}.</value></data>
+  <data name="Audit_Action_Login" xml:space="preserve"><value>Login</value></data>
+  <data name="Audit_Action_Logout" xml:space="preserve"><value>Logout</value></data>
+  <data name="Audit_Action_RequestAccount" xml:space="preserve"><value>Account request</value></data>
+  <data name="Audit_Action_SettingsSaved" xml:space="preserve"><value>Settings saved</value></data>
+  <data name="Audit_Action_TicketCreated" xml:space="preserve"><value>Ticket created</value></data>
+  <data name="Audit_Action_TicketUpdated" xml:space="preserve"><value>Ticket updated</value></data>
+  <data name="Audit_Action_TicketAssigned" xml:space="preserve"><value>Ticket assigned</value></data>
+  <data name="Audit_Action_TicketClosed" xml:space="preserve"><value>Ticket closed</value></data>
+  <data name="Audit_Action_TicketDeleted" xml:space="preserve"><value>Ticket deleted</value></data>
+  <data name="Audit_Action_MessageSent" xml:space="preserve"><value>Message sent</value></data>
+  <data name="Audit_Action_UserBanned" xml:space="preserve"><value>User banned</value></data>
+  <data name="Audit_Action_UserActivated" xml:space="preserve"><value>User activated</value></data>
+  <data name="Audit_Action_UserUnbanned" xml:space="preserve"><value>User unbanned</value></data>
+  <data name="Audit_Desc_SettingsSaved" xml:space="preserve"><value>Application settings changed.</value></data>
+  <data name="Audit_Desc_LoginForm" xml:space="preserve"><value>Signed in via login form.</value></data>
+  <data name="Audit_Desc_LogoutDesktop" xml:space="preserve"><value>User signed out from desktop application.</value></data>
+  <data name="Audit_Desc_UserBanned" xml:space="preserve"><value>Banned user: {0}.</value></data>
+  <data name="Audit_Desc_UserActivated" xml:space="preserve"><value>Activated user: {0}.</value></data>
+  <data name="Audit_Desc_UserUnbanned" xml:space="preserve"><value>Unbanned user: {0}.</value></data>
+  <data name="Audit_Desc_TicketCreated" xml:space="preserve"><value>Created ticket: {0}</value></data>
+  <data name="Audit_User" xml:space="preserve"><value>User: {0}</value></data>
+  <data name="Audit_Ticket" xml:space="preserve"><value>Ticket #{0}</value></data>
+  <data name="Admin_StatusCount" xml:space="preserve"><value>{0} — {1}</value></data>
+  <data name="Admin_StatusActive" xml:space="preserve"><value>Active</value></data>
+  <data name="Admin_StatusBan" xml:space="preserve"><value>Banned</value></data>
+  <data name="Toast_LoggedIn" xml:space="preserve"><value>Signed in as {0}.</value></data>
+  <data name="Toast_LoggedOut" xml:space="preserve"><value>Signed out.</value></data>
+  <data name="Toast_RequestAccountSent" xml:space="preserve"><value>Account request submitted.</value></data>
+  <data name="Toast_RequestAccountOffline" xml:space="preserve"><value>Cannot reach API. Cannot submit request offline.</value></data>
+  <data name="Toast_TicketsOfflineCache" xml:space="preserve"><value>Cannot reach API. Showing offline data.</value></data>
+  <data name="Toast_TicketsFetchError" xml:space="preserve"><value>An error occurred while loading tickets.</value></data>
+  <data name="Toast_TicketsLostConnection" xml:space="preserve"><value>Lost connection to API.</value></data>
+  <data name="Toast_TicketsRefreshFailed" xml:space="preserve"><value>Could not refresh ticket list.</value></data>
+  <data name="Toast_TicketCreated" xml:space="preserve"><value>New ticket created.</value></data>
+  <data name="Toast_TicketCreateOffline" xml:space="preserve"><value>Cannot reach API. Cannot create ticket.</value></data>
+  <data name="Toast_TicketSaved" xml:space="preserve"><value>Ticket changes saved.</value></data>
+  <data name="Toast_TicketSaveOffline" xml:space="preserve"><value>Cannot reach API. Changes were not saved.</value></data>
+  <data name="Toast_TicketClosed" xml:space="preserve"><value>Ticket closed.</value></data>
+  <data name="Toast_TicketDeleted" xml:space="preserve"><value>Ticket deleted.</value></data>
+  <data name="Toast_TicketAssigned" xml:space="preserve"><value>Ticket assigned to you.</value></data>
+  <data name="Toast_TicketAssignOffline" xml:space="preserve"><value>Cannot reach API. Ticket was not assigned.</value></data>
+  <data name="Toast_MessageSent" xml:space="preserve"><value>Message sent.</value></data>
+  <data name="Toast_MessageSendOffline" xml:space="preserve"><value>Cannot reach API. Message was not sent.</value></data>
+  <data name="Toast_DetailsOffline" xml:space="preserve"><value>Cannot reach API. Ticket details are available offline.</value></data>
+  <data name="Toast_DetailsLoadError" xml:space="preserve"><value>An error occurred while loading ticket details.</value></data>
+  <data name="Toast_TicketCreateOfflineBlocked" xml:space="preserve"><value>Cannot create a ticket while offline.</value></data>
+  <data name="Toast_DetailsEditForbidden" xml:space="preserve"><value>You do not have permission to edit this ticket.</value></data>
+  <data name="Toast_DetailsEditOffline" xml:space="preserve"><value>Cannot edit ticket while offline.</value></data>
+  <data name="Toast_DetailsAssignForbidden" xml:space="preserve"><value>You do not have permission to assign this ticket.</value></data>
+  <data name="Toast_DetailsAssignOffline" xml:space="preserve"><value>Cannot assign ticket while offline.</value></data>
+  <data name="Toast_DetailsMessageOffline" xml:space="preserve"><value>Cannot send messages while offline.</value></data>

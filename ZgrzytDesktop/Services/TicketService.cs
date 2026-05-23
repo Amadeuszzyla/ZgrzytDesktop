@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 
 using ZgrzytDesktop.Services.Interfaces;
@@ -36,32 +37,44 @@ public class TicketService : ITicketService
         string sortDirection = "desc",
         TicketQueueView queueView = TicketQueueView.All)
     {
-        var endpointName = queueView switch
-        {
-            TicketQueueView.Active => "active-tickets",
-            TicketQueueView.Unassigned => "unassigned-tickets",
-            _ => "tickets"
-        };
-
-        var queryParameters = new List<string>
-        {
-            $"page={page}",
-            $"per_page={perPage}"
-        };
-
-        AddQueryParameter(queryParameters, "search", search);
+        var endpointName = ResolveEndpointName(queueView);
 
         if (queueView == TicketQueueView.All)
         {
-            AddQueryParameter(queryParameters, "status", status);
-            AddQueryParameter(queryParameters, "priority", priority);
-            AddQueryParameter(queryParameters, "sort_by", sortBy);
-            AddQueryParameter(queryParameters, "sort_direction", sortDirection);
+            return await FetchTicketsPageAsync(
+                endpointName,
+                page,
+                perPage,
+                search,
+                status,
+                priority,
+                sortBy,
+                sortDirection,
+                includeFilterAndSortParams: true);
         }
 
-        var endpoint = $"{endpointName}?{string.Join("&", queryParameters)}";
+        if (!TicketQueueListProcessor.RequiresLocalProcessing(status, priority, sortBy, sortDirection))
+        {
+            return await FetchTicketsPageAsync(
+                endpointName,
+                page,
+                perPage,
+                search,
+                status: null,
+                priority: null,
+                sortBy,
+                sortDirection,
+                includeFilterAndSortParams: false);
+        }
 
-        return await _apiService.GetAsync<PaginatedResponse<Ticket>>(endpoint);
+        var aggregation = await FetchAllQueuePagesAsync(endpointName, search);
+        var filtered = TicketQueueListProcessor.Filter(aggregation.Tickets, status, priority, search);
+        var sorted = TicketQueueListProcessor.Sort(filtered, sortBy, sortDirection);
+        var paginated = TicketQueueListProcessor.Paginate(sorted, page, perPage);
+        paginated.IsQueueFetchTruncated = aggregation.Truncated;
+        paginated.QueuePagesFetched = aggregation.PagesFetched;
+        paginated.QueueApiReportedTotal = aggregation.ApiReportedTotal;
+        return paginated;
     }
 
     public async Task<PaginatedResponse<Ticket>?> GetActiveTicketsAsync(
@@ -73,8 +86,7 @@ public class TicketService : ITicketService
             page: page,
             perPage: perPage,
             search: search,
-            queueView: TicketQueueView.Active
-        );
+            queueView: TicketQueueView.Active);
     }
 
     public async Task<PaginatedResponse<Ticket>?> GetUnassignedTicketsAsync(
@@ -86,8 +98,7 @@ public class TicketService : ITicketService
             page: page,
             perPage: perPage,
             search: search,
-            queueView: TicketQueueView.Unassigned
-        );
+            queueView: TicketQueueView.Unassigned);
     }
 
     public async Task<Ticket?> GetTicketAsync(int id)
@@ -134,6 +145,58 @@ public class TicketService : ITicketService
     {
         return await _apiService.DeleteAsync($"tickets/{id}");
     }
+
+    private static string ResolveEndpointName(TicketQueueView queueView) =>
+        queueView switch
+        {
+            TicketQueueView.Active => "active-tickets",
+            TicketQueueView.Unassigned => "unassigned-tickets",
+            _ => "tickets"
+        };
+
+    private async Task<PaginatedResponse<Ticket>?> FetchTicketsPageAsync(
+        string endpointName,
+        int page,
+        int perPage,
+        string? search,
+        string? status,
+        string? priority,
+        string sortBy,
+        string sortDirection,
+        bool includeFilterAndSortParams)
+    {
+        var queryParameters = new List<string>
+        {
+            $"page={page}",
+            $"per_page={perPage}"
+        };
+
+        AddQueryParameter(queryParameters, "search", search);
+
+        if (includeFilterAndSortParams)
+        {
+            AddQueryParameter(queryParameters, "status", status);
+            AddQueryParameter(queryParameters, "priority", priority);
+            AddQueryParameter(queryParameters, "sort_by", sortBy);
+            AddQueryParameter(queryParameters, "sort_direction", sortDirection);
+        }
+
+        var endpoint = $"{endpointName}?{string.Join("&", queryParameters)}";
+        return await _apiService.GetAsync<PaginatedResponse<Ticket>>(endpoint);
+    }
+
+    private Task<QueuePageAggregationResult> FetchAllQueuePagesAsync(string endpointName, string? search) =>
+        TicketQueuePageAggregator.FetchAllPagesAsync(
+            (fetchPage, pageSize) => FetchTicketsPageAsync(
+                endpointName,
+                fetchPage,
+                pageSize,
+                search,
+                status: null,
+                priority: null,
+                sortBy: TicketSortHelper.DefaultField.SortBy,
+                sortDirection: TicketSortHelper.DefaultDirection.Direction,
+                includeFilterAndSortParams: false));
 
     private static void AddQueryParameter(List<string> parameters, string name, string? value)
     {

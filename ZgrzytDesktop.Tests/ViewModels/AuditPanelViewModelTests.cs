@@ -1,3 +1,4 @@
+using System.Reflection;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Tests.Infrastructure.Fakes;
 using ZgrzytDesktop.ViewModels.DashboardModules;
@@ -25,7 +26,7 @@ public class AuditPanelViewModelTests
             Description = "second"
         });
 
-        var panel = new AuditPanelViewModel(audit, (_, _) => { });
+        var panel = new AuditPanelViewModel(audit);
 
         await panel.RefreshAsync();
 
@@ -35,18 +36,10 @@ public class AuditPanelViewModelTests
     }
 
     [Fact]
-    public async Task ClearAuditLogsCommand_ClearsEntriesAndShowsToast()
+    public void AuditPanelViewModel_DoesNotExposeClearAuditCommandToUi()
     {
-        var audit = new FakeAuditLogService();
-        audit.Entries.Add(new AuditLogEntry { UserLogin = "u", Action = "Test", Description = "d" });
+        var panel = new AuditPanelViewModel(new FakeAuditLogService());
 
-        string? toastMessage = null;
-        var panel = new AuditPanelViewModel(audit, (message, _) => toastMessage = message);
-
-        await panel.ClearAuditLogsCommand.ExecuteAsync(null);
-
-        Assert.Empty(panel.AuditLogEntries);
-        Assert.True(panel.HasNoAuditLogEntries);
-        Assert.Equal("Lokalny audyt został wyczyszczony.", toastMessage);
+        Assert.Null(panel.GetType().GetProperty("ClearAuditLogsCommand", BindingFlags.Instance | BindingFlags.Public));
     }
 }

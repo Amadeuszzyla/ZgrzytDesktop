@@ -26,7 +26,7 @@ public class DashboardStatisticsTests
 
         try
         {
-            await vm.RefreshTicketsNowCommand.ExecuteAsync(null);
+            await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
             Assert.Equal(5, vm.StatsTotalTickets);
             Assert.Equal(2, vm.StatsNewTickets);
@@ -55,7 +55,7 @@ public class DashboardStatisticsTests
 
         try
         {
-            await vm.RefreshTicketsNowCommand.ExecuteAsync(null);
+            await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
             Assert.Equal(2, vm.StatsLowPriorityTickets);
             Assert.Equal(2, vm.StatsMediumPriorityTickets);
@@ -83,7 +83,7 @@ public class DashboardStatisticsTests
 
         try
         {
-            await vm.RefreshTicketsNowCommand.ExecuteAsync(null);
+            await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
             Assert.Equal(3, vm.StatsAssignedTickets);
             Assert.Equal(2, vm.StatsUnassignedTickets);
@@ -106,7 +106,7 @@ public class DashboardStatisticsTests
 
         try
         {
-            await vm.RefreshTicketsNowCommand.ExecuteAsync(null);
+            await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
             Assert.Equal(0, vm.StatsTotalTickets);
             Assert.Equal(1, vm.StatsStatusChartMaximum);

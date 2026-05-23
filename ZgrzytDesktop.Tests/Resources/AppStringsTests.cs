@@ -19,6 +19,12 @@ public class AppStringsTests
         { "Api_Unauthorized", "Sesja wygasła albo użytkownik nie jest zalogowany.", "Session expired or user is not logged in." },
         { "Api_Forbidden", "Brak uprawnień do wykonania tej operacji.", "You do not have permission to perform this action." },
         { "Toast_SettingsSaved", "Ustawienia zapisane", "Settings saved" },
+        { "Details_InfoTitle", "Informacje o zgłoszeniu", "Ticket information" },
+        { "RequestAccount_Title", "Zgłoś nowe konto", "Request new account" },
+        { "Audit_Title", "Lokalny audyt aplikacji", "Local application audit" },
+        { "Login_Button", "Zaloguj się", "Sign in" },
+        { "Tickets_CreateButton", "Utwórz zgłoszenie", "Create ticket" },
+        { "Stats_ChartByStatus", "Według statusu", "By status" },
         { "Toast_UserBanned", "Użytkownik został zbanowany.", "User has been banned." }
     };
 

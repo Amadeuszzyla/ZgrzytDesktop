@@ -14,6 +14,8 @@ using ZgrzytDesktop.Helpers;
 
 using ZgrzytDesktop.Models;
 
+using ZgrzytDesktop.ViewModels.DashboardModules;
+
 using ZgrzytDesktop.Resources;
 
 using ZgrzytDesktop.Services;
@@ -43,10 +45,6 @@ public partial class DashboardViewModel : ViewModelBase
     private readonly IUserAdminService _userAdminService;
 
     private readonly Func<Task> _onLogoutRequested;
-
-    private readonly List<Ticket> _allTickets = new();
-
-
 
     private DispatcherTimer? _ticketPollingTimer;
 
@@ -146,45 +144,38 @@ public partial class DashboardViewModel : ViewModelBase
 
         InitializeDashboardPanels();
 
+        InitializeTicketsPanel();
+
+        InitializeTicketDetailsPanel();
+
+        InitializeAdminPanel();
+
         InitializeCommands();
 
         InitializeTicketCollections();
-
-        InitializeAdminCollections();
 
         SettingsPanel.ApplyBootstrapFromSettings();
 
         AppStrings.ApplyCulture(SettingsPanel.SelectedUiCulture);
 
-        SettingsService.ApplyThemeMode(SettingsPanel.SelectedThemeMode);
+        SettingsService.ApplyThemeMode(SettingsPanelViewModel.LightThemeMode);
 
         ApplyDefaultSortAndAdminFilter();
 
-        ConfigureTicketQueueViewsForRole();
+        TicketsPanel.ConfigureQueueViewsForRole(CanManageTickets);
 
-
-
-        PollingStatusMessage = AutoRefreshStatusText;
-
-
+        PollingStatusMessage = TicketsPanel.AutoRefreshStatusText;
 
         if (bootstrap.EnableTimers)
-
             InitializeTimers();
 
-
-
-        SetSelectedPageNumberSilently(CurrentPage);
-
-        SetSelectedPageSizeSilently(PageSize);
-
-        UpdatePageNumbers();
+        TicketsPanel.BootstrapPaginationSelection();
 
 
 
         if (bootstrap.ShowLoginToast)
 
-            ShowToast($"Zalogowano jako {CurrentUser.Name}.", ToastTypes.Info);
+            ShowToast(AppStrings.GetFormat("Toast_LoggedIn", CurrentUser.Name), ToastTypes.Info);
 
 
 
@@ -197,21 +188,9 @@ public partial class DashboardViewModel : ViewModelBase
 
 
     private void ApplyDefaultSortAndAdminFilter()
-
     {
-
-        _selectedTicketSortField = TicketSortHelper.DefaultField;
-
-        _selectedTicketSortDirection = TicketSortHelper.DefaultDirection;
-
-        _selectedAdminUserListFilterOption = AdminListFilterOption.All[0];
-
-        OnPropertyChanged(nameof(SelectedTicketSortField));
-
-        OnPropertyChanged(nameof(SelectedTicketSortDirection));
-
-        OnPropertyChanged(nameof(SelectedAdminUserListFilterOption));
-
+        TicketsPanel.ApplyDefaultSort();
+        AdminPanel.ApplyDefaultFilter();
     }
 
 
@@ -237,7 +216,7 @@ public partial class DashboardViewModel : ViewModelBase
 
         {
 
-            Interval = TimeSpan.FromSeconds(TicketAutoRefreshIntervalSeconds)
+            Interval = TimeSpan.FromSeconds(TicketsPanelViewModel.AutoRefreshIntervalSeconds)
 
         };
 

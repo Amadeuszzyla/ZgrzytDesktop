@@ -1,5 +1,6 @@
 using System.Net;
 using ZgrzytDesktop.Exceptions;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Services.Interfaces;
@@ -13,6 +14,18 @@ public sealed class FakeTicketService : ITicketService
 
     public int? LastPage { get; private set; }
 
+    public int? LastPerPage { get; private set; }
+
+    public string? LastSearch { get; private set; }
+
+    public string? LastStatus { get; private set; }
+
+    public string? LastPriority { get; private set; }
+
+    public string? LastSortBy { get; private set; }
+
+    public string? LastSortDirection { get; private set; }
+
     public Exception? GetTicketsException { get; set; }
 
     public ApiException? GetTicketsApiException { get; set; }
@@ -20,6 +33,14 @@ public sealed class FakeTicketService : ITicketService
     public Dictionary<int, PaginatedResponse<Ticket>> PagedResponses { get; } = new();
 
     public int GetTicketsCallCount { get; private set; }
+
+    public CreateTicketRequest? LastCreateRequest { get; private set; }
+
+    public Ticket? NextCreatedTicket { get; set; }
+
+    public ApiException? CreateTicketApiException { get; set; }
+
+    public int CreateTicketCallCount { get; private set; }
 
     public PaginatedResponse<Ticket>? NextTicketsResponse { get; set; } =
         new()
@@ -43,12 +64,35 @@ public sealed class FakeTicketService : ITicketService
         GetTicketsCallCount++;
         LastQueueView = queueView;
         LastPage = page;
+        LastPerPage = perPage;
+        LastSearch = search;
+        LastStatus = status;
+        LastPriority = priority;
+        LastSortBy = sortBy;
+        LastSortDirection = sortDirection;
 
         if (GetTicketsException is not null)
             throw GetTicketsException;
 
         if (GetTicketsApiException is not null)
             throw GetTicketsApiException;
+
+        if (queueView != TicketQueueView.All)
+        {
+            var source = NextTicketsResponse?.Data ?? [];
+
+            if (!TicketQueueListProcessor.RequiresLocalProcessing(status, priority, sortBy, sortDirection))
+            {
+                var serverFiltered = TicketQueueListProcessor.Filter(source, status: null, priority: null, search);
+                return Task.FromResult<PaginatedResponse<Ticket>?>(
+                    TicketQueueListProcessor.Paginate(serverFiltered, page, perPage));
+            }
+
+            var filtered = TicketQueueListProcessor.Filter(source, status, priority, search);
+            var sorted = TicketQueueListProcessor.Sort(filtered, sortBy, sortDirection);
+            return Task.FromResult<PaginatedResponse<Ticket>?>(
+                TicketQueueListProcessor.Paginate(sorted, page, perPage));
+        }
 
         if (PagedResponses.TryGetValue(page, out var paged))
             return Task.FromResult<PaginatedResponse<Ticket>?>(paged);
@@ -68,19 +112,126 @@ public sealed class FakeTicketService : ITicketService
         string? search = null) =>
         GetTicketsAsync(page, perPage, search, queueView: TicketQueueView.Unassigned);
 
-    public Task<Ticket?> GetTicketAsync(int id) => Task.FromResult<Ticket?>(null);
+    public Dictionary<int, Ticket> TicketsById { get; } = new();
 
-    public Task<List<TicketMessage>> GetTicketMessagesAsync(int ticketId) =>
-        Task.FromResult(new List<TicketMessage>());
+    public ApiException? GetTicketApiException { get; set; }
 
-    public Task<Ticket?> CreateTicketAsync(CreateTicketRequest request) =>
-        Task.FromResult<Ticket?>(null);
+    public Dictionary<int, List<TicketMessage>> MessagesByTicketId { get; } = new();
 
-    public Task<Ticket?> UpdateTicketAsync(int id, UpdateTicketRequest request) =>
-        Task.FromResult<Ticket?>(null);
+    public int GetTicketCallCount { get; private set; }
 
-    public Task<TicketMessage?> SendMessageAsync(int ticketId, string body) =>
-        Task.FromResult<TicketMessage?>(null);
+    public int GetTicketMessagesCallCount { get; private set; }
 
-    public Task<bool> DeleteTicketAsync(int id) => Task.FromResult(true);
+    public Task<Ticket?> GetTicketAsync(int id)
+    {
+        GetTicketCallCount++;
+
+        if (GetTicketApiException is not null)
+            throw GetTicketApiException;
+
+        return Task.FromResult(TicketsById.TryGetValue(id, out var ticket) ? ticket : null);
+    }
+
+    public Task<List<TicketMessage>> GetTicketMessagesAsync(int ticketId)
+    {
+        GetTicketMessagesCallCount++;
+
+        if (MessagesByTicketId.TryGetValue(ticketId, out var messages))
+            return Task.FromResult(messages);
+
+        return Task.FromResult(new List<TicketMessage>());
+    }
+
+    public Task<Ticket?> CreateTicketAsync(CreateTicketRequest request)
+    {
+        CreateTicketCallCount++;
+        LastCreateRequest = request;
+
+        if (CreateTicketApiException is not null)
+            throw CreateTicketApiException;
+
+        return Task.FromResult(NextCreatedTicket);
+    }
+
+    public int? LastUpdateTicketId { get; private set; }
+
+    public UpdateTicketRequest? LastUpdateRequest { get; private set; }
+
+    public Ticket? NextUpdatedTicket { get; set; }
+
+    public ApiException? UpdateTicketApiException { get; set; }
+
+    public ApiException? SendMessageApiException { get; set; }
+
+    public ApiException? DeleteTicketApiException { get; set; }
+
+    public bool DeleteTicketResult { get; set; } = true;
+
+    public string? LastSendMessageBody { get; private set; }
+
+    public int UpdateTicketCallCount { get; private set; }
+
+    public int SendMessageCallCount { get; private set; }
+
+    public int DeleteTicketCallCount { get; private set; }
+
+    public Task<Ticket?> UpdateTicketAsync(int id, UpdateTicketRequest request)
+    {
+        UpdateTicketCallCount++;
+        LastUpdateTicketId = id;
+        LastUpdateRequest = request;
+
+        if (UpdateTicketApiException is not null)
+            throw UpdateTicketApiException;
+
+        if (NextUpdatedTicket is not null)
+            return Task.FromResult<Ticket?>(NextUpdatedTicket);
+
+        if (TicketsById.TryGetValue(id, out var existing))
+        {
+            if (request.Status is not null)
+                existing.Status = request.Status;
+
+            if (request.Priority is not null)
+                existing.Priority = request.Priority;
+
+            if (request.AssignedItId is not null)
+                existing.AssignedItId = request.AssignedItId;
+
+            return Task.FromResult<Ticket?>(existing);
+        }
+
+        return Task.FromResult<Ticket?>(null);
+    }
+
+    public Task<TicketMessage?> SendMessageAsync(int ticketId, string body)
+    {
+        SendMessageCallCount++;
+        LastSendMessageBody = body;
+
+        if (SendMessageApiException is not null)
+            throw SendMessageApiException;
+
+        var message = new TicketMessage { Id = SendMessageCallCount, Content = body, TicketId = ticketId };
+
+        if (!MessagesByTicketId.TryGetValue(ticketId, out var list))
+        {
+            list = new List<TicketMessage>();
+            MessagesByTicketId[ticketId] = list;
+        }
+
+        list.Add(message);
+        return Task.FromResult<TicketMessage?>(message);
+    }
+
+    public Task<bool> DeleteTicketAsync(int id)
+    {
+        DeleteTicketCallCount++;
+
+        if (DeleteTicketApiException is not null)
+            throw DeleteTicketApiException;
+
+        TicketsById.Remove(id);
+        return Task.FromResult(DeleteTicketResult);
+    }
 }

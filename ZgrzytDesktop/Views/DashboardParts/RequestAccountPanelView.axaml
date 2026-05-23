@@ -2,71 +2,35 @@
     x:Class="ZgrzytDesktop.Views.DashboardParts.RequestAccountPanelView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:CompileBindings="False">
+    xmlns:parts="clr-namespace:ZgrzytDesktop.Views.DashboardParts"
+    xmlns:vm="using:ZgrzytDesktop.ViewModels"
+    x:CompileBindings="False"
+    x:DataType="vm:DashboardViewModel">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Panel Margin="24,32,24,32" MinHeight="480">
+            <Border
+                Classes="account-form-card"
+                MaxWidth="480"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top">
+                <StackPanel Spacing="22">
+                    <StackPanel Spacing="6" HorizontalAlignment="Center">
+                        <TextBlock
+                            Classes="account-form-title"
+                            Text="{Binding LblRequestAccountTitle}"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center" />
+                        <TextBlock
+                            Classes="account-form-subtitle"
+                            Text="{Binding LblRequestAccountSubtitle}"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center" />
+                    </StackPanel>
 
-                <StackPanel Classes="page-content" MaxWidth="760">
-
-                    <Border Classes="app-card">
-
-                        <StackPanel Spacing="12">
-                            <TextBlock Classes="section-title-large" Text="Zgłoś nowe konto" />
-
-                            <TextBlock
-                                Classes="section-subtitle"
-                                Text="Wypełnij dane nowego użytkownika. Prośba zostanie wysłana do administratora." />
-
-                            <TextBlock Classes="field-label" Text="Imię i nazwisko" Margin="0" />
-
-                            <TextBox
-                                Text="{Binding RequestName}"
-                                PlaceholderText="np. Jan Kowalski"
-                                IsEnabled="{Binding CanRequestAccount}" />
-
-                            <TextBlock Classes="field-label" Text="Login" Margin="0" />
-
-                            <TextBox
-                                Text="{Binding RequestLogin}"
-                                PlaceholderText="np. j.kowalski"
-                                IsEnabled="{Binding CanRequestAccount}" />
-
-                            <TextBlock Classes="field-label" Text="E-mail" Margin="0" />
-
-                            <TextBox
-                                Text="{Binding RequestEmail}"
-                                PlaceholderText="np. jan.kowalski@firma.pl"
-                                IsEnabled="{Binding CanRequestAccount}" />
-
-                            <TextBlock Classes="field-label" Text="Hasło" Margin="0" />
-
-                            <TextBox
-                                Text="{Binding RequestPassword}"
-                                PasswordChar="•"
-                                PlaceholderText="Hasło"
-                                IsEnabled="{Binding CanRequestAccount}" />
-
-                            <TextBlock Classes="field-label" Text="Potwierdzenie hasła" Margin="0" />
-
-                            <TextBox
-                                Text="{Binding RequestPasswordConfirmation}"
-                                PasswordChar="•"
-                                PlaceholderText="Powtórz hasło"
-                                IsEnabled="{Binding CanRequestAccount}" />
-
-                            <Button
-                                Classes="btn-primary"
-                                Content="Wyślij prośbę"
-                                Command="{Binding RequestAccountCommand}"
-                                HorizontalAlignment="Left"
-                                IsEnabled="{Binding CanRequestAccount}" />
-
-                            <TextBlock
-                                Text="{Binding RequestAccountStatusMessage}"
-                                TextWrapping="Wrap"
-                                Foreground="{DynamicResource AppSecondaryTextBrush}" />
-                        </StackPanel>
-                    </Border>
+                    <parts:RequestAccountFormView />
                 </StackPanel>
-            </ScrollViewer>
+            </Border>
+        </Panel>
+    </ScrollViewer>
 </UserControl>

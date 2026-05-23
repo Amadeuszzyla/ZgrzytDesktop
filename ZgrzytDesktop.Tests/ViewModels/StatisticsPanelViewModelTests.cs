@@ -1,4 +1,6 @@
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Tests.Infrastructure;
 using ZgrzytDesktop.Tests.Infrastructure.Fakes;
@@ -43,6 +45,62 @@ public class StatisticsPanelViewModelTests
     }
 
     [Fact]
+    public void ApplyFromTickets_WithoutResponseData_ShowsUnavailableMessage_Pl()
+    {
+        AppStrings.ApplyCulture("pl");
+
+        var panel = CreatePanel();
+        panel.ApplyFromTickets(TicketTestDataBuilder.CreateMixedStatisticsSet(), 5, fromCurrentPageOnly: true);
+
+        Assert.False(panel.IsResponseTimeAvailable);
+        Assert.Equal(
+            "API nie dostarcza danych czasu pierwszej odpowiedzi.",
+            panel.StatsResponseTimeMessage);
+    }
+
+    [Fact]
+    public void ApplyFromTickets_WithoutResponseData_ShowsUnavailableMessage_En()
+    {
+        AppStrings.ApplyCulture("en");
+
+        var panel = CreatePanel();
+        panel.ApplyFromTickets(TicketTestDataBuilder.CreateMixedStatisticsSet(), 5, fromCurrentPageOnly: true);
+
+        Assert.False(panel.IsResponseTimeAvailable);
+        Assert.Equal(
+            "The API does not provide first response time data.",
+            panel.StatsResponseTimeMessage);
+    }
+
+    [Fact]
+    public void NotifyLocalization_RefreshesResponseTimeMessage_WhenCultureChanges()
+    {
+        var panel = CreatePanel();
+        var created = new DateTime(2026, 4, 1, 12, 0, 0);
+
+        panel.ApplyFromTickets(
+        [
+            new Ticket
+            {
+                Id = 1,
+                CreatedAt = created,
+                FirstResponseAt = created.AddHours(2)
+            }
+        ],
+            totalInSystem: 1,
+            fromCurrentPageOnly: true);
+
+        AppStrings.ApplyCulture("pl");
+        panel.NotifyLocalization();
+        Assert.Contains("first_response_at", panel.StatsResponseTimeMessage, StringComparison.Ordinal);
+
+        AppStrings.ApplyCulture("en");
+        panel.NotifyLocalization();
+        Assert.Contains("first_response_at", panel.StatsResponseTimeMessage, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("nie dostarcza", panel.StatsResponseTimeMessage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task LoadAllPagesStatistics_AggregatesMultiplePages()
     {
         var pageOneTickets = TicketTestDataBuilder.CreateMixedStatisticsSet().Take(2).ToList();
@@ -73,7 +131,7 @@ public class StatisticsPanelViewModelTests
                 return true;
             },
             ShowToast = (_, _) => { },
-            LogAuditAsync = (_, _, _) => Task.CompletedTask,
+            LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
             GetIsOffline = () => false,
             SetIsOffline = _ => { },
             NotifyLocalization = () => { },

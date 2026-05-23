@@ -7,6 +7,7 @@ using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Tests.Infrastructure;
 using ZgrzytDesktop.Tests.Infrastructure.Fakes;
 using ZgrzytDesktop.ViewModels;
+using ZgrzytDesktop.ViewModels.DashboardModules;
 
 namespace ZgrzytDesktop.Tests.ViewModels;
 
@@ -60,7 +61,7 @@ public class DashboardViewModelTests
         var tickets = new FakeTicketService();
         var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard("it", tickets: tickets);
 
-        vm.SelectedTicketQueueView = FilterLabels.Active;
+        vm.TicketsPanel.SelectedTicketQueueView = FilterLabels.Active;
         await Task.Delay(100);
 
         Assert.Equal(TicketQueueView.Active, tickets.LastQueueView);
@@ -72,25 +73,24 @@ public class DashboardViewModelTests
         var tickets = new FakeTicketService();
         var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard("it", tickets: tickets);
 
-        vm.SelectedTicketQueueView = FilterLabels.Unassigned;
+        vm.TicketsPanel.SelectedTicketQueueView = FilterLabels.Unassigned;
         await Task.Delay(100);
 
         Assert.Equal(TicketQueueView.Unassigned, tickets.LastQueueView);
     }
 
     [Fact]
-    public async Task SaveSettingsCommand_PersistsThemeAndCulture()
+    public async Task SaveSettingsCommand_PersistsCultureAndLightTheme()
     {
         var settings = new FakeSettingsService();
         var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard(settings: settings);
 
-        vm.SelectedThemeMode = "Dark";
         vm.SelectedUiCulture = "en";
 
         await vm.SaveSettingsCommand.ExecuteAsync(null);
 
         Assert.Equal(1, settings.SaveAsyncCallCount);
-        Assert.Equal("Dark", settings.Settings.ThemeMode);
+        Assert.Equal(SettingsPanelViewModel.LightThemeMode, settings.Settings.ThemeMode);
         Assert.Equal("en", settings.Settings.UiCulture);
         Assert.Equal("en", vm.SelectedUiCulture);
     }
@@ -156,5 +156,34 @@ public class DashboardViewModelTests
 
         Assert.True(vm.ShowRequestAccountNav);
         Assert.False(vm.ShowAdministrationNav);
+    }
+
+    [Fact]
+    public void ItRole_ShowsAdministrationNav_WithoutUsersPanel()
+    {
+        var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard("it");
+
+        Assert.True(vm.ShowAdministrationNav);
+        Assert.False(vm.IsAdminRole);
+        Assert.True(vm.IsStaffRole);
+
+        vm.AdminPanel.PrepareAdminPage(vm.IsAdminRole);
+
+        Assert.False(vm.IsAdminUsersPanelVisible);
+        Assert.True(vm.IsAdminNewAccountPanelVisible);
+    }
+
+    [Fact]
+    public void AdminRole_ShowsUsersPanelOnAdminPage()
+    {
+        var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard("admin");
+
+        Assert.True(vm.ShowAdministrationNav);
+        Assert.True(vm.IsAdminRole);
+
+        vm.AdminPanel.PrepareAdminPage(vm.IsAdminRole);
+
+        Assert.True(vm.IsAdminUsersPanelVisible);
+        Assert.Equal(AdminTabs.Users, vm.AdminTab);
     }
 }

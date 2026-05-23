@@ -10,6 +10,7 @@ using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
+using ZgrzytDesktop.Security;
 using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
@@ -218,7 +219,7 @@ public class ApiService : IApiService
                 return new ApiConnectionTestResult
                 {
                     Success = true,
-                    Message = "Połączenie z API działa poprawnie."
+                    Message = AppStrings.Get("Api_TestConnection_Success")
                 };
             }
 
@@ -227,14 +228,17 @@ public class ApiService : IApiService
                 return new ApiConnectionTestResult
                 {
                     Success = true,
-                    Message = "API odpowiada, ale token użytkownika jest nieprawidłowy albo wygasł."
+                    Message = AppStrings.Get("Api_TestConnection_Unauthorized")
                 };
             }
 
             return new ApiConnectionTestResult
             {
                 Success = false,
-                Message = $"API odpowiedziało błędem: {(int)response.StatusCode} {response.StatusCode}"
+                Message = AppStrings.GetFormat(
+                    "Api_TestConnection_Error",
+                    (int)response.StatusCode,
+                    response.StatusCode)
             };
         }
         catch
@@ -242,7 +246,7 @@ public class ApiService : IApiService
             return new ApiConnectionTestResult
             {
                 Success = false,
-                Message = "Nie udało się połączyć z API."
+                Message = AppStrings.Get("Api_TestConnection_Failed")
             };
         }
     }
@@ -353,7 +357,7 @@ public class ApiService : IApiService
 
         normalized = normalized.Replace("api/api/", "api/", StringComparison.OrdinalIgnoreCase);
 
-        return normalized;
+        return ApiUrlSecurityHelper.EnsureSecureApiBaseUrl(normalized);
     }
 }
 

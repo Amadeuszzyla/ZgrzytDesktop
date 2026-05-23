@@ -20,17 +20,15 @@ public class LocalUserCacheService : ILocalUserCacheService
 
     public LocalUserCacheService(string? customDirectory = null)
     {
-        var directory = customDirectory;
-
-        if (string.IsNullOrWhiteSpace(directory))
+        if (string.IsNullOrWhiteSpace(customDirectory))
         {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            directory = Path.Combine(appData, "ZgrzytDesktop", "Cache");
+            AppDataPaths.EnsureDirectoryForFile(AppDataPaths.UserCacheFilePath);
+            _filePath = AppDataPaths.UserCacheFilePath;
+            return;
         }
 
-        Directory.CreateDirectory(directory);
-
-        _filePath = Path.Combine(directory, "user-cache.json");
+        Directory.CreateDirectory(customDirectory);
+        _filePath = Path.Combine(customDirectory, "user-cache.json");
     }
 
     public async Task SaveUserAsync(User user)
@@ -38,8 +36,7 @@ public class LocalUserCacheService : ILocalUserCacheService
         try
         {
             var json = JsonSerializer.Serialize(user, _jsonOptions);
-            var protectedJson = LocalDataProtector.ProtectString(json);
-            await File.WriteAllTextAsync(_filePath, protectedJson);
+            await SecureLocalFileStorage.WriteEncryptedAsync(_filePath, json);
         }
         catch
         {
@@ -51,11 +48,9 @@ public class LocalUserCacheService : ILocalUserCacheService
     {
         try
         {
-            if (!File.Exists(_filePath))
-                return null;
-
-            var stored = await File.ReadAllTextAsync(_filePath);
-            var json = LocalDataProtector.UnprotectString(stored);
+            var json = await SecureLocalFileStorage.ReadDecryptedAsync(
+                _filePath,
+                SecureLocalFileStorage.LooksLikeJsonDocument);
 
             if (string.IsNullOrWhiteSpace(json))
                 return null;
@@ -70,16 +65,7 @@ public class LocalUserCacheService : ILocalUserCacheService
 
     public Task ClearAsync()
     {
-        try
-        {
-            if (File.Exists(_filePath))
-                File.Delete(_filePath);
-        }
-        catch
-        {
-            // Czyszczenie cache nie może zatrzymać aplikacji.
-        }
-
+        SecureLocalFileStorage.TryDelete(_filePath);
         return Task.CompletedTask;
     }
 }

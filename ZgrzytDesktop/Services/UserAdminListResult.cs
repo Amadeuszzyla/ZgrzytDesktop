@@ -9,5 +9,7 @@ public sealed class UserAdminListResult
 
     public bool UsedLocalFilterFallback { get; init; }
 
+    public UserAdminListInfoKind InfoKind { get; init; }
+
     public string? InformationalMessage { get; init; }
 }

@@ -1,19 +1,38 @@
 using System;
 using System.Text.RegularExpressions;
+using ZgrzytDesktop.Resources;
 
 namespace ZgrzytDesktop.Helpers;
 
 public static class TicketCategoryHelper
 {
-    public static readonly string[] Categories = ["Hardware", "Software", "Sieć"];
+    public const string Hardware = "Hardware";
+    public const string Software = "Software";
+    public const string Network = "Sieć";
+
+    public static readonly string[] Categories = [Hardware, Software, Network];
 
     private static readonly Regex TitleCategoryPrefixRegex = new(
-        @"^\[(Hardware|Software|Sieć)\]\s*",
+        @"^\[(Hardware|Software|Sieć|Network)\]\s*",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
     private static readonly Regex DescriptionCategoryLineRegex = new(
-        @"^Kategoria:\s*(Hardware|Software|Sieć)\s*$",
+        @"^(Kategoria:|Category:)\s*(Hardware|Software|Sieć|Network)\s*$",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Multiline | RegexOptions.Compiled);
+
+    public static string ToDisplayCategory(string? storageCategory)
+    {
+        if (string.IsNullOrWhiteSpace(storageCategory))
+            return string.Empty;
+
+        return NormalizeCategoryName(storageCategory) switch
+        {
+            Hardware => AppStrings.Get("Category_Hardware"),
+            Software => AppStrings.Get("Category_Software"),
+            Network => AppStrings.Get("Category_Network"),
+            _ => storageCategory.Trim()
+        };
+    }
 
     public static string FormatTitle(string? category, string title)
     {
@@ -22,9 +41,10 @@ public static class TicketCategoryHelper
         if (string.IsNullOrWhiteSpace(category))
             return cleanTitle;
 
+        var storageCategory = NormalizeCategoryName(category.Trim());
         var withoutPrefix = StripTitleCategoryPrefix(cleanTitle);
 
-        return $"[{category.Trim()}] {withoutPrefix}";
+        return $"[{storageCategory}] {withoutPrefix}";
     }
 
     public static string FormatDescription(string? category, string description)
@@ -37,7 +57,8 @@ public static class TicketCategoryHelper
         if (DescriptionCategoryLineRegex.IsMatch(cleanDescription))
             return cleanDescription;
 
-        return $"Kategoria: {category.Trim()}{Environment.NewLine}{Environment.NewLine}{cleanDescription}";
+        var storageCategory = NormalizeCategoryName(category.Trim());
+        return $"{AppStrings.Get("Category_DescriptionPrefix")} {storageCategory}{Environment.NewLine}{Environment.NewLine}{cleanDescription}";
     }
 
     public static string ExtractCategory(string? title, string? description)
@@ -55,7 +76,7 @@ public static class TicketCategoryHelper
             var descriptionMatch = DescriptionCategoryLineRegex.Match(description);
 
             if (descriptionMatch.Success)
-                return NormalizeCategoryName(descriptionMatch.Groups[1].Value);
+                return NormalizeCategoryName(descriptionMatch.Groups[2].Value);
         }
 
         return string.Empty;
@@ -69,13 +90,17 @@ public static class TicketCategoryHelper
         return TitleCategoryPrefixRegex.Replace(title.Trim(), string.Empty).Trim();
     }
 
-    private static string NormalizeCategoryName(string value)
+    public static string NormalizeCategoryName(string value)
     {
-        foreach (var category in Categories)
-        {
-            if (string.Equals(category, value, StringComparison.OrdinalIgnoreCase))
-                return category;
-        }
+        if (string.Equals(value, Hardware, StringComparison.OrdinalIgnoreCase))
+            return Hardware;
+
+        if (string.Equals(value, Software, StringComparison.OrdinalIgnoreCase))
+            return Software;
+
+        if (string.Equals(value, Network, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(value, "Network", StringComparison.OrdinalIgnoreCase))
+            return Network;
 
         return value.Trim();
     }

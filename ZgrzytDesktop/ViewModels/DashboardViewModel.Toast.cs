@@ -10,7 +10,7 @@ public partial class DashboardViewModel
 {
     private string _toastMessage = string.Empty;
     private bool _isToastVisible;
-    private string _toastBackground = "#2563EB";
+    private string _toastBackground = "#7C3AED";
     private string _toastForeground = "#FFFFFF";
 
     public string ToastMessage
@@ -97,7 +97,7 @@ public partial class DashboardViewModel
                 ToastForeground = "#FFFFFF";
                 break;
             default:
-                ToastBackground = "#2563EB";
+                ToastBackground = "#7C3AED";
                 ToastForeground = "#FFFFFF";
                 break;
         }

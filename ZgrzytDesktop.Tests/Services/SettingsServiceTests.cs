@@ -76,7 +76,7 @@ public class SettingsServiceTests
             var loaded = await service.LoadAsync();
 
             Assert.Equal(ApiDefaults.ProductionApiBaseUrl, loaded.ApiBaseUrl);
-            Assert.Equal("System", loaded.ThemeMode);
+            Assert.Equal("Light", loaded.ThemeMode);
         }
         finally
         {
@@ -96,7 +96,7 @@ public class SettingsServiceTests
             var loaded = await service.LoadAsync();
 
             Assert.Equal(ApiDefaults.ProductionApiBaseUrl, loaded.ApiBaseUrl);
-            Assert.Equal("System", loaded.ThemeMode);
+            Assert.Equal("Light", loaded.ThemeMode);
         }
         finally
         {
@@ -115,7 +115,7 @@ public class SettingsServiceTests
             var legacy = new AppSettings
             {
                 ApiBaseUrl = "http://127.0.0.1:9000/api/",
-                ThemeMode = "System"
+                ThemeMode = "Light"
             };
 
             await service.SaveAsync(legacy);
@@ -131,11 +131,11 @@ public class SettingsServiceTests
     }
 
     [Theory]
-    [InlineData("System", "System")]
-    [InlineData("Light", "Light")]
-    [InlineData("Dark", "Dark")]
-    [InlineData("invalid", "System")]
-    public void NormalizeThemeMode_ShouldReturnExpectedValue(string input, string expected)
+    [InlineData("System")]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    [InlineData("invalid")]
+    public void NormalizeThemeMode_ShouldAlwaysReturnLight(string input)
     {
         var directory = CreateTempDirectory();
 
@@ -143,7 +143,7 @@ public class SettingsServiceTests
         {
             var service = new SettingsService(directory);
 
-            Assert.Equal(expected, service.NormalizeThemeMode(input));
+            Assert.Equal("Light", service.NormalizeThemeMode(input));
         }
         finally
         {
@@ -170,7 +170,7 @@ public class SettingsServiceTests
 
             var loaded = await service.LoadAsync();
 
-            Assert.Equal("Dark", loaded.ThemeMode);
+            Assert.Equal("Light", loaded.ThemeMode);
         }
         finally
         {

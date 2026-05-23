@@ -3,6 +3,7 @@ using System.Text.Json;
 using Xunit;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Tests.Infrastructure;
 
@@ -158,7 +159,7 @@ public class UserAdminServiceTests
             Assert.Single(result.Users);
             Assert.Equal("active-user", result.Users[0].Login);
             Assert.True(result.UsedLocalFilterFallback);
-            Assert.Equal(UserAdminService.LocalFilterFallbackMessage, result.InformationalMessage);
+            Assert.Equal(UserAdminListInfoKind.LocalFilterFallback, result.InfoKind);
             Assert.Equal(2, handler.Requests.Count);
             Assert.EndsWith("/api/users", handler.Requests[1].Uri!.AbsolutePath, StringComparison.OrdinalIgnoreCase);
         }
@@ -240,7 +241,7 @@ public class UserAdminServiceTests
             var result = await service.GetUsersAsync(UserAdminListFilter.Banned);
 
             Assert.Empty(result.Users);
-            Assert.Equal(UserAdminService.BannedListNotSupportedMessage, result.InformationalMessage);
+            Assert.Equal(UserAdminListInfoKind.BannedListNotSupported, result.InfoKind);
         }
         finally
         {
@@ -259,7 +260,7 @@ public class UserAdminServiceTests
 
             var ex = await Assert.ThrowsAsync<ApiException>(() => service.BanUserAsync(3));
 
-            Assert.Equal(UserAdminService.ActionNotSupportedMessage, ex.Message);
+            Assert.Equal(AppStrings.Get("Admin_ActionNotSupported"), ex.Message);
             Assert.DoesNotContain("<html", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
         finally
@@ -290,5 +291,47 @@ public class UserAdminServiceTests
             Assert.Contains(filtered, user => user.Login == "target");
         else
             Assert.DoesNotContain(filtered, user => user.Login == "target");
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_FilterAll_ShouldCallOnlyUsersEndpoint()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.EnqueueJson(HttpStatusCode.OK, "[]");
+            var service = TestApiFactory.CreateUserAdmin(api);
+
+            await service.GetUsersAsync(UserAdminListFilter.All);
+
+            Assert.Single(handler.Requests);
+            Assert.EndsWith("/api/users", handler.Requests[0].Uri!.AbsolutePath, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WhenActiveUsersReturns403_ShouldNotFallbackToUsers()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.Enqueue(statusCode: HttpStatusCode.Forbidden, content: """{ "message": "Forbidden" }""", mediaType: "application/json");
+            var service = TestApiFactory.CreateUserAdmin(api);
+
+            var ex = await Assert.ThrowsAsync<ApiException>(() =>
+                service.GetUsersAsync(UserAdminListFilter.Active));
+
+            Assert.Equal(AppStrings.Get("Admin_ListForbidden"), ex.Message);
+            Assert.Single(handler.Requests);
+            Assert.EndsWith("/api/active-users", handler.Requests[0].Uri!.AbsolutePath, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
     }
 }

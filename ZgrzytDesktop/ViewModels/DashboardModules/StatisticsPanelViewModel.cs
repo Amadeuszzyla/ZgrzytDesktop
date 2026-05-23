@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
@@ -29,8 +30,13 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
     private double _statsStatusChartMaximum = 1;
     private double _statsPriorityChartMaximum = 1;
     private double _statsAssignmentChartMaximum = 1;
-    private string _statsScopeMessage = "Brak pobranych zgłoszeń.";
+    private string _statsScopeMessage = AppStrings.Get("Stats_Scope_NoData");
+    private string _statsResponseTimeMessage = AppStrings.Get("Stats_ResponseTimeUnavailable");
+    private bool _isResponseTimeAvailable;
     private bool _isLoadingAllStatistics;
+    private bool _fromCurrentPageOnly;
+    private int _totalInSystem;
+    private ResponseTimeStatistics? _lastResponseTimeStatistics;
 
     public StatisticsPanelViewModel(
         ITicketService ticketService,
@@ -122,6 +128,18 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
         private set => SetProperty(ref _statsScopeMessage, value);
     }
 
+    public string StatsResponseTimeMessage
+    {
+        get => _statsResponseTimeMessage;
+        private set => SetProperty(ref _statsResponseTimeMessage, value);
+    }
+
+    public bool IsResponseTimeAvailable
+    {
+        get => _isResponseTimeAvailable;
+        private set => SetProperty(ref _isResponseTimeAvailable, value);
+    }
+
     public bool IsLoadingAllStatistics
     {
         get => _isLoadingAllStatistics;
@@ -148,6 +166,26 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
 
     public string LblStatsKpiHighPriority => AppStrings.Get("Stats_KpiHighPriority");
 
+    public string LblStatsLoadingAllPages => AppStrings.Get("Stats_LoadingAllPages");
+
+    public string LblStatsChartByStatus => AppStrings.Get("Stats_ChartByStatus");
+
+    public string LblStatsChartByPriority => AppStrings.Get("Stats_ChartByPriority");
+
+    public string LblStatsChartAssignment => AppStrings.Get("Stats_ChartAssignment");
+
+    public string LblStatsAssigned => AppStrings.Get("Stats_Assigned");
+
+    public string LblStatsUnassigned => AppStrings.Get("Stats_Unassigned");
+
+    public string LblStatsPriorityLow => AppStrings.Get("Stats_PriorityLow");
+
+    public string LblStatsPriorityMedium => AppStrings.Get("Stats_PriorityMedium");
+
+    public string LblStatsPriorityHigh => AppStrings.Get("Stats_PriorityHigh");
+
+    public string LblStatsResponseTime => AppStrings.Get("Stats_ResponseTimeTitle");
+
     public IAsyncRelayCommand LoadAllPagesStatisticsCommand { get; }
 
     public void NotifyLocalization()
@@ -159,6 +197,18 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
         OnPropertyChanged(nameof(LblStatsKpiInProgress));
         OnPropertyChanged(nameof(LblStatsKpiClosed));
         OnPropertyChanged(nameof(LblStatsKpiHighPriority));
+        OnPropertyChanged(nameof(LblStatsLoadingAllPages));
+        OnPropertyChanged(nameof(LblStatsChartByStatus));
+        OnPropertyChanged(nameof(LblStatsChartByPriority));
+        OnPropertyChanged(nameof(LblStatsChartAssignment));
+        OnPropertyChanged(nameof(LblStatsAssigned));
+        OnPropertyChanged(nameof(LblStatsUnassigned));
+        OnPropertyChanged(nameof(LblStatsPriorityLow));
+        OnPropertyChanged(nameof(LblStatsPriorityMedium));
+        OnPropertyChanged(nameof(LblStatsPriorityHigh));
+        OnPropertyChanged(nameof(LblStatsResponseTime));
+        RefreshStatsScopeMessage();
+        RefreshResponseTimeMessage();
     }
 
     public void NotifyTicketsLoadingChanged() => OnPropertyChanged(nameof(IsNotLoading));
@@ -168,23 +218,17 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
 
     private void ApplyTicketStatistics(IReadOnlyList<Ticket> tickets, int totalInSystem, bool fromCurrentPageOnly)
     {
-        StatsTotalTickets = tickets.Count;
-        StatsNewTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Status, TicketStatuses.Nowe, StringComparison.OrdinalIgnoreCase));
-        StatsInProgressTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Status, TicketStatuses.WTrakcie, StringComparison.OrdinalIgnoreCase));
-        StatsClosedTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Status, TicketStatuses.Zamkniete, StringComparison.OrdinalIgnoreCase));
+        var snapshot = TicketStatisticsCalculator.Compute(tickets);
 
-        StatsLowPriorityTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Priority, TicketPriorities.Low, StringComparison.OrdinalIgnoreCase));
-        StatsMediumPriorityTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Priority, TicketPriorities.Medium, StringComparison.OrdinalIgnoreCase));
-        StatsHighPriorityTickets = tickets.Count(ticket =>
-            string.Equals(ticket.Priority, TicketPriorities.High, StringComparison.OrdinalIgnoreCase));
-
-        StatsAssignedTickets = tickets.Count(ticket => ticket.AssignedItId.HasValue);
-        StatsUnassignedTickets = Math.Max(0, tickets.Count - StatsAssignedTickets);
+        StatsTotalTickets = snapshot.Total;
+        StatsNewTickets = snapshot.New;
+        StatsInProgressTickets = snapshot.InProgress;
+        StatsClosedTickets = snapshot.Closed;
+        StatsLowPriorityTickets = snapshot.LowPriority;
+        StatsMediumPriorityTickets = snapshot.MediumPriority;
+        StatsHighPriorityTickets = snapshot.HighPriority;
+        StatsAssignedTickets = snapshot.Assigned;
+        StatsUnassignedTickets = snapshot.Unassigned;
 
         StatsStatusChartMaximum = Math.Max(
             1,
@@ -196,18 +240,53 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
             1,
             Math.Max(StatsAssignedTickets, StatsUnassignedTickets));
 
+        _fromCurrentPageOnly = fromCurrentPageOnly;
+        _totalInSystem = totalInSystem;
+        _lastResponseTimeStatistics = snapshot.ResponseTime;
+        RefreshStatsScopeMessage();
+        RefreshResponseTimeMessage();
+    }
+
+    private void RefreshResponseTimeMessage()
+    {
+        var responseTime = _lastResponseTimeStatistics ?? new ResponseTimeStatistics();
+        IsResponseTimeAvailable = responseTime.IsAvailable;
+
+        if (!responseTime.IsAvailable || responseTime.Average is null)
+        {
+            StatsResponseTimeMessage = AppStrings.Get("Stats_ResponseTimeUnavailable");
+            return;
+        }
+
+        var durationText = StatisticsDurationFormatter.Format(responseTime.Average.Value);
+        var methodKey = responseTime.Source switch
+        {
+            ResponseTimeSampleSource.FirstResponseAtField => "Stats_ResponseTimeMethodApi",
+            ResponseTimeSampleSource.EmbeddedStaffMessages => "Stats_ResponseTimeMethodMessages",
+            ResponseTimeSampleSource.Mixed => "Stats_ResponseTimeMethodMixed",
+            _ => "Stats_ResponseTimeMethodMixed"
+        };
+
+        StatsResponseTimeMessage = AppStrings.GetFormat(
+            methodKey,
+            durationText,
+            responseTime.SampleCount);
+    }
+
+    private void RefreshStatsScopeMessage()
+    {
         StatsScopeMessage = StatsTotalTickets == 0
-            ? "Brak zgłoszeń do analizy."
-            : fromCurrentPageOnly && totalInSystem > StatsTotalTickets
-                ? $"Statystyki dla {StatsTotalTickets} zgłoszeń na bieżącej stronie listy (łącznie w systemie: {totalInSystem})."
-                : $"Statystyki dla {StatsTotalTickets} zgłoszeń (łącznie w systemie: {totalInSystem}).";
+            ? AppStrings.Get("Stats_Scope_NoTickets")
+            : _fromCurrentPageOnly && _totalInSystem > StatsTotalTickets
+                ? AppStrings.GetFormat("Stats_Scope_CurrentPage", StatsTotalTickets, _totalInSystem)
+                : AppStrings.GetFormat("Stats_Scope_AllPages", StatsTotalTickets, _totalInSystem);
     }
 
     private async Task LoadAllPagesStatisticsAsync()
     {
         if (_bridge.GetIsOffline())
         {
-            StatsScopeMessage = "Statystyki wielostronicowe wymagają połączenia z API.";
+            StatsScopeMessage = AppStrings.Get("Stats_AllPagesRequiresOnline");
             return;
         }
 
@@ -240,11 +319,11 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
                     } while (page <= lastPage);
 
                     ApplyTicketStatistics(aggregated, totalInSystem, fromCurrentPageOnly: false);
-                    _bridge.ShowToast($"Zaktualizowano statystyki ({aggregated.Count} zgłoszeń).", ToastTypes.Success);
+                    _bridge.ShowToast(AppStrings.GetFormat("Stats_Loaded", aggregated.Count), ToastTypes.Success);
                 },
                 setStatusMessage: message => StatsScopeMessage = message,
-                unexpectedStatusMessage: "Nie udało się pobrać statystyk ze wszystkich stron.",
-                unexpectedToastMessage: "Nie udało się pobrać statystyk.",
+                unexpectedStatusMessage: AppStrings.Get("Stats_LoadAllPagesFailed"),
+                unexpectedToastMessage: AppStrings.Get("Stats_LoadAllFailed"),
                 setOfflineOnServiceUnavailable: false);
         }
         finally

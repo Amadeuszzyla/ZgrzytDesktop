@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
+using ZgrzytDesktop.Helpers;
 
 namespace ZgrzytDesktop.Models;
 
@@ -17,6 +18,24 @@ public class AuditLogEntry
     [JsonPropertyName("ticket_id")]
     public int? TicketId { get; set; }
 
+    [JsonPropertyName("details_key")]
+    public string? DetailsKey { get; set; }
+
+    [JsonPropertyName("parameters_json")]
+    public string? ParametersJson { get; set; }
+
     [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
+
+    [JsonIgnore]
+    public string DisplayAction => AuditDisplayHelper.GetActionDisplay(Action);
+
+    [JsonIgnore]
+    public string DisplayDescription => AuditDisplayHelper.GetDescriptionDisplay(this);
+
+    [JsonIgnore]
+    public string DisplayUserLogin => AuditDisplayHelper.FormatUserLogin(UserLogin);
+
+    [JsonIgnore]
+    public string DisplayTicketLabel => AuditDisplayHelper.FormatTicketId(TicketId);
 }

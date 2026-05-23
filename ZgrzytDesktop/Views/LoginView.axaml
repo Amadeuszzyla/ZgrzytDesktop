@@ -4,98 +4,106 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:CompileBindings="False">
 
-    <Grid Background="#111827">
+    <Grid RowDefinitions="Auto,*" Background="{DynamicResource AppPageBackgroundBrush}">
 
-        <Border
-            Width="440"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Background="#1F2937"
-            BorderBrush="#374151"
-            BorderThickness="1"
-            CornerRadius="18"
-            Padding="32">
-
-            <StackPanel Spacing="15">
-
-                <StackPanel Spacing="4">
-                    <TextBlock
-                        Text="ZGRZYT Desktop"
-                        FontSize="30"
-                        FontWeight="Bold"
-                        Foreground="White"
-                        HorizontalAlignment="Center" />
-
-                    <TextBlock
-                        Text="System zgłoszeń technicznych"
-                        FontSize="14"
-                        Foreground="#9CA3AF"
-                        TextAlignment="Center"
-                        HorizontalAlignment="Center" />
+        <Border Grid.Row="0" Classes="app-topbar">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel
+                    Grid.Column="0"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    VerticalAlignment="Center">
+                    <Image
+                        Classes="topbar-logo"
+                        Source="/Assets/zgrzyt-logo.png"
+                        Width="36"
+                        Height="36" />
+                    <TextBlock Classes="topbar-brand" Text="ZGRZYT" />
                 </StackPanel>
 
-                <Separator
-                    Margin="0,8,0,4"
-                    Background="#374151" />
-
-                <TextBlock
-                    Text="Logowanie"
-                    FontSize="21"
-                    FontWeight="Bold"
-                    Foreground="White" />
-
-                <TextBlock
-                    Text="Login"
-                    FontWeight="SemiBold"
-                    Foreground="#D1D5DB" />
-
-                <TextBox
-                    Text="{Binding Login, Mode=TwoWay}"
-                    PlaceholderText="Wpisz login"
-                    Height="42"
-                    FontSize="14"
-                    Padding="10,9,10,5"
-                    VerticalContentAlignment="Center"
-                    IsEnabled="{Binding IsNotLoading}" />
-
-                <TextBlock
-                    Text="Hasło"
-                    FontWeight="SemiBold"
-                    Foreground="#D1D5DB" />
-
-                <TextBox
-                    Text="{Binding Password, Mode=TwoWay}"
-                    PasswordChar="•"
-                    PlaceholderText="Wpisz hasło"
-                    Height="42"
-                    FontSize="14"
-                    Padding="10,9,10,5"
-                    VerticalContentAlignment="Center"
-                    IsEnabled="{Binding IsNotLoading}" />
-
-                <Button
-                    Content="{Binding LoginButtonText}"
-                    Command="{Binding LoginCommand}"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center"
-                    Padding="12"
-                    Margin="0,8,0,0"
-                    FontWeight="SemiBold"
-                    IsEnabled="{Binding IsNotLoading}" />
-
                 <Border
-                    Background="#7F1D1D"
-                    CornerRadius="8"
-                    Padding="10"
-                    IsVisible="{Binding HasError}">
-
-                    <TextBlock
-                        Text="{Binding ErrorMessage}"
-                        Foreground="#FEE2E2"
-                        TextWrapping="Wrap" />
+                    Grid.Column="2"
+                    Classes="version-badge"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right">
+                    <TextBlock Classes="version-badge-text" Text="v0.1.0-alpha" />
                 </Border>
-
-            </StackPanel>
+            </Grid>
         </Border>
+
+        <Grid Grid.Row="1">
+            <Border
+                Classes="login-card"
+                Width="440"
+                MaxWidth="440"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Margin="24">
+
+                <StackPanel Spacing="18">
+                    <StackPanel Spacing="6" HorizontalAlignment="Center">
+                        <TextBlock
+                            Classes="login-welcome-title"
+                            Text="{Binding LblLoginTitle}"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center" />
+
+                        <TextBlock
+                            Classes="login-welcome-subtitle"
+                            Text="{Binding LblAppSubtitle}"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                        <TextBlock
+                            Classes="login-field-label"
+                            Text="{Binding LblLoginLabel}" />
+
+                        <TextBox
+                            Classes="login-field"
+                            Text="{Binding Login, Mode=TwoWay}"
+                            PlaceholderText="{Binding LblLoginPlaceholder}"
+                            MinHeight="44"
+                            FontSize="14"
+                            VerticalContentAlignment="Center"
+                            IsEnabled="{Binding IsNotLoading}" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                        <TextBlock
+                            Classes="login-field-label"
+                            Text="{Binding LblPasswordLabel}" />
+
+                        <TextBox
+                            Classes="login-field"
+                            Text="{Binding Password, Mode=TwoWay}"
+                            PasswordChar="•"
+                            PlaceholderText="{Binding LblPasswordPlaceholder}"
+                            MinHeight="44"
+                            FontSize="14"
+                            VerticalContentAlignment="Center"
+                            IsEnabled="{Binding IsNotLoading}" />
+                    </StackPanel>
+
+                    <Button
+                        Classes="btn-primary login-submit"
+                        Content="{Binding LoginButtonText}"
+                        Command="{Binding LoginCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        IsEnabled="{Binding IsNotLoading}" />
+
+                    <Border
+                        Classes="login-error"
+                        IsVisible="{Binding HasError}">
+                        <TextBlock
+                            Classes="login-error-text"
+                            Text="{Binding ErrorMessage}"
+                            TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

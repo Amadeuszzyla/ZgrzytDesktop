@@ -12,13 +12,13 @@
 
                 <StackPanel Grid.Row="0" Spacing="4">
                     <TextBlock
-                        Text="ZGRZYT"
+                        Text="{Binding LblAppBrandName}"
                         FontSize="28"
                         FontWeight="Bold"
                         Foreground="{DynamicResource SidebarPrimaryTextBrush}" />
 
                     <TextBlock
-                        Text="Desktop"
+                        Text="{Binding LblAppBrandSuffix}"
                         FontSize="14"
                         Foreground="{DynamicResource SidebarMutedTextBrush}" />
                 </StackPanel>

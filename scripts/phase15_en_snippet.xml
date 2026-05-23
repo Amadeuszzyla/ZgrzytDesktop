@@ -1,0 +1,97 @@
+  <data name="App_BrandName" xml:space="preserve"><value>ZGRZYT</value></data>
+  <data name="App_BrandSuffix" xml:space="preserve"><value>Desktop</value></data>
+  <data name="Login_AppTitle" xml:space="preserve"><value>ZGRZYT Desktop</value></data>
+  <data name="Login_AppSubtitle" xml:space="preserve"><value>Sign in</value></data>
+  <data name="Login_Title" xml:space="preserve"><value>Welcome back</value></data>
+  <data name="Login_LabelLogin" xml:space="preserve"><value>Login</value></data>
+  <data name="Login_LabelPassword" xml:space="preserve"><value>Password</value></data>
+  <data name="Login_PlaceholderLogin" xml:space="preserve"><value>Enter login</value></data>
+  <data name="Login_PlaceholderPassword" xml:space="preserve"><value>Enter password</value></data>
+  <data name="Login_Button" xml:space="preserve"><value>Sign in</value></data>
+  <data name="Login_ButtonLoading" xml:space="preserve"><value>Signing in...</value></data>
+  <data name="Grid_Id" xml:space="preserve"><value>ID</value></data>
+  <data name="Grid_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Grid_Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Grid_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Grid_Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="Grid_CreatedAt" xml:space="preserve"><value>Created</value></data>
+  <data name="Grid_Login" xml:space="preserve"><value>Login</value></data>
+  <data name="Grid_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Grid_Role" xml:space="preserve"><value>Role</value></data>
+  <data name="Grid_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Grid_Ban" xml:space="preserve"><value>Banned</value></data>
+  <data name="Tickets_PageSizeLabel" xml:space="preserve"><value>Per page:</value></data>
+  <data name="Tickets_PageFirst" xml:space="preserve"><value>First</value></data>
+  <data name="Tickets_PagePrevious" xml:space="preserve"><value>Previous</value></data>
+  <data name="Tickets_PageLabel" xml:space="preserve"><value>Page:</value></data>
+  <data name="Tickets_PageNext" xml:space="preserve"><value>Next</value></data>
+  <data name="Tickets_PageLast" xml:space="preserve"><value>Last</value></data>
+  <data name="Tickets_NewSubtitle" xml:space="preserve"><value>Fill in the fields and create a ticket in the system.</value></data>
+  <data name="Tickets_FieldCategory" xml:space="preserve"><value>Category</value></data>
+  <data name="Tickets_FieldPriority" xml:space="preserve"><value>Priority</value></data>
+  <data name="Tickets_FieldTitle" xml:space="preserve"><value>Title</value></data>
+  <data name="Tickets_FieldDescription" xml:space="preserve"><value>Description</value></data>
+  <data name="Tickets_NewTitlePlaceholder" xml:space="preserve"><value>Ticket title</value></data>
+  <data name="Tickets_NewDescriptionPlaceholder" xml:space="preserve"><value>Problem description</value></data>
+  <data name="Tickets_CreateButton" xml:space="preserve"><value>Create ticket</value></data>
+  <data name="Tickets_EmptyList" xml:space="preserve"><value>No tickets</value></data>
+  <data name="Details_BackToList" xml:space="preserve"><value>← Back to list</value></data>
+  <data name="Details_InfoTitle" xml:space="preserve"><value>Ticket information</value></data>
+  <data name="Details_Processing" xml:space="preserve"><value>Processing...</value></data>
+  <data name="Details_Reporter" xml:space="preserve"><value>Reporter</value></data>
+  <data name="Details_AssignedIt" xml:space="preserve"><value>Assigned IT</value></data>
+  <data name="Details_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Details_CloseOwnHint" xml:space="preserve"><value>You may close your own ticket if the backend allows it. On HTTP 403 the operation is blocked by the API.</value></data>
+  <data name="Details_StaffHint" xml:space="preserve"><value>You can view the ticket and messages. Status, priority and assignment editing is available for admin/it roles.</value></data>
+  <data name="Details_OfflineHint" xml:space="preserve"><value>Offline mode — editing, assignment and messages are unavailable.</value></data>
+  <data name="Details_ManageTitle" xml:space="preserve"><value>Ticket management</value></data>
+  <data name="Details_SaveChanges" xml:space="preserve"><value>Save changes</value></data>
+  <data name="Details_AssignToMe" xml:space="preserve"><value>Assign to me</value></data>
+  <data name="Details_CloseTicket" xml:space="preserve"><value>Close ticket</value></data>
+  <data name="Details_DeleteTicket" xml:space="preserve"><value>Delete ticket</value></data>
+  <data name="Details_LocalAuditTitle" xml:space="preserve"><value>Local change history</value></data>
+  <data name="Details_LocalAuditSubtitle" xml:space="preserve"><value>Actions performed in this application.</value></data>
+  <data name="Details_LocalAuditEmpty" xml:space="preserve"><value>No local entries for this ticket.</value></data>
+  <data name="Details_MessagesTitle" xml:space="preserve"><value>Messages</value></data>
+  <data name="Details_MessagesSubtitle" xml:space="preserve"><value>Conversation within this ticket.</value></data>
+  <data name="Details_MessagePlaceholder" xml:space="preserve"><value>Type a message...</value></data>
+  <data name="Details_Send" xml:space="preserve"><value>Send</value></data>
+  <data name="Details_NoMessages" xml:space="preserve"><value>No messages in this ticket.</value></data>
+  <data name="Details_AssignedHint" xml:space="preserve"><value>Assigned to:</value></data>
+  <data name="Details_NotAssignedHint" xml:space="preserve"><value>No one is assigned to this task</value></data>
+  <data name="RequestAccount_Title" xml:space="preserve"><value>Request new account</value></data>
+  <data name="RequestAccount_Subtitle" xml:space="preserve"><value>Fill in the new user details. The request will be sent to an administrator.</value></data>
+  <data name="RequestAccount_FullName" xml:space="preserve"><value>Full name</value></data>
+  <data name="RequestAccount_Login" xml:space="preserve"><value>Login</value></data>
+  <data name="RequestAccount_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="RequestAccount_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="RequestAccount_PasswordConfirm" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="RequestAccount_PlaceholderName" xml:space="preserve"><value>e.g. John Smith</value></data>
+  <data name="RequestAccount_PlaceholderLogin" xml:space="preserve"><value>e.g. j.smith</value></data>
+  <data name="RequestAccount_PlaceholderEmail" xml:space="preserve"><value>e.g. john.smith@company.com</value></data>
+  <data name="RequestAccount_PlaceholderPassword" xml:space="preserve"><value>Password</value></data>
+  <data name="RequestAccount_PlaceholderPasswordConfirm" xml:space="preserve"><value>Repeat password</value></data>
+  <data name="RequestAccount_Submit" xml:space="preserve"><value>Submit request</value></data>
+  <data name="Admin_RegisterTitle" xml:space="preserve"><value>User registration</value></data>
+  <data name="Admin_RegisterSubtitle" xml:space="preserve"><value>Create a new account request in the system (POST /api/request-account).</value></data>
+  <data name="Admin_StatusInactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="Stats_LoadingAllPages" xml:space="preserve"><value>Aggregating multiple list pages...</value></data>
+  <data name="Stats_ChartByStatus" xml:space="preserve"><value>By status</value></data>
+  <data name="Stats_ChartByPriority" xml:space="preserve"><value>By priority</value></data>
+  <data name="Stats_ChartAssignment" xml:space="preserve"><value>Assignment</value></data>
+  <data name="Stats_Assigned" xml:space="preserve"><value>Assigned</value></data>
+  <data name="Stats_Unassigned" xml:space="preserve"><value>Unassigned</value></data>
+  <data name="Stats_PriorityLow" xml:space="preserve"><value>Low</value></data>
+  <data name="Stats_PriorityMedium" xml:space="preserve"><value>Medium</value></data>
+  <data name="Stats_PriorityHigh" xml:space="preserve"><value>High</value></data>
+  <data name="Audit_Title" xml:space="preserve"><value>Local application audit</value></data>
+  <data name="Audit_Subtitle" xml:space="preserve"><value>Actions performed locally in the desktop application.</value></data>
+  <data name="Audit_Refresh" xml:space="preserve"><value>Refresh audit</value></data>
+  <data name="Audit_Clear" xml:space="preserve"><value>Clear audit</value></data>
+  <data name="Audit_Empty" xml:space="preserve"><value>No local audit entries.</value></data>
+  <data name="Audit_ColumnTimestamp" xml:space="preserve"><value>Date and time</value></data>
+  <data name="Audit_ColumnUser" xml:space="preserve"><value>User</value></data>
+  <data name="Audit_ColumnAction" xml:space="preserve"><value>Action</value></data>
+  <data name="Audit_ColumnTicketId" xml:space="preserve"><value>Ticket ID</value></data>
+  <data name="Audit_ColumnDescription" xml:space="preserve"><value>Description</value></data>
+  <data name="Toast_AuditCleared" xml:space="preserve"><value>Local audit log has been cleared.</value></data>

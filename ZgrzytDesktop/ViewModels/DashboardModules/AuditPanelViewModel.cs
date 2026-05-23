@@ -3,8 +3,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
-using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.ViewModels.DashboardModules;
@@ -12,15 +12,11 @@ namespace ZgrzytDesktop.ViewModels.DashboardModules;
 public sealed class AuditPanelViewModel : ViewModelBase
 {
     private readonly ILocalAuditLogService _auditLogService;
-    private readonly Action<string, string> _showToast;
 
-    public AuditPanelViewModel(ILocalAuditLogService auditLogService, Action<string, string> showToast)
+    public AuditPanelViewModel(ILocalAuditLogService auditLogService)
     {
         _auditLogService = auditLogService;
-        _showToast = showToast;
-
         LoadAuditLogsCommand = new AsyncRelayCommand(RefreshAsync);
-        ClearAuditLogsCommand = new AsyncRelayCommand(ClearAsync);
     }
 
     public ObservableCollection<AuditLogEntry> AuditLogEntries { get; } = new();
@@ -29,7 +25,37 @@ public sealed class AuditPanelViewModel : ViewModelBase
 
     public IAsyncRelayCommand LoadAuditLogsCommand { get; }
 
-    public IAsyncRelayCommand ClearAuditLogsCommand { get; }
+    public string LblAuditTitle => AppStrings.Get("Audit_Title");
+
+    public string LblAuditSubtitle => AppStrings.Get("Audit_Subtitle");
+
+    public string LblAuditRefresh => AppStrings.Get("Audit_Refresh");
+
+    public string LblAuditEmpty => AppStrings.Get("Audit_Empty");
+
+    public string LblAuditColumnTimestamp => AppStrings.Get("Audit_ColumnTimestamp");
+
+    public string LblAuditColumnUser => AppStrings.Get("Audit_ColumnUser");
+
+    public string LblAuditColumnAction => AppStrings.Get("Audit_ColumnAction");
+
+    public string LblAuditColumnTicketId => AppStrings.Get("Audit_ColumnTicketId");
+
+    public string LblAuditColumnDescription => AppStrings.Get("Audit_ColumnDescription");
+
+    public void NotifyLocalization()
+    {
+        OnPropertyChanged(nameof(LblAuditTitle));
+        OnPropertyChanged(nameof(LblAuditSubtitle));
+        OnPropertyChanged(nameof(LblAuditRefresh));
+        OnPropertyChanged(nameof(LblAuditEmpty));
+        OnPropertyChanged(nameof(LblAuditColumnTimestamp));
+        OnPropertyChanged(nameof(LblAuditColumnUser));
+        OnPropertyChanged(nameof(LblAuditColumnAction));
+        OnPropertyChanged(nameof(LblAuditColumnTicketId));
+        OnPropertyChanged(nameof(LblAuditColumnDescription));
+        RefreshEntryDisplayBindings();
+    }
 
     public async Task RefreshAsync()
     {
@@ -43,10 +69,15 @@ public sealed class AuditPanelViewModel : ViewModelBase
         OnPropertyChanged(nameof(HasNoAuditLogEntries));
     }
 
-    private async Task ClearAsync()
+    private void RefreshEntryDisplayBindings()
     {
-        await _auditLogService.ClearAsync();
-        await RefreshAsync();
-        _showToast("Lokalny audyt został wyczyszczony.", ToastTypes.Info);
+        if (AuditLogEntries.Count == 0)
+            return;
+
+        var snapshot = AuditLogEntries.ToList();
+        AuditLogEntries.Clear();
+
+        foreach (var entry in snapshot)
+            AuditLogEntries.Add(entry);
     }
 }

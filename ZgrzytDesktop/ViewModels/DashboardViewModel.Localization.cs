@@ -60,12 +60,12 @@ public partial class DashboardViewModel
         OnPropertyChanged(nameof(LblAdminTabUsers));
         OnPropertyChanged(nameof(LblAdminTabNewAccount));
         SettingsPanel.NotifyLocalization();
+        AuditPanel.NotifyLocalization();
         StatisticsPanel.NotifyLocalization();
-        OnPropertyChanged(nameof(TicketSortFields));
-        OnPropertyChanged(nameof(TicketSortDirections));
-        OnPropertyChanged(nameof(AdminUserListFilterOptions));
-        OnPropertyChanged(nameof(SelectedTicketSortField));
-        OnPropertyChanged(nameof(SelectedTicketSortDirection));
-        OnPropertyChanged(nameof(SelectedAdminUserListFilterOption));
+        TicketsPanel.NotifyLocalization();
+        TicketDetailsPanel.NotifyLocalization();
+        AdminPanel.NotifyLocalization();
+        RefreshAvailableStatusAndPriorityOptions();
+        NotifyUiLabels();
     }
 }

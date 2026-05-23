@@ -6,6 +6,10 @@ using ZgrzytDesktop.Tests.Infrastructure;
 
 namespace ZgrzytDesktop.Tests.Integration;
 
+/// <summary>
+/// Live API contract tests. Require ZGRZYT_API_URL, ZGRZYT_LOGIN, ZGRZYT_PASSWORD — otherwise skipped.
+/// Read-only against production data; logout test uses an isolated session only.
+/// </summary>
 public class LiveApiIntegrationTests : IClassFixture<IntegrationApiTestHost>
 {
     private readonly IntegrationApiTestHost _host;
@@ -45,10 +49,7 @@ public class LiveApiIntegrationTests : IClassFixture<IntegrationApiTestHost>
 
         var response = await _host.Tickets!.GetTicketsAsync(page: 1, perPage: 10);
 
-        Assert.NotNull(response);
-        Assert.NotNull(response!.Data);
-        Assert.True(response.Total >= 0);
-        Assert.True(response.LastPage >= 1);
+        LiveApiTestHelpers.AssertPaginatedTickets(response);
     }
 
     [SkippableFact]
@@ -56,15 +57,19 @@ public class LiveApiIntegrationTests : IClassFixture<IntegrationApiTestHost>
     public async Task GetUsers_AsStaffRole_ReturnsUserList()
     {
         Skip.IfNot(_host.IsConfigured, IntegrationTestEnvironment.SkipReason);
-        Skip.IfNot(
-            _host.IsStaffRole,
-            "ZGRZYT_LOGIN must be an admin or it account to call GET /api/users.");
+        Skip.IfNot(_host.IsStaffRole, LiveApiTestHelpers.StaffRoleSkipReason);
 
         var result = await _host.UserAdmin!.GetUsersAsync();
 
         Assert.NotNull(result.Users);
     }
 
+    /// <summary>
+    /// Verifies Bearer invalidation after POST /api/logout.
+    /// Known backend: GET /api/user with a revoked token may return 500 instead of 401 on Render/Sanctum;
+    /// POST /api/logout usually succeeds — the 500 appears on the follow-up authenticated request.
+    /// Security requirement: stale token must not return 200 OK with a user profile.
+    /// </summary>
     [SkippableFact]
     [Trait("Category", "Integration")]
     public async Task PostLogout_InvalidatesBearerSession()
@@ -76,25 +81,31 @@ public class LiveApiIntegrationTests : IClassFixture<IntegrationApiTestHost>
         try
         {
             Assert.NotNull(isolated.User);
-            Assert.False(string.IsNullOrWhiteSpace(isolated.User!.Login));
+
+            var profileBeforeLogout = await isolated.Auth!.GetCurrentUserAsync();
+            Assert.NotNull(profileBeforeLogout);
 
             var staleToken = await isolated.GetStoredAccessTokenAsync();
             Assert.False(string.IsNullOrWhiteSpace(staleToken));
 
+            ApiException? logoutPostEx = null;
+
             try
             {
-                await isolated.Auth!.LogoutAsync();
+                await isolated.Auth.LogoutAsync();
             }
-            catch (ApiException logoutEx)
+            catch (ApiException ex)
             {
-                Assert.DoesNotContain("<html", logoutEx.Message, StringComparison.OrdinalIgnoreCase);
-                Assert.DoesNotContain("Laravel", logoutEx.Message, StringComparison.OrdinalIgnoreCase);
+                logoutPostEx = ex;
             }
 
+            LiveApiTestHelpers.AssertLogoutPostDoesNotLeakHtml(logoutPostEx);
+
+            // LogoutAsync clears the in-memory token; restore the pre-logout token to probe invalidation.
             isolated.Api!.SetToken(staleToken);
 
             User? profileAfterLogout = null;
-            ApiException? userRequestEx = null;
+            ApiException? staleUserRequestEx = null;
 
             try
             {
@@ -102,20 +113,20 @@ public class LiveApiIntegrationTests : IClassFixture<IntegrationApiTestHost>
             }
             catch (ApiException ex)
             {
-                userRequestEx = ex;
+                staleUserRequestEx = ex;
             }
 
             if (profileAfterLogout is not null)
             {
                 Assert.Fail(
-                    "GET /api/user with the pre-logout Bearer token must not return 200 OK after POST /api/logout.");
+                    "GET /api/user with the pre-logout Bearer token returned 200 OK after POST /api/logout. " +
+                    "The token must be invalidated (expected 401/403 or known backend 500, not a live session).");
             }
 
-            Assert.NotNull(userRequestEx);
-
-            // Real backend may return 500 instead of 401 after Sanctum token invalidation;
-            // this is treated as backend inconsistency, not desktop failure.
-            AssertStaleTokenRejectedAfterLogout(userRequestEx);
+            Assert.NotNull(staleUserRequestEx);
+            LiveApiTestHelpers.AssertStaleTokenDoesNotAuthenticate(
+                staleUserRequestEx,
+                "GET /api/user after POST /api/logout");
         }
         finally
         {
@@ -123,18 +134,72 @@ public class LiveApiIntegrationTests : IClassFixture<IntegrationApiTestHost>
         }
     }
 
-    private static void AssertStaleTokenRejectedAfterLogout(ApiException ex)
+    [SkippableFact]
+    [Trait("Category", "Integration")]
+    public async Task GetActiveTickets_AsStaffRole_ReturnsPaginatedList()
     {
-        Assert.DoesNotContain("<html", ex.Message, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("Laravel", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Skip.IfNot(_host.IsConfigured, IntegrationTestEnvironment.SkipReason);
+        Skip.IfNot(_host.IsStaffRole, LiveApiTestHelpers.StaffRoleSkipReason);
 
-        if (ex.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden
-            or HttpStatusCode.InternalServerError)
-        {
-            return;
-        }
+        var status = await _host.GetEndpointStatusAsync("active-tickets?page=1&per_page=10");
+        LiveApiTestHelpers.AssertStaffListStatus(status, "active-tickets", allowNotFoundFallback: false);
 
-        Assert.Fail(
-            $"Unexpected status for GET /api/user with stale token after logout: {(int)ex.StatusCode} {ex.StatusCode}.");
+        var response = await _host.Tickets!.GetActiveTicketsAsync(page: 1, perPage: 10);
+        LiveApiTestHelpers.AssertPaginatedTickets(response);
+    }
+
+    [SkippableFact]
+    [Trait("Category", "Integration")]
+    public async Task GetUnassignedTickets_AsStaffRole_ReturnsPaginatedList()
+    {
+        Skip.IfNot(_host.IsConfigured, IntegrationTestEnvironment.SkipReason);
+        Skip.IfNot(_host.IsStaffRole, LiveApiTestHelpers.StaffRoleSkipReason);
+
+        var status = await _host.GetEndpointStatusAsync("unassigned-tickets?page=1&per_page=10");
+        LiveApiTestHelpers.AssertStaffListStatus(status, "unassigned-tickets", allowNotFoundFallback: false);
+
+        var response = await _host.Tickets!.GetUnassignedTicketsAsync(page: 1, perPage: 10);
+        LiveApiTestHelpers.AssertPaginatedTickets(response);
+    }
+
+    [SkippableFact]
+    [Trait("Category", "Integration")]
+    public async Task GetStaffUserListEndpoints_ReturnsOkOrDocumentsNotFound()
+    {
+        Skip.IfNot(_host.IsConfigured, IntegrationTestEnvironment.SkipReason);
+        Skip.IfNot(_host.IsStaffRole, LiveApiTestHelpers.StaffRoleSkipReason);
+
+        LiveApiTestHelpers.AssertStaffListStatus(
+            await _host.GetEndpointStatusAsync("users"),
+            "users",
+            allowNotFoundFallback: false);
+
+        LiveApiTestHelpers.AssertStaffListStatus(
+            await _host.GetEndpointStatusAsync("active-users"),
+            "active-users",
+            allowNotFoundFallback: true);
+
+        LiveApiTestHelpers.AssertStaffListStatus(
+            await _host.GetEndpointStatusAsync("inactive-users"),
+            "inactive-users",
+            allowNotFoundFallback: true);
+
+        var bannedStatus = await _host.GetEndpointStatusAsync("banned-users");
+        LiveApiTestHelpers.AssertStaffListStatus(
+            bannedStatus,
+            "banned-users",
+            allowNotFoundFallback: true);
+
+        var allUsers = await _host.UserAdmin!.GetUsersAsync();
+        Assert.NotNull(allUsers.Users);
+
+        var activeUsers = await _host.UserAdmin.GetActiveUsersAsync();
+        Assert.NotNull(activeUsers.Users);
+
+        var inactiveUsers = await _host.UserAdmin.GetInactiveUsersAsync();
+        Assert.NotNull(inactiveUsers.Users);
+
+        var bannedUsers = await _host.UserAdmin.GetBannedUsersAsync();
+        Assert.NotNull(bannedUsers.Users);
     }
 }

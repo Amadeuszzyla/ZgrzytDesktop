@@ -2,179 +2,322 @@
     x:Class="ZgrzytDesktop.Views.DashboardParts.TicketDetailsPanelView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:CompileBindings="False">
-<Grid
-                ColumnDefinitions="1.2*,*"
-                ColumnSpacing="20"
-                Margin="{DynamicResource AppPagePadding}">
+    xmlns:conv="clr-namespace:ZgrzytDesktop.Converters"
+    xmlns:parts="clr-namespace:ZgrzytDesktop.Views.DashboardParts"
+    xmlns:vm="using:ZgrzytDesktop.ViewModels"
+    x:CompileBindings="False"
+    x:DataType="vm:DashboardViewModel">
 
-                <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="16" MinWidth="560">
+    <UserControl.Resources>
+        <conv:ObjectIsNotNullConverter x:Key="ObjectIsNotNullConverter" />
+    </UserControl.Resources>
 
-                        <Border Classes="app-card">
-                            <StackPanel Spacing="14">
-                                <TextBlock Classes="section-title-large" Text="Informacje o zgłoszeniu" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Classes="page-content">
+            <Button
+                Classes="details-back-link"
+                Content="{Binding LblDetailsBackToList}"
+                Command="{Binding ShowTicketsPageCommand}"
+                HorizontalAlignment="Left"
+                Margin="0,0,0,4" />
 
-                                <Border Classes="app-subtle-panel">
-                                    <TextBlock Text="{Binding DetailsStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
-                                </Border>
+            <Border Classes="app-card details-main-card">
+                <DockPanel LastChildFill="True">
+                    <Border
+                        DockPanel.Dock="Right"
+                        Classes="details-actions-panel"
+                        Width="280"
+                        Margin="24,0,0,0"
+                        IsVisible="{Binding CanManageTickets}">
+                        <StackPanel Spacing="12">
+                            <TextBlock Classes="section-title" Text="{Binding LblDetailsManageTitle}" />
 
-                                <TextBlock Text="Przetwarzanie..." IsVisible="{Binding IsLoadingDetails}" FontStyle="Italic" Foreground="{DynamicResource AppMutedTextBrush}" />
-
-                                <TextBlock Classes="ticket-title" Text="{Binding TicketDetails.Title}" />
-
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Border Classes="app-chip">
-                                        <TextBlock Classes="app-chip-text" Text="{Binding TicketDetails.DisplayStatus}" />
-                                    </Border>
-                                    <Border Classes="app-chip-warning">
-                                        <TextBlock Classes="app-chip-text-warning" Text="{Binding TicketDetails.Priority}" />
-                                    </Border>
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="8">
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-label" Text="Zgłaszający" Margin="0" />
-                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TicketDetails.User.Name}" Foreground="{DynamicResource AppPrimaryTextBrush}" />
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Classes="field-label" Text="Przypisany IT" Margin="0" />
-                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TicketDetails.AssignedTo.Name}" Foreground="{DynamicResource AppPrimaryTextBrush}" />
-                                </Grid>
-
-                                <StackPanel Spacing="6">
-                                    <TextBlock Classes="field-label" Text="Opis" Margin="0" />
-                                    <Border Classes="app-subtle-panel">
-                                        <TextBlock Text="{Binding TicketDetails.Description}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
-                                    </Border>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Background="{DynamicResource AppInfoPanelBackgroundBrush}" CornerRadius="10" Padding="12" IsVisible="{Binding IsRegularUser}">
                             <StackPanel Spacing="6">
-                                <TextBlock Text="Możesz zamknąć własne zgłoszenie, jeśli backend na to pozwala. Przy błędzie 403 operacja jest zablokowana po stronie API." TextWrapping="Wrap" Foreground="{DynamicResource AppInfoPanelForegroundBrush}" FontSize="12" IsVisible="{Binding CanCloseOwnTicket}" />
-                                <TextBlock Text="Masz dostęp do podglądu zgłoszenia i wiadomości. Edycja statusu, priorytetu oraz przypisywanie są dostępne dla ról admin/it." TextWrapping="Wrap" Foreground="{DynamicResource AppInfoPanelForegroundBrush}" FontSize="12" />
+                                <TextBlock Classes="field-label" Text="{Binding LblGridStatus}" Margin="0" />
+                                <ComboBox
+                                    MinHeight="38"
+                                    ItemsSource="{Binding AvailableStatuses}"
+                                    SelectedItem="{Binding TicketDetailsPanel.SelectedStatus}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanEditTicket}"
+                                    HorizontalAlignment="Stretch" />
                             </StackPanel>
-                        </Border>
 
-                        <Border Background="{DynamicResource AppWarnPanelBackgroundBrush}" CornerRadius="10" Padding="12" IsVisible="{Binding IsOffline}">
-                            <TextBlock Text="Tryb offline — edycja, przypisywanie i wiadomości są niedostępne." TextWrapping="Wrap" Foreground="{DynamicResource AppWarnPanelForegroundBrush}" />
-                        </Border>
-
-                        <Border Classes="app-card" IsVisible="{Binding CanManageTickets}">
-                            <StackPanel Spacing="14">
-                                <TextBlock Classes="section-title-large" Text="Zarządzanie zgłoszeniem" />
-
-                                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                                    <StackPanel Grid.Column="0" Spacing="6">
-                                        <TextBlock Classes="field-label" Text="Status" Margin="0" />
-                                        <ComboBox MinHeight="38" ItemsSource="{Binding AvailableStatuses}" SelectedItem="{Binding SelectedStatus}" IsEnabled="{Binding CanEditTicket}" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="1" Spacing="6">
-                                        <TextBlock Classes="field-label" Text="Priorytet" Margin="0" />
-                                        <ComboBox MinHeight="38" ItemsSource="{Binding AvailablePriorities}" SelectedItem="{Binding SelectedPriority}" IsEnabled="{Binding CanEditTicket}" />
-                                    </StackPanel>
-                                </Grid>
-
-                                <UniformGrid Columns="2" Rows="2" Margin="0,4,0,0">
-                                    <Button Classes="btn-primary" Content="Zapisz zmiany" Command="{Binding UpdateTicketCommand}" IsEnabled="{Binding CanEditTicket}" Margin="0,0,6,6" HorizontalAlignment="Stretch" />
-                                    <Button Classes="btn-secondary" Content="Przypisz do mnie" Command="{Binding AssignToMeCommand}" IsEnabled="{Binding CanAssignTicket}" Margin="6,0,0,6" HorizontalAlignment="Stretch" />
-                                    <Button Classes="btn-warning" Content="Zamknij zgłoszenie" Command="{Binding CloseTicketCommand}" IsEnabled="{Binding CanCloseTicket}" Margin="0,0,6,0" HorizontalAlignment="Stretch" />
-                                    <Button Classes="btn-danger" Content="Usuń zgłoszenie" Command="{Binding DeleteTicketCommand}" IsEnabled="{Binding CanDeleteTicket}" Margin="6,0,0,0" HorizontalAlignment="Stretch" />
-                                </UniformGrid>
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="field-label" Text="{Binding LblGridPriority}" Margin="0" />
+                                <ComboBox
+                                    MinHeight="38"
+                                    ItemsSource="{Binding AvailablePriorities}"
+                                    SelectedItem="{Binding TicketDetailsPanel.SelectedPriority}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanEditTicket}"
+                                    HorizontalAlignment="Stretch" />
                             </StackPanel>
-                        </Border>
 
-                        <Border Classes="app-card">
-                            <StackPanel Spacing="10">
-                                <TextBlock Classes="section-title-large" Text="Historia lokalnych zmian" />
-                                <TextBlock Classes="section-subtitle" Text="Historia działań wykonanych w tej aplikacji." />
-
-                                <Border MaxHeight="220" Classes="app-subtle-panel" Padding="8">
-                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                        <ItemsControl ItemsSource="{Binding TicketAuditLogEntries}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Border Classes="message-bubble" Margin="0,0,0,8">
-                                                        <StackPanel Spacing="4">
-                                                            <TextBlock Text="{Binding Action}" FontWeight="SemiBold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
-                                                            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
-                                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                                <TextBlock Text="{Binding UserLogin}" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
-                                                                <TextBlock Text="·" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
-                                                                <TextBlock Text="{Binding Timestamp}" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
-                                                            </StackPanel>
-                                                        </StackPanel>
-                                                    </Border>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                </Border>
-
-                                <TextBlock Classes="empty-state" Text="Brak lokalnych wpisów dla tego zgłoszenia." IsVisible="{Binding HasNoTicketAuditLogEntries}" />
+                            <StackPanel Spacing="8" Margin="0,4,0,0">
+                                <Button
+                                    Classes="btn-primary"
+                                    Content="{Binding LblDetailsSaveChanges}"
+                                    Command="{Binding TicketDetailsPanel.UpdateTicketCommand}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanEditTicket}"
+                                    HorizontalAlignment="Stretch"
+                                    MinHeight="40" />
+                                <Button
+                                    Classes="btn-secondary"
+                                    Content="{Binding LblDetailsAssignToMe}"
+                                    Command="{Binding TicketDetailsPanel.AssignToMeCommand}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanAssignTicket}"
+                                    HorizontalAlignment="Stretch"
+                                    MinHeight="40" />
+                                <Button
+                                    Classes="btn-warning"
+                                    Content="{Binding LblDetailsCloseTicket}"
+                                    Command="{Binding TicketDetailsPanel.CloseTicketCommand}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanCloseTicket}"
+                                    HorizontalAlignment="Stretch"
+                                    MinHeight="40" />
+                                <Button
+                                    Classes="btn-danger"
+                                    Content="{Binding LblDetailsDeleteTicket}"
+                                    Command="{Binding TicketDetailsPanel.DeleteTicketCommand}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanDeleteTicket}"
+                                    HorizontalAlignment="Stretch"
+                                    MinHeight="40" />
                             </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
+                        </StackPanel>
+                    </Border>
 
-                <Border Grid.Column="1" Classes="app-card" MinHeight="480" MaxWidth="720" HorizontalAlignment="Stretch" Padding="0">
-                    <DockPanel LastChildFill="True">
-                        <StackPanel DockPanel.Dock="Top" Margin="18,18,18,12" Spacing="4">
-                            <TextBlock Classes="section-title-large" Text="Wiadomości" />
-                            <TextBlock Classes="section-subtitle" Text="Korespondencja w ramach zgłoszenia." />
+                    <StackPanel Spacing="14">
+                        <TextBlock Classes="section-title-large" Text="{Binding LblDetailsInfoTitle}" />
+
+                        <TextBlock
+                            Text="{Binding LblDetailsProcessing}"
+                            IsVisible="{Binding TicketDetailsPanel.IsLoadingDetails}"
+                            FontStyle="Italic"
+                            Foreground="{DynamicResource AppMutedTextBrush}" />
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <TextBlock
+                                Grid.Column="0"
+                                Classes="ticket-title"
+                                Text="{Binding TicketDetailsPanel.TicketDetails.Title}"
+                                VerticalAlignment="Center" />
+                            <StackPanel
+                                Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="6"
+                                VerticalAlignment="Top">
+                                <parts:TicketPriorityBadgeView Priority="{Binding TicketDetailsPanel.TicketDetails.DisplayPriority}" />
+                                <parts:TicketStatusBadgeView DisplayStatus="{Binding TicketDetailsPanel.TicketDetails.DisplayStatus}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Classes="field-label"
+                                Text="{Binding LblDetailsReporter}"
+                                Margin="0" />
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Text="{Binding TicketDetailsPanel.TicketDetails.User.Name}"
+                                Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Classes="field-label"
+                                Text="{Binding LblDetailsAssignedIt}"
+                                Margin="0" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Text="{Binding TicketDetailsPanel.TicketDetails.AssignedTo.Name}"
+                                Foreground="{DynamicResource AppPrimaryTextBrush}"
+                                IsVisible="{Binding TicketDetailsPanel.TicketDetails.AssignedTo, Converter={StaticResource ObjectIsNotNullConverter}}" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Foreground="{DynamicResource AppMutedTextBrush}"
+                                FontStyle="Italic"
+                                Text="—"
+                                IsVisible="{Binding TicketDetailsPanel.TicketDetails.AssignedTo, Converter={StaticResource ObjectIsNotNullConverter}, ConverterParameter=invert}" />
+                        </Grid>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Classes="field-label" Text="{Binding LblDetailsDescription}" Margin="0" />
+                            <Border Classes="app-subtle-panel">
+                                <TextBlock
+                                    Text="{Binding TicketDetailsPanel.TicketDetails.Description}"
+                                    TextWrapping="Wrap"
+                                    Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                            </Border>
                         </StackPanel>
 
                         <Border
-                            DockPanel.Dock="Bottom"
-                            BorderBrush="{DynamicResource AppCardBorderBrush}"
-                            BorderThickness="0,1,0,0"
-                            Padding="18,14">
+                            Background="{DynamicResource AppInfoPanelBackgroundBrush}"
+                            CornerRadius="10"
+                            Padding="12"
+                            IsVisible="{Binding IsRegularUser}">
+                            <StackPanel Spacing="6">
+                                <TextBlock
+                                    Text="{Binding LblDetailsCloseOwnHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="{DynamicResource AppInfoPanelForegroundBrush}"
+                                    FontSize="12"
+                                    IsVisible="{Binding TicketDetailsPanel.CanCloseOwnTicket}" />
+                                <TextBlock
+                                    Text="{Binding LblDetailsStaffHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="{DynamicResource AppInfoPanelForegroundBrush}"
+                                    FontSize="12" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border
+                            Background="{DynamicResource AppWarnPanelBackgroundBrush}"
+                            CornerRadius="10"
+                            Padding="12"
+                            IsVisible="{Binding IsOffline}">
+                            <TextBlock
+                                Text="{Binding LblDetailsOfflineHint}"
+                                TextWrapping="Wrap"
+                                Foreground="{DynamicResource AppWarnPanelForegroundBrush}" />
+                        </Border>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <Border Classes="app-card details-messages-card" Padding="0">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Top" Margin="18,18,18,12" Spacing="4">
+                        <TextBlock Classes="section-title-large" Text="{Binding LblDetailsMessagesTitle}" />
+                        <TextBlock Classes="section-subtitle" Text="{Binding LblDetailsMessagesSubtitle}" />
+                    </StackPanel>
+
+                    <Border
+                        DockPanel.Dock="Bottom"
+                        BorderBrush="{DynamicResource AppCardBorderBrush}"
+                        BorderThickness="0,1,0,0"
+                        Padding="18,14">
+                        <StackPanel Spacing="10">
+                            <TextBlock
+                                Text="{Binding TicketDetailsPanel.DetailsStatusMessage}"
+                                TextWrapping="Wrap"
+                                Foreground="{DynamicResource AppSecondaryTextBrush}"
+                                FontSize="12" />
 
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <TextBox
                                     Grid.Column="0"
-                                    Text="{Binding NewMessageText}"
+                                    Text="{Binding TicketDetailsPanel.NewMessageText}"
                                     AcceptsReturn="True"
                                     TextWrapping="Wrap"
                                     MinHeight="80"
-                                    PlaceholderText="Wpisz wiadomość..."
-                                    IsEnabled="{Binding CanSendMessage}" />
-
+                                    MaxWidth="720"
+                                    HorizontalAlignment="Stretch"
+                                    PlaceholderText="{Binding LblDetailsMessagePlaceholder}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanSendMessage}" />
                                 <Button
                                     Grid.Column="1"
                                     Classes="btn-primary"
-                                    Content="Wyślij"
-                                    Command="{Binding SendMessageCommand}"
-                                    IsEnabled="{Binding CanSendMessage}"
+                                    Content="{Binding LblDetailsSend}"
+                                    Command="{Binding TicketDetailsPanel.SendMessageCommand}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanSendMessage}"
                                     VerticalAlignment="Bottom"
-                                    MinWidth="100" />
+                                    MinWidth="100"
+                                    MinHeight="40" />
                             </Grid>
-                        </Border>
+                        </StackPanel>
+                    </Border>
 
-                        <Panel Margin="18,0,18,12">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{Binding Messages}">
+                    <Panel Margin="18,0,18,12" MinHeight="220">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Classes="details-messages-list" MaxWidth="720" HorizontalAlignment="Left">
+                                <ItemsControl ItemsSource="{Binding TicketDetailsPanel.Messages}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Classes="message-bubble" Margin="0,0,0,10">
+                                            <Border Classes="message-bubble">
                                                 <StackPanel Spacing="6">
                                                     <Grid ColumnDefinitions="*,Auto">
-                                                        <TextBlock Text="{Binding Sender.Name}" FontWeight="SemiBold" Foreground="{DynamicResource AppPrimaryTextBrush}" />
-                                                        <TextBlock Grid.Column="1" Text="{Binding CreatedAt}" FontSize="11" Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                        <TextBlock
+                                                            Text="{Binding Sender.Name}"
+                                                            FontWeight="SemiBold"
+                                                            Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                                        <TextBlock
+                                                            Grid.Column="1"
+                                                            Text="{Binding CreatedAt}"
+                                                            FontSize="11"
+                                                            Foreground="{DynamicResource AppMutedTextBrush}" />
                                                     </Grid>
-                                                    <TextBlock Text="{Binding Content}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                                    <TextBlock
+                                                        Text="{Binding Content}"
+                                                        TextWrapping="Wrap"
+                                                        Foreground="{DynamicResource AppSecondaryTextBrush}" />
                                                 </StackPanel>
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                            </ScrollViewer>
+                            </StackPanel>
+                        </ScrollViewer>
 
-                            <TextBlock
-                                Classes="empty-state"
-                                Text="Brak wiadomości w tym zgłoszeniu."
-                                IsVisible="{Binding HasNoMessages}" />
-                        </Panel>
-                    </DockPanel>
-                </Border>
-            </Grid>
+                        <TextBlock
+                            Classes="empty-state"
+                            Text="{Binding LblDetailsNoMessages}"
+                            IsVisible="{Binding TicketDetailsPanel.HasNoMessages}"
+                            IsHitTestVisible="False" />
+                    </Panel>
+                </DockPanel>
+            </Border>
+
+            <Border Classes="app-card">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="section-title-large" Text="{Binding LblDetailsLocalAuditTitle}" />
+                    <TextBlock Classes="section-subtitle" Text="{Binding LblDetailsLocalAuditSubtitle}" />
+
+                    <Border MaxHeight="220" Classes="app-subtle-panel" Padding="8">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding TicketDetailsPanel.TicketAuditLogEntries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Classes="message-bubble" Margin="0,0,0,8">
+                                            <StackPanel Spacing="4">
+                                                <TextBlock
+                                                    Text="{Binding DisplayAction}"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                                <TextBlock
+                                                    Text="{Binding DisplayDescription}"
+                                                    TextWrapping="Wrap"
+                                                    Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock
+                                                        Text="{Binding DisplayUserLogin}"
+                                                        FontSize="11"
+                                                        Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                    <TextBlock
+                                                        Text="·"
+                                                        FontSize="11"
+                                                        Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                    <TextBlock
+                                                        Text="{Binding Timestamp}"
+                                                        FontSize="11"
+                                                        Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+
+                    <TextBlock
+                        Classes="empty-state"
+                        Text="{Binding LblDetailsLocalAuditEmpty}"
+                        IsVisible="{Binding TicketDetailsPanel.HasNoTicketAuditLogEntries}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

@@ -7,6 +7,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Security;
 using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
@@ -27,12 +28,12 @@ public class SettingsService : ISettingsService
 
         if (string.IsNullOrWhiteSpace(directory))
         {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            directory = Path.Combine(appData, "ZgrzytDesktop", "Settings");
+            AppDataPaths.EnsureDirectoryForFile(AppDataPaths.SettingsFilePath);
+            _filePath = AppDataPaths.SettingsFilePath;
+            return;
         }
 
         Directory.CreateDirectory(directory);
-
         _filePath = Path.Combine(directory, "settings.json");
     }
 
@@ -70,7 +71,7 @@ public class SettingsService : ISettingsService
             return new AppSettings
             {
                 ApiBaseUrl = ApiDefaults.ProductionApiBaseUrl,
-                ThemeMode = "System"
+                ThemeMode = "Light"
             };
         }
     }
@@ -109,7 +110,7 @@ public class SettingsService : ISettingsService
             return new AppSettings
             {
                 ApiBaseUrl = ApiDefaults.ProductionApiBaseUrl,
-                ThemeMode = "System"
+                ThemeMode = "Light"
             };
         }
     }
@@ -169,19 +170,10 @@ public class SettingsService : ISettingsService
 
         normalized = normalized.Replace("api/api/", "api/", StringComparison.OrdinalIgnoreCase);
 
-        return normalized;
+        return ApiUrlSecurityHelper.EnsureSecureApiBaseUrl(normalized);
     }
 
-    public string NormalizeThemeMode(string? themeMode)
-    {
-        if (string.Equals(themeMode, "Light", StringComparison.OrdinalIgnoreCase))
-            return "Light";
-
-        if (string.Equals(themeMode, "Dark", StringComparison.OrdinalIgnoreCase))
-            return "Dark";
-
-        return "System";
-    }
+    public string NormalizeThemeMode(string? themeMode) => "Light";
 
     public static string NormalizeUiCulture(string? uiCulture)
     {
@@ -199,15 +191,8 @@ public class SettingsService : ISettingsService
         if (Application.Current is null)
             return;
 
-        void Apply()
-        {
-            Application.Current!.RequestedThemeVariant = themeMode switch
-            {
-                "Light" => ThemeVariant.Light,
-                "Dark" => ThemeVariant.Dark,
-                _ => ThemeVariant.Default
-            };
-        }
+        void Apply() =>
+            Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
 
         if (Dispatcher.UIThread.CheckAccess())
             Apply();

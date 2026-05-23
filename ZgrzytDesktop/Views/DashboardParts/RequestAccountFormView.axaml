@@ -1,0 +1,70 @@
+<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.RequestAccountFormView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ZgrzytDesktop.ViewModels"
+    x:CompileBindings="False"
+    x:DataType="vm:DashboardViewModel">
+
+    <StackPanel Spacing="16">
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRequestAccountFullName}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding RequestName}"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderName}"
+                IsEnabled="{Binding CanRequestAccount}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRequestAccountLogin}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding RequestLogin}"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderLogin}"
+                IsEnabled="{Binding CanRequestAccount}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRequestAccountEmail}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding RequestEmail}"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderEmail}"
+                IsEnabled="{Binding CanRequestAccount}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRequestAccountPassword}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding RequestPassword}"
+                PasswordChar="•"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderPassword}"
+                IsEnabled="{Binding CanRequestAccount}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRequestAccountPasswordConfirm}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding RequestPasswordConfirmation}"
+                PasswordChar="•"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderPasswordConfirm}"
+                IsEnabled="{Binding CanRequestAccount}" />
+        </StackPanel>
+
+        <Button
+            Classes="btn-primary account-form-submit"
+            Content="{Binding LblRequestAccountSubmit}"
+            Command="{Binding RequestAccountCommand}"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            IsEnabled="{Binding CanRequestAccount}" />
+
+        <TextBlock
+            Classes="account-form-status"
+            Text="{Binding RequestAccountStatusMessage}"
+            TextWrapping="Wrap" />
+    </StackPanel>
+</UserControl>

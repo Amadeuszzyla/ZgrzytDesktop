@@ -16,29 +16,27 @@ public class SettingsPanelViewModelTests
     public SettingsPanelViewModelTests() => ViewModelTestSetup.EnsureAppStrings();
 
     [Fact]
-    public void Constructor_InitializesThemeAndCultureCollections()
+    public void Constructor_InitializesCultureCollection()
     {
         var panel = CreatePanel();
 
-        Assert.Equal(3, panel.ThemeModes.Count);
         Assert.Equal(2, panel.UiCultures.Count);
-        Assert.Contains("Dark", panel.ThemeModes);
         Assert.Contains("en", panel.UiCultures);
+        Assert.Equal(SettingsPanelViewModel.LightThemeMode, panel.SelectedThemeMode);
     }
 
     [Fact]
-    public async Task SaveSettingsCommand_PersistsThemeAndCulture()
+    public async Task SaveSettingsCommand_PersistsCultureAndLightTheme()
     {
         var settings = new FakeSettingsService();
         var panel = CreatePanel(settings: settings);
 
-        panel.SelectedThemeMode = "Dark";
         panel.SelectedUiCulture = "en";
 
         await panel.SaveSettingsCommand.ExecuteAsync(null);
 
         Assert.Equal(1, settings.SaveAsyncCallCount);
-        Assert.Equal("Dark", settings.Settings.ThemeMode);
+        Assert.Equal(SettingsPanelViewModel.LightThemeMode, settings.Settings.ThemeMode);
         Assert.Equal("en", settings.Settings.UiCulture);
         Assert.Equal("en", panel.SelectedUiCulture);
     }
@@ -88,7 +86,7 @@ public class SettingsPanelViewModelTests
                 }
             },
             ShowToast = (_, _) => { },
-            LogAuditAsync = (_, _, _) => Task.CompletedTask,
+            LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
             GetIsOffline = () => false,
             SetIsOffline = _ => { },
             NotifyLocalization = () => { },

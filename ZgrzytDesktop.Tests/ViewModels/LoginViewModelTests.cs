@@ -34,7 +34,7 @@ public class LoginViewModelTests
         Assert.Equal("jan", loggedIn!.Login);
         Assert.False(vm.HasError);
         Assert.True(vm.IsNotLoading);
-        Assert.Single(audit.Entries);
+        Assert.Empty(audit.Entries);
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class LoginViewModelTests
 
         await vm.LoginCommand.ExecuteAsync(null);
 
-        Assert.Equal("Nie udało się zalogować. Sprawdź login i hasło.", vm.ErrorMessage);
+        Assert.Equal(AppStrings.Get("Login_InvalidCredentials"), vm.ErrorMessage);
     }
 
     [Fact]
@@ -79,8 +79,7 @@ public class LoginViewModelTests
         {
             LoginResult = new User { Id = 2, Login = "admin", Role = "admin", Active = true }
         };
-        var audit = new FakeAuditLogService();
-        var vm = new LoginViewModel(auth, audit, _ => { })
+        var vm = new LoginViewModel(auth, new FakeAuditLogService(), _ => { })
         {
             Login = "admin",
             Password = password
@@ -89,8 +88,6 @@ public class LoginViewModelTests
         await vm.LoginCommand.ExecuteAsync(null);
 
         Assert.Equal(("admin", password), auth.LastLoginCredentials);
-        Assert.DoesNotContain(password, audit.Entries[0].Description, StringComparison.Ordinal);
-        Assert.DoesNotContain(password, audit.Entries[0].Action, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -131,7 +128,7 @@ public class LoginViewModelTests
         var vm = new LoginViewModel(new FakeAuthService(), new FakeAuditLogService(), _ => { });
 
         Assert.True(vm.IsNotLoading);
-        Assert.Equal("Zaloguj", vm.LoginButtonText);
+        Assert.Equal("Zaloguj się", vm.LoginButtonText);
 
         vm.IsLoading = true;
 

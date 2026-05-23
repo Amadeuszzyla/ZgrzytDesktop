@@ -17,23 +17,20 @@ public class TokenStorage : ITokenStorage
 
     public TokenStorage(string? customDirectory)
     {
-        var directory = customDirectory;
-
-        if (string.IsNullOrWhiteSpace(directory))
+        if (string.IsNullOrWhiteSpace(customDirectory))
         {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            directory = Path.Combine(appData, "ZgrzytDesktop");
+            AppDataPaths.EnsureDirectoryForFile(AppDataPaths.TokenFilePath);
+            _filePath = AppDataPaths.TokenFilePath;
+            return;
         }
 
-        Directory.CreateDirectory(directory);
-
-        _filePath = Path.Combine(directory, "token.txt");
+        Directory.CreateDirectory(customDirectory);
+        _filePath = Path.Combine(customDirectory, "token.txt");
     }
 
     public async Task SaveTokenAsync(string token)
     {
-        var protectedToken = LocalDataProtector.ProtectString(token);
-        await File.WriteAllTextAsync(_filePath, protectedToken);
+        await SecureLocalFileStorage.WriteEncryptedAsync(_filePath, token);
     }
 
     public string? LoadTokenSync()
@@ -121,16 +118,7 @@ public class TokenStorage : ITokenStorage
 
     public Task ClearTokenAsync()
     {
-        try
-        {
-            if (File.Exists(_filePath))
-                File.Delete(_filePath);
-        }
-        catch
-        {
-            // Usunięcie tokena nie może zatrzymać aplikacji.
-        }
-
+        SecureLocalFileStorage.TryDelete(_filePath);
         return Task.CompletedTask;
     }
 }

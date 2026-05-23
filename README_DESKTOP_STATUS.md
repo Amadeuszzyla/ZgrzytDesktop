@@ -1,118 +1,147 @@
 # ZGRZYT Desktop — status i ograniczenia
 
-Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ograniczenia wynikające z API (bez zmian backendu). Ostatnia aktualizacja: po Fazie 10 (SOLID, podział widoków, DI).
+Dokument opisuje zgodność aplikacji Avalonia z wymaganiami projektu oraz ograniczenia wynikające z API (bez zmian backendu). **Ostatnia aktualizacja: po Fazie 17F** (ochrona danych lokalnych DPAPI, brama ról IT/Admin, bezpieczeństwo API).
 
 ## Co działa
 
 ### Uwierzytelnianie i sesja
 
-- Logowanie (`POST /api/login`), Bearer, `GET /api/user`, wylogowanie (`POST /api/logout`)
-- Autologowanie z tokenu w `%AppData%` (DPAPI)
-- Przy odpowiedzi **401**: jedna próba `POST /api/refresh` (jeśli skonfigurowane w `ApiService.TryRefreshSessionAsync`), ponowienie żądania; przy ponownym 401 — wylogowanie
-- Ręczne odświeżenie sesji w ustawieniach (`POST /api/refresh`)
+- Logowanie (`POST /api/login`), Bearer (Laravel Sanctum), `GET /api/user`, wylogowanie (`POST /api/logout`)
+- **Dostęp do aplikacji desktopowej: tylko role `it` i `admin`** (rola `user` jest blokowana po logowaniu i autologinie)
+- Autologowanie z tokenu w `%AppData%\ZgrzytDesktop\token.txt` (**DPAPI CurrentUser**, bez plaintext JWT)
+- Przy odpowiedzi **401**: jedna próba `POST /api/refresh`, ponowienie żądania; przy ponownym 401 — wylogowanie lokalne (token usuwany, powrót do logowania)
+- Ręczne odświeżenie sesji w ustawieniach
+- Produkcja: **HTTPS**; `http://` dozwolone wyłącznie dla localhost / 127.0.0.1 (dev)
 
 ### Zgłoszenia i wiadomości
 
-- Listy: `GET tickets`, `active-tickets`, `unassigned-tickets` (widoki kolejki wg roli)
-- Filtry: status, priorytet, wyszukiwanie tekstowe, paginacja
-- **Sortowanie**: dwa ComboBoxy (pole + kierunek) → query `sort_by` / `sort_direction` (np. `created_at`, `desc`) — sortowanie po stronie API, **nie** przez kliknięcie nagłówków DataGrid
+- Listy: `GET tickets`, `active-tickets`, `unassigned-tickets` (kolejki wg roli **it** / **admin**)
+- **Wszystkie:** filtry status, priorytet, wyszukiwanie, sort (`sort_by` / `sort_direction`), paginacja — parametry w query API
+- **Aktywne / Nieprzypisane:** wyszukiwanie w API; przy wybranym statusie, priorytecie lub sorcie innym niż domyślny — pobranie kolejki (stronicowane po stronie serwera, agregacja po stronie klienta) i **filtrowanie / sort / paginacja lokalna** (`TicketQueueListProcessor`, Faza 16I)
+- UI listy: **karty zgłoszeń** (`ticket-card`), nie tabela DataGrid
 - Szczegóły zgłoszenia, wiadomości (`GET`/`POST .../messages`, pole JSON `body`)
-- Tworzenie zgłoszenia, auto-odświeżanie listy (timer)
-- Edycja statusu/priorytetu, przypisanie do siebie, zamknięcie, usunięcie — wg roli **it** / **admin** (i zamknięcie własnego zgłoszenia dla **user**, jeśli API pozwoli)
+- Tworzenie zgłoszenia, auto-odświeżanie listy (timer ~45 s)
+- Edycja statusu/priorytetu, przypisanie, zamknięcie, usunięcie — wg roli **it** / **admin** (i zamknięcie własnego dla **user**, jeśli API pozwoli)
 
 ### Kategorie i statusy
 
-- Kategorie UI: Hardware, Software, Sieć — zapis w tytule `[Kategoria]` i linii opisu `Kategoria: ...` (pole `category` **nie** jest wysyłane w body API)
-- Statusy w UI: Nowe / W toku / Rozwiązane → API: `nowe` / `w trakcie` / `zamknięte`
+- Kategorie UI: Hardware, Software, Sieć — zapis w tytule `[Kategoria]` i linii `Kategoria: ...` (pole `category` **nie** w body API)
+- Statusy: API `nowe` / `w trakcie` / `zamknięte` → UI PL **Nowe** / **W toku** / **Zamknięte** (EN: New / In progress / **Closed**)
 
 ### Administracja i konta
 
-- **Administracja** (role **admin**): `GET users`, `active-users`, `inactive-users`, `banned-users`; `POST ban`, `activate`, `unban` (odbanowanie z hasłem w body)
-- **Zgłoś nowe konto** (`POST /api/request-account`) — użytkownik w menu; it/admin w zakładce Administracja → Nowe konto
+- **Administracja** (staff): nawigacja w topbarze; **admin** — zakładka Użytkownicy
+- Listy: `users`, `active-users`, `inactive-users`, `banned-users`; przy **404** na wyspecjalizowanym endpoincie — fallback `GET users` + filtr lokalny
+- Akcje: `POST ban`, `activate`, `unban` (hasło w body)
+- UI listy użytkowników: **karty** (`admin-user-card`), nie DataGrid
+- **Zgłoś nowe konto** (`POST /api/request-account`) — użytkownik w menu; it/admin w Administracji
 
 ### Statystyki, audyt, UX
 
-- Statystyki: domyślnie z **bieżącej strony** listy; przycisk agreguje wiele stron przez wielokrotne `GET tickets`
-- **Lokalny audyt** (historia w szczegółach zgłoszenia i w ustawieniach) — zapis desktopowy, szyfrowany DPAPI
-- Motyw: jasny / ciemny / system (`settings.json`)
-- Język: **pl** / **en** (`AppStrings.resx` + `AppStrings.en.resx`, `UiCulture` w ustawieniach)
+- Statystyki: KPI z bieżącej strony listy; przycisk agreguje wiele stron przez `GET tickets`
+- **Lokalny audyt** (historia w szczegółach zgłoszenia i w ustawieniach) — zapis desktopowy, DPAPI; wpisy historyczne nie są migrowane przy zmianie języka — nowe wpisy w aktualnym języku UI
+- **Motyw:** wyłącznie **jasny** (light-only); brak aktywnego wyboru dark/system w UI
+- **Język:** **pl** / **en** (`AppStrings`, `UiCulture` w ustawieniach)
+- **Layout:** topbar z logo ZGRZYT (`/Assets/zgrzyt-logo.png`), nawigacja pozioma, sekcje pełnoekranowe — zgodnie z referencją webową
 - Toasty w oknie aplikacji; tryb offline z cache zgłoszeń
 
-### Jakość kodu i testy
+### Architektura UI i kodu (Fazy 14–16)
 
-- `DashboardViewModel` podzielony na **19** plików partial (Navigation, Tickets, TicketDetails, Admin, Settings, Statistics, Audit, Toast, Support, Localization, …)
-- Główny plik `DashboardViewModel.cs`: ok. **289** linii fizycznie, ok. **126** niepustych; **partiale łącznie:** ok. **2427** linii
-- Wspólna obsługa błędów API (`HandleApiError`, `ExecuteApiAsync`) — admin, szczegóły (update/assign/message/delete/close), ustawienia, prośba o konto, tworzenie zgłoszenia, agregacja statystyk wielostronicowych; `LoadTickets`, auto-refresh, `LoadTicketDetails` (offline/HTML) — dedykowany `catch`
-- **Widoki:** `DashboardView.axaml` + `Views/DashboardParts/*.axaml` (7 UserControl, ten sam `DataContext` co dashboard)
+| Warstwa | Opis |
+|---------|------|
+| `MainWindowViewModel` | Login ↔ dashboard, autologowanie |
+| `DashboardViewModel` | Shell: nawigacja, toasty, fasada etykiet, koordynacja paneli |
+| `TicketsPanelViewModel` | Lista, filtry, sort, paginacja, tworzenie (partiale) |
+| `TicketDetailsPanelViewModel` | Szczegóły, wiadomości, mutacje (partiale) |
+| `AdminPanelViewModel` | Użytkownicy, ban/activate/unban, nowe konto |
+| `SettingsPanelViewModel` | Język, zapis, refresh sesji |
+| `StatisticsPanelViewModel` | KPI, wykresy, agregacja |
+| `AuditPanelViewModel` | Lokalny dziennik w ustawieniach |
+| `DashboardView` + `DashboardParts/` | Topbar + UserControl na sekcję |
+
 - Stałe: `AppSections`, `AppRoles`, `TicketStatuses`, `TicketPriorities`, `FilterLabels`, `AdminTabs`, `ToastTypes`
-- **Interfejsy** (`Services/Interfaces/`): `IApiService`, `IAuthService`, `ITicketService`, `ISettingsService`, `ILocalAuditLogService`, `ITokenStorage`, `IUserAdminService`, `ILocalTicketCacheService`, `ILocalUserCacheService`
-- **DI:** `App.axaml.cs` rejestruje singletony i tworzy `MainWindowViewModel`; `ServiceProvider.Dispose()` przy `Exit` / `ShutdownRequested` (flaga jednorazowego dispose)
-- **Nawigacja:** `MainWindowViewModel` + `ViewLocator` (`LoginView` / `DashboardView`); App nie ustawia widoków ręcznie na `MainWindow.Content`
-- **Test helper:** `MainWindowDependencies` — tylko testy (`ViewModelTestFactory`), bez produkcyjnego `CreateProductionDependencies`
+- **Interfejsy** (`Services/Interfaces/`): `IApiService`, `IAuthService`, `ITicketService`, `ISettingsService`, `ILocalAuditLogService`, `ITokenStorage`, `IUserAdminService`, cache
+- **DI:** `App.axaml.cs`; testy produkcyjnego DI — `ViewModelTestFactory` + fakes (bez `ServiceProvider` w testach jednostkowych)
 
-**Weryfikacja build/test/publish:**
+### Jakość — weryfikacja build/test
 
 | Krok | Wynik |
 |------|--------|
-| `dotnet build` | OK — 0 błędów, 0 ostrzeżeń |
-| `dotnet test` | **158** passed, **5** skipped (integracja), **163** łącznie |
-| `ZgrzytDesktop.Tests` | **147** passed, **5** skipped |
-| `ZgrzytDesktop.Headless.Tests` | **11** passed |
-| `dotnet publish` `-c Release -r win-x64 --self-contained false` | OK |
+| `dotnet build -c Release` | OK — 0 błędów, 0 ostrzeżeń (typowo) |
+| `ZgrzytDesktop.Tests` | **~340+** passed, **8** skipped (integracja live API) |
+| `ZgrzytDesktop.Headless.Tests` | **22** passed |
+| **Razem (passed)** | **311** |
+| `scripts/publish-release.ps1` | ZIP self-contained `ZgrzytDesktop-win-x64-release.zip` |
 
-**Projekty testowe:**
+**Projekty testowe (skrót):**
 
-| Obszar | Projekt / pliki |
-|--------|-----------------|
-| ViewModele | `LoginViewModelTests`, `MainWindowViewModelTests`, `DashboardViewModelTests`, `DashboardStatisticsTests`, `DashboardPollingTests`, `DashboardOfflineCacheTests` |
-| Audyt | `LocalAuditLogServiceTests` |
-| i18n | `AppStringsTests` |
-| Serwisy, helpery, modele | m.in. `AuthServiceTests`, `TicketServiceTests`, `UserAdminServiceTests`, `ApiErrorSanitizerTests`, `StatusDisplayHelperTests`, … |
-| UI headless | `HeadlessViewsTests` (6) + `ViewLocatorShellTests` (5) — `ViewLocator.Build`, `MainWindow` + `ContentControl` |
-| Integracja API (opcjonalna) | `LiveApiIntegrationTests` — skip bez env; [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) |
+| Obszar | Pliki / projekty |
+|--------|------------------|
+| Panele i dashboard | `TicketsPanelViewModelTests`, `TicketDetailsPanelViewModelTests`, `DashboardViewModelTests`, polling, offline, statystyki |
+| i18n / regresja F16 | `LocalizationRuntimeTests`, `Phase16RegressionTests`, `Phase16HStragglersTests`, `Phase16IQueueFilterTests` |
+| Serwisy | `TicketServiceTests`, `UserAdminServiceTests`, `AuthServiceTests`, … |
+| Headless UI | `HeadlessViewsTests`, `ViewLocatorShellTests` |
+| Integracja (opcjonalna) | `LiveApiIntegrationTests` — [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) |
+| Bezpieczeństwo (17F) | `Phase17FSecurityTests`, `TokenStorageTests`, `DesktopAccessHelperTests`, `MainWindowDesktopAccessTests` |
 
-Testy jednostkowe i headless używają mock HTTP / fake serwisów — **nie** wymagają żywego API domyślnie.
+Testy domyślne **nie** wymagają żywego API.
 
 ## Ograniczenia API i produktu (świadome)
 
 | Obszar | Ograniczenie |
 |--------|----------------|
 | `GET /api/logs` | Brak w OpenAPI — UI **nie** pobiera logów systemowych z backendu |
-| Pole `category` | Nie w requestach tworzenia/edycji; tylko prefix/opis (unikanie 422) |
-| Zamknięcie przez **user** | Przycisk „Zamknij” dla autora; przy **403** z API — komunikat w UI (backend może wymagać it/admin) |
-| Czas pierwszej reakcji IT | Model `Ticket` ma `created_at`, `updated_at`, `closed_at` — **brak** `first_response_at` / SLA w API → desktop **nie** wyświetza prawdziwego czasu pierwszej odpowiedzi IT |
-| Statystyki globalne | Bez dedykowanego raportu API — agregacja przez wielokrotne listowanie `tickets` |
-| `DELETE /api/tickets/{id}` | W UI dla uprawnionych ról; przy braku uprawnień: **403** |
-| Adres API | Stały w kodzie / `settings.json`; **brak** edycji URL w panelu ustawień |
-| Powiadomienia Windows | **Brak** — nie używamy tray ani toastów systemowych (informacja tylko w aplikacji) |
-| Panel admin | Przy braku roli admin: **403** z API |
-| Live test `POST /api/logout` | Po wylogowaniu stary Bearer **nie** może dawać 200 na `GET /api/user`; test integracyjny akceptuje **401** / **403**; **500** po unieważnieniu tokena to znane niespójne zachowanie backendu (nie fail desktopu) — [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) |
+| Pole `category` | Nie w requestach tworzenia/edycji; tylko prefix/opis |
+| Zamknięcie przez **user** | Przycisk dla autora; przy **403** — komunikat (backend może wymagać it/admin) |
+| Czas pierwszej reakcji IT | Brak `first_response_at` w API |
+| Statystyki globalne | Agregacja przez wielokrotne `GET tickets` |
+| `active-tickets` / `unassigned-tickets` | Brak udokumentowanych parametrów `status`/`priority`/`sort` jak w `GET tickets` — desktop stosuje **lokalny fallback** przy filtrach (Faza 16I) |
+| Adres API | Stały w kodzie / `settings.json`; **brak** edycji URL w ustawieniach |
+| Motyw | Tylko jasny — wybór dark/system usunięty z UI (Faza 16E) |
+| Powiadomienia Windows | **Brak** — tylko toasty w aplikacji |
+| Panel admin | Przy braku roli: **403** |
+| Live test `POST /api/logout` | Stary Bearer nie powinien dawać 200 na `GET /api/user`; akceptowane 401/403/500 (500 = znane zachowanie backendu) |
 
-## Pliki lokalne (AppData)
+## Pliki lokalne i ochrona danych (Faza 17F)
 
-| Plik / folder | Zawartość |
-|---------------|-----------|
-| `token.txt` | Token dostępu (DPAPI) |
-| `Cache/` | Cache użytkownika i zgłoszeń (DPAPI) |
-| `audit-log.json` | Lokalny audyt działań (DPAPI) |
-| `Settings/settings.json` | `ThemeMode`, `UiCulture`; `ApiBaseUrl` zapisany, ale **nie edytowany w UI** |
+Wszystkie dane użytkownika: **`%AppData%\ZgrzytDesktop`** (`Environment.SpecialFolder.ApplicationData`). Aplikacja **nie** zapisuje nic w folderze publish ani w bieżącym katalogu roboczym. **Nie wymaga** uprawnień administratora Windows.
+
+| Plik / folder | Zawartość | Ochrona |
+|---------------|-----------|---------|
+| `token.txt` | Bearer JWT | **DPAPI** `CurrentUser` (+ migracja ze starego plaintext) |
+| `Cache/tickets-cache.json` | Zgłoszenia offline | **DPAPI** (+ migracja z plaintext JSON) |
+| `Cache/user-cache.json` | Profil użytkownika offline | **DPAPI** |
+| `audit-log.json` | Lokalny audyt | **DPAPI** |
+| `Settings/settings.json` | `ThemeMode`, `UiCulture`, `ApiBaseUrl` | Brak haseł/tokenów w modelu; tylko konfiguracja UI |
+
+- Szyfrowanie: `System.Security.Cryptography.ProtectedData` (entropy aplikacji), **bez własnej kryptografii**.
+- ACL katalogów: standardowe uprawnienia profilu użytkownika; zawartość i tak jest szyfrowana DPAPI dla tego konta.
+- Logi: brak `Console`/`Debug` z tokenami; `SensitiveDataRedactor` do redakcji Bearer/JWT w tekstach.
+- Błędy API: `ApiErrorSanitizer` usuwa HTML, stack trace i techniczne zrzuty.
 
 ## Role w UI
 
-| Rola | Uprawnienia w aplikacji |
-|------|-------------------------|
-| **user** | Lista, szczegóły, wiadomości, nowe zgłoszenia, zamknięcie własnego (jeśli API pozwoli), **Zgłoś nowe konto** |
-| **it** | Jak wyżej + edycja statusu/priorytetu, przypisanie, zamknięcie/usuwanie wg API, Administracja → Nowe konto |
-| **admin** | Jak it + zakładka **Użytkownicy** (filtry list, ban, aktywacja, odbanowanie) |
+| Rola | Desktop |
+|------|---------|
+| **user** | **Brak dostępu** — komunikat `Login_DesktopAccessDenied`, wylogowanie, czyszczenie cache |
+| **it** | Pełny dostęp staff (zgłoszenia, kolejki, administracja → nowe konto) |
+| **admin** | Jak it + zakładka **Użytkownicy** |
 
-Autoryzacja końcowa zawsze po stronie API (401/403).
+Autoryzacja operacji po stronie API (401/403) pozostaje bez zmian.
 
-## Dane testowe
+## Dystrybucja
 
-Tytuły i treści zgłoszeń na liście pochodzą z API — desktop nie filtruje treści z bazy. Przykładowe dane w środowisku dev czyści się po stronie backendu/bazy.
+| Sposób | Status |
+|--------|--------|
+| **ZIP folderu publish** (self-contained) | **Rekomendowane** — `scripts/publish-release.ps1`, [README_RELEASE.txt](README_RELEASE.txt) |
+| **Inno Setup / MSI / MSIX** | Opcjonalne po oddaniu |
+
+Użytkownik końcowy: **rozpakować cały ZIP** i uruchomić `ZgrzytDesktop.exe` z folderu publish — **nie** przenosić samego EXE.
+
+Artefakty `bin/`, `obj/`, `publish/`, `*.zip` — w `.gitignore`.
 
 ## Powiązane dokumenty
 
-- [README.md](README.md) — uruchomienie, publish, skrót funkcji, podsumowanie testów
+- [README.md](README.md) — uruchomienie, architektura, publish, testy
 - [REQUIREMENTS.md](REQUIREMENTS.md) — wymagania środowiska
-- [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) — testy integracyjne i ręczne wywołania API
+- [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) — testy integracyjne i ręczne API

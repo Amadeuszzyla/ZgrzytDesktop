@@ -1,0 +1,8 @@
+<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.UserBanBadgeView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border x:Name="BadgeRoot" Classes="ticket-badge ticket-badge-priority-high">
+        <TextBlock x:Name="BadgeText" Classes="ticket-badge-text" />
+    </Border>
+</UserControl>

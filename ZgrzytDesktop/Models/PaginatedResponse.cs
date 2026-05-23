@@ -5,6 +5,15 @@ namespace ZgrzytDesktop.Models;
 
 public class PaginatedResponse<T>
 {
+    /// <summary>Set when active/unassigned local fallback stopped at a safety cap.</summary>
+    [JsonIgnore]
+    public bool IsQueueFetchTruncated { get; set; }
+
+    [JsonIgnore]
+    public int QueuePagesFetched { get; set; }
+
+    [JsonIgnore]
+    public int? QueueApiReportedTotal { get; set; }
     [JsonPropertyName("current_page")]
     public int CurrentPage { get; set; }
 

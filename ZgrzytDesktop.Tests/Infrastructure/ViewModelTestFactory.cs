@@ -84,7 +84,7 @@ public static class ViewModelTestFactory
         settings ??= new FakeSettingsService();
         audit ??= new FakeAuditLogService();
 
-        var (_, _, tempDir) = TestApiFactory.CreateApi();
+        var (api, _, tempDir) = TestApiFactory.CreateApi();
         ILocalTicketCacheService ticketCache = new LocalTicketCacheService(tempDir);
         ILocalUserCacheService userCache = new LocalUserCacheService(tempDir);
 
@@ -95,6 +95,7 @@ public static class ViewModelTestFactory
             ticketCache,
             userCache,
             audit,
-            new FakeUserAdminService());
+            new FakeUserAdminService(),
+            api);
     }
 }

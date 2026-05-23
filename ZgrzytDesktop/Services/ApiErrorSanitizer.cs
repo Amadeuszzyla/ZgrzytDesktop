@@ -40,11 +40,21 @@ public static class ApiErrorSanitizer
             return AppStrings.Get("Api_HtmlResponse");
         }
 
+        if (LooksLikeTechnicalDump(content))
+        {
+            return statusCode == HttpStatusCode.InternalServerError
+                ? AppStrings.Get("Api_InternalServerError")
+                : AppStrings.Get("Api_UnexpectedError");
+        }
+
         if (statusCode == HttpStatusCode.UnprocessableEntity &&
             TryExtractValidationMessage(content, out var validationMessage))
         {
             return validationMessage;
         }
+
+        if (TryUsePlainFriendlyMessage(content, statusCode, out var friendlyMessage))
+            return friendlyMessage;
 
         return statusCode switch
         {
@@ -61,6 +71,37 @@ public static class ApiErrorSanitizer
     public static string SanitizeForDisplay(string? content, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
     {
         return SanitizeApiErrorMessage(content, statusCode);
+    }
+
+    private static bool TryUsePlainFriendlyMessage(string? content, HttpStatusCode statusCode, out string message)
+    {
+        message = string.Empty;
+
+        if (statusCode is not (HttpStatusCode.Forbidden or HttpStatusCode.NotFound))
+            return false;
+
+        if (string.IsNullOrWhiteSpace(content) || IsHtmlResponse(content))
+            return false;
+
+        var trimmed = content.Trim();
+
+        if (trimmed.StartsWith('{') || trimmed.StartsWith('['))
+            return false;
+
+        if (trimmed.Length > 512)
+            return false;
+
+        if (!LooksLikeFriendlySentence(trimmed))
+            return false;
+
+        message = trimmed;
+        return true;
+    }
+
+    private static bool LooksLikeFriendlySentence(string text)
+    {
+        var words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return words.Length >= 3 || text.Length >= 24;
     }
 
     private static bool TryExtractValidationMessage(string? content, out string message)
@@ -114,6 +155,16 @@ public static class ApiErrorSanitizer
         {
             return false;
         }
+    }
+
+    private static bool LooksLikeTechnicalDump(string? content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return false;
+
+        return content.Contains("StackTrace", StringComparison.OrdinalIgnoreCase)
+               || content.Contains(" at System.", StringComparison.Ordinal)
+               || content.Contains("Exception:", StringComparison.OrdinalIgnoreCase);
     }
 
     private static string TruncatePlainText(string? content, int maxLength)

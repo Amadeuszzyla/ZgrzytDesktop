@@ -23,7 +23,11 @@ public class Ticket
     public string DisplayStatus => StatusDisplayHelper.ToDisplayStatus(Status);
 
     [JsonIgnore]
-    public string DisplayCategory => TicketCategoryHelper.ExtractCategory(Title, Description);
+    public string DisplayPriority => PriorityDisplayHelper.ToDisplayPriority(Priority);
+
+    [JsonIgnore]
+    public string DisplayCategory => TicketCategoryHelper.ToDisplayCategory(
+        TicketCategoryHelper.ExtractCategory(Title, Description));
 
     [JsonPropertyName("priority")]
     public string Priority { get; set; } = string.Empty;
@@ -64,6 +68,12 @@ public class Ticket
     [JsonPropertyName("closed_at")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]
     public DateTime? ClosedAt { get; set; }
+
+    /// <summary>
+    /// When provided by API: timestamp of first IT response (SLA / reaction time).
+    /// </summary>
+    [JsonPropertyName("first_response_at")]
+    public DateTime? FirstResponseAt { get; set; }
 
     [JsonPropertyName("category")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]

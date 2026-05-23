@@ -7,7 +7,7 @@
         <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="CornerRadius" Value="10" />
         <Setter Property="Padding" Value="10,8" />
         <Setter Property="CaretBrush" Value="{DynamicResource AppInputCaretBrush}" />
         <Setter Property="SelectionBrush" Value="{DynamicResource AppInputSelectionBrush}" />
@@ -59,7 +59,7 @@
         <Setter Property="Foreground" Value="{DynamicResource AppInputForegroundBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource AppInputBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="CornerRadius" Value="10" />
         <Setter Property="Padding" Value="10,8" />
     </Style>
 

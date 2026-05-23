@@ -6,15 +6,11 @@ namespace ZgrzytDesktop.ViewModels;
 
 public partial class DashboardViewModel
 {
-    public ObservableCollection<string> ThemeModes => SettingsPanel.ThemeModes;
-
     public ObservableCollection<string> UiCultures => SettingsPanel.UiCultures;
 
     public string LblSettingsTitle => SettingsPanel.LblSettingsTitle;
 
     public string LblSettingsSubtitle => SettingsPanel.LblSettingsSubtitle;
-
-    public string LblSettingsTheme => SettingsPanel.LblSettingsTheme;
 
     public string LblSettingsLanguage => SettingsPanel.LblSettingsLanguage;
 
@@ -36,11 +32,7 @@ public partial class DashboardViewModel
 
     public AuditPanelViewModel AuditPanel { get; private set; } = null!;
 
-    public string SelectedThemeMode
-    {
-        get => SettingsPanel.SelectedThemeMode;
-        set => SettingsPanel.SelectedThemeMode = value;
-    }
+    public string SelectedThemeMode => SettingsPanel.SelectedThemeMode;
 
     public string SelectedUiCulture
     {
@@ -59,8 +51,6 @@ public partial class DashboardViewModel
     public IAsyncRelayCommand RefreshSessionCommand => SettingsPanel.RefreshSessionCommand;
 
     public IAsyncRelayCommand LoadAuditLogsCommand => AuditPanel.LoadAuditLogsCommand;
-
-    public IAsyncRelayCommand ClearAuditLogsCommand => AuditPanel.ClearAuditLogsCommand;
 
     public IAsyncRelayCommand LoadAllPagesStatisticsCommand => StatisticsPanel.LoadAllPagesStatisticsCommand;
 
@@ -108,7 +98,7 @@ public partial class DashboardViewModel
     {
         var bridge = CreateModuleBridge();
 
-        AuditPanel = new AuditPanelViewModel(_auditLogService, ShowToast);
+        AuditPanel = new AuditPanelViewModel(_auditLogService);
         SettingsPanel = new SettingsPanelViewModel(
             _settingsService,
             _authService,
@@ -117,6 +107,6 @@ public partial class DashboardViewModel
         StatisticsPanel = new StatisticsPanelViewModel(
             _ticketService,
             bridge,
-            () => IsNotLoading);
+            () => TicketsPanel.IsNotLoading);
     }
 }

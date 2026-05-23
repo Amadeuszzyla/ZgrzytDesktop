@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services;
@@ -52,6 +53,25 @@ public sealed class IntegrationApiTestHost : IAsyncLifetime, IDisposable
             return null;
 
         return await new TokenStorage(_tempDirectory).GetTokenAsync();
+    }
+
+    /// <summary>
+    /// Performs GET /api/{endpoint} and returns HTTP status without desktop fallback logic.
+    /// </summary>
+    public async Task<HttpStatusCode> GetEndpointStatusAsync(string endpoint)
+    {
+        if (Api is null)
+            throw new InvalidOperationException("API client is not initialized.");
+
+        try
+        {
+            await Api.GetAsync<JsonElement>(endpoint);
+            return HttpStatusCode.OK;
+        }
+        catch (ApiException ex)
+        {
+            return ex.StatusCode;
+        }
     }
 
     public async Task InitializeAsync()

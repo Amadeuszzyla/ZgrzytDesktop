@@ -118,6 +118,8 @@ public partial class DashboardViewModel
                !ApiErrorSanitizer.IsHtmlResponse(ticket.Description);
     }
 
+    internal Task HandleSessionExpiredFromApiAsync() => HandleSessionExpiredAsync();
+
     private async Task HandleSessionExpiredAsync()
     {
         await Dispatcher.UIThread.InvokeAsync(async () =>

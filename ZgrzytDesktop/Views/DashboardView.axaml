@@ -5,63 +5,42 @@
     xmlns:parts="clr-namespace:ZgrzytDesktop.Views.DashboardParts"
     x:CompileBindings="False">
 
-    <Grid>
-        <Grid ColumnDefinitions="240,*" Background="{DynamicResource AppPageBackgroundBrush}">
+    <Grid Background="{DynamicResource AppPageBackgroundBrush}">
+        <Grid RowDefinitions="Auto,*">
+            <parts:DashboardTopBarView Grid.Row="0" />
 
-            <parts:DashboardSidebarView Grid.Column="0" />
-
-            <Grid Grid.Column="1" RowDefinitions="Auto,*">
-
-                <Border
-                    Grid.Row="0"
-                    Background="{DynamicResource AppSurfaceBrush}"
-                    BorderBrush="{DynamicResource AppCardBorderBrush}"
-                    BorderThickness="0,0,0,1"
-                    Padding="22,16">
-
-                    <StackPanel Spacing="3">
-                        <TextBlock
-                            Text="{Binding CurrentSectionTitle}"
-                            FontSize="26"
-                            FontWeight="Bold"
-                            Foreground="{DynamicResource AppPrimaryTextBrush}" />
-
-                        <TextBlock
-                            Text="{Binding LblHeaderSubtitle}"
-                            Foreground="{DynamicResource AppMutedTextBrush}"
-                            FontSize="13" />
-                    </StackPanel>
-                </Border>
-
-                <Grid Grid.Row="1">
-                    <parts:TicketsPanelView IsVisible="{Binding IsTicketsPageVisible}" />
-                    <parts:TicketDetailsPanelView IsVisible="{Binding IsDetailsPageVisible}" />
-                    <parts:StatisticsPanelView IsVisible="{Binding IsStatisticsPageVisible}" />
-                    <parts:RequestAccountPanelView IsVisible="{Binding IsRequestAccountPageVisible}" />
-                    <parts:AdminPanelView IsVisible="{Binding IsAdminPageVisible}" />
-                    <parts:SettingsPanelView IsVisible="{Binding IsSettingsPageVisible}" />
-                </Grid>
-
+            <Grid Grid.Row="1">
+                <parts:TicketsPanelView IsVisible="{Binding IsTicketsPageVisible}" />
+                <parts:TicketDetailsPanelView IsVisible="{Binding IsDetailsPageVisible}" />
+                <parts:StatisticsPanelView IsVisible="{Binding IsStatisticsPageVisible}" />
+                <parts:RequestAccountPanelView IsVisible="{Binding IsRequestAccountPageVisible}" />
+                <parts:AdminPanelView IsVisible="{Binding IsAdminPageVisible}" />
+                <parts:SettingsPanelView IsVisible="{Binding IsSettingsPageVisible}" />
             </Grid>
         </Grid>
 
         <Border
+            Classes="toast-card"
             IsVisible="{Binding IsToastVisible}"
-            Background="{Binding ToastBackground}"
-            HorizontalAlignment="Right"
+            HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            Margin="0,20,28,0"
-            Padding="16,12"
-            CornerRadius="10"
+            Margin="20,76,20,0"
             MaxWidth="420"
-            BorderBrush="#00000020"
-            BorderThickness="1">
-
-            <TextBlock
-                Text="{Binding ToastMessage}"
-                Foreground="{Binding ToastForeground}"
-                FontSize="14"
-                TextWrapping="Wrap" />
+            ZIndex="100">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Border
+                    Grid.Column="0"
+                    Width="4"
+                    MinHeight="24"
+                    CornerRadius="4"
+                    Background="{Binding ToastBackground}"
+                    VerticalAlignment="Stretch" />
+                <TextBlock
+                    Grid.Column="1"
+                    Classes="toast-text"
+                    Text="{Binding ToastMessage}"
+                    TextWrapping="Wrap" />
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

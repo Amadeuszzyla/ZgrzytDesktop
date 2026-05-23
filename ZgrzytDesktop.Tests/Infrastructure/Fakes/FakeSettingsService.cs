@@ -9,7 +9,7 @@ public sealed class FakeSettingsService : ISettingsService
     public AppSettings Settings { get; } = new()
     {
         ApiBaseUrl = "http://127.0.0.1:9000/api/",
-        ThemeMode = "System",
+        ThemeMode = "Light",
         UiCulture = "pl"
     };
 

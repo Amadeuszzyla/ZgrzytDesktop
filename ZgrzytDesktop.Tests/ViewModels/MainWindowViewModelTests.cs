@@ -64,17 +64,17 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public async Task LoginSuccess_FromLoginViewModel_ShowsDashboard()
+    public async Task LoginSuccess_FromLoginViewModel_StaffRole_ShowsDashboard()
     {
         var auth = new FakeAuthService
         {
-            LoginResult = new User { Id = 3, Login = "user1", Role = "user", Active = true }
+            LoginResult = new User { Id = 3, Login = "it-user", Role = "it", Active = true }
         };
         var deps = ViewModelTestFactory.CreateMainWindowDependencies(auth);
         var window = new MainWindowViewModel(deps, runStartup: false);
         var login = (LoginViewModel)window.CurrentViewModel;
 
-        login.Login = "user1";
+        login.Login = "it-user";
         login.Password = "pass";
         await login.LoginCommand.ExecuteAsync(null);
 

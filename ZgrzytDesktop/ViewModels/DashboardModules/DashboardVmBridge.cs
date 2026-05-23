@@ -11,7 +11,7 @@ public sealed class DashboardVmBridge
 
     public required Action<string, string> ShowToast { get; init; }
 
-    public required Func<string, int?, string, Task> LogAuditAsync { get; init; }
+    public required Func<string, int?, string?, object?[]?, Task> LogAuditAsync { get; init; }
 
     public required Func<bool> GetIsOffline { get; init; }
 

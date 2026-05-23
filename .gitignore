@@ -9,6 +9,11 @@ publish/
 **/publish/
 *.pdb
 
+# Release archives (do not commit)
+*.zip
+*.7z
+*.rar
+
 # Audit / generated artifacts
 _audit_build/
 ZgrzytDesktop/obj/Generated/

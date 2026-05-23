@@ -78,4 +78,8 @@ internal static class HeadlessViewTestHelper
 
     public static int CountDescendantsByTypeName(AvaloniaControl root, string typeName) =>
         EnumerateDescendants(root).Count(control => control.GetType().Name == typeName);
+
+    public static TextBlock? FindTextBlockWithExactText(AvaloniaControl root, string text) =>
+        FindDescendants<TextBlock>(root)
+            .FirstOrDefault(textBlock => string.Equals(textBlock.Text, text, StringComparison.Ordinal));
 }

@@ -9,12 +9,17 @@
   <data name="Login_InvalidCredentials" xml:space="preserve"><value>Nieprawidłowy login albo hasło.</value></data>
   <data name="Login_Offline" xml:space="preserve"><value>Brak połączenia z API. Sprawdź, czy backend jest uruchomiony.</value></data>
   <data name="Login_UnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas logowania.</value></data>
+  <data name="Login_DesktopAccessDenied" xml:space="preserve"><value>Aplikacja desktopowa jest dostępna tylko dla pracowników IT i administratorów.</value></data>
   <data name="Api_Forbidden" xml:space="preserve"><value>Brak uprawnień do wykonania tej operacji.</value></data>
   <data name="Api_Unauthorized" xml:space="preserve"><value>Sesja wygasła albo użytkownik nie jest zalogowany.</value></data>
   <data name="Api_NotFound" xml:space="preserve"><value>Nie znaleziono zasobu lub endpoint nie istnieje.</value></data>
   <data name="Api_HtmlResponse" xml:space="preserve"><value>Serwer zwrócił stronę błędu zamiast danych API. Sprawdź endpoint lub uprawnienia.</value></data>
   <data name="Api_Conflict" xml:space="preserve"><value>Operacja jest sprzeczna z aktualnym stanem danych.</value></data>
   <data name="Api_ServiceUnavailable" xml:space="preserve"><value>Brak połączenia z API. Sprawdź, czy backend działa.</value></data>
+  <data name="Api_TestConnection_Success" xml:space="preserve"><value>Połączenie z API działa poprawnie.</value></data>
+  <data name="Api_TestConnection_Unauthorized" xml:space="preserve"><value>API odpowiada, ale token użytkownika jest nieprawidłowy albo wygasł.</value></data>
+  <data name="Api_TestConnection_Error" xml:space="preserve"><value>API odpowiedziało błędem: {0} {1}</value></data>
+  <data name="Api_TestConnection_Failed" xml:space="preserve"><value>Nie udało się połączyć z API.</value></data>
   <data name="Api_InternalServerError" xml:space="preserve"><value>Błąd serwera. Spróbuj ponownie później.</value></data>
   <data name="Api_UnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas komunikacji z API.</value></data>
   <data name="Api_SessionExpired" xml:space="preserve"><value>Sesja wygasła. Zaloguj się ponownie.</value></data>
@@ -54,6 +59,9 @@
   <data name="Admin_Filter_Active" xml:space="preserve"><value>Aktywni</value></data>
   <data name="Admin_Filter_Inactive" xml:space="preserve"><value>Nieaktywni</value></data>
   <data name="Admin_Filter_Banned" xml:space="preserve"><value>Zbanowani</value></data>
+  <data name="Admin_UserLoginLine" xml:space="preserve"><value>Login: {0}</value></data>
+  <data name="Admin_UserEmailLine" xml:space="preserve"><value>E-mail: {0}</value></data>
+  <data name="Admin_UserRoleLine" xml:space="preserve"><value>Rola: {0}</value></data>
   <data name="Admin_RefreshList" xml:space="preserve"><value>Odśwież listę</value></data>
   <data name="Admin_Activate" xml:space="preserve"><value>Aktywuj</value></data>
   <data name="Admin_Ban" xml:space="preserve"><value>Zbanuj</value></data>
@@ -74,7 +82,7 @@
   <data name="Stats_KpiAll" xml:space="preserve"><value>Wszystkie</value></data>
   <data name="Stats_KpiNew" xml:space="preserve"><value>Nowe</value></data>
   <data name="Stats_KpiInProgress" xml:space="preserve"><value>W toku</value></data>
-  <data name="Stats_KpiClosed" xml:space="preserve"><value>Rozwiązane</value></data>
+  <data name="Stats_KpiClosed" xml:space="preserve"><value>Zamknięte</value></data>
   <data name="Stats_KpiHighPriority" xml:space="preserve"><value>Wysoki priorytet</value></data>
   <data name="Toast_SettingsSaved" xml:space="preserve"><value>Ustawienia zapisane</value></data>
   <data name="Toast_SettingsSaveFailed" xml:space="preserve"><value>Nie udało się zapisać ustawień.</value></data>
@@ -90,4 +98,277 @@
   <data name="Toast_AdminUnbanPasswordRequired" xml:space="preserve"><value>Podaj hasło do odbanowania użytkownika.</value></data>
   <data name="Lang_Polish" xml:space="preserve"><value>Polski</value></data>
   <data name="Lang_English" xml:space="preserve"><value>English</value></data>
+  <data name="App_BrandName" xml:space="preserve"><value>ZGRZYT</value></data>
+  <data name="App_BrandSuffix" xml:space="preserve"><value>Desktop</value></data>
+  <data name="Login_AppTitle" xml:space="preserve"><value>ZGRZYT Desktop</value></data>
+  <data name="Login_AppSubtitle" xml:space="preserve"><value>Zaloguj się</value></data>
+  <data name="Login_Title" xml:space="preserve"><value>Witaj ponownie</value></data>
+  <data name="Login_LabelLogin" xml:space="preserve"><value>Login</value></data>
+  <data name="Login_LabelPassword" xml:space="preserve"><value>Hasło</value></data>
+  <data name="Login_PlaceholderLogin" xml:space="preserve"><value>Wpisz login</value></data>
+  <data name="Login_PlaceholderPassword" xml:space="preserve"><value>Wpisz hasło</value></data>
+  <data name="Login_Button" xml:space="preserve"><value>Zaloguj się</value></data>
+  <data name="Login_ButtonLoading" xml:space="preserve"><value>Logowanie...</value></data>
+  <data name="Grid_Id" xml:space="preserve"><value>ID</value></data>
+  <data name="Grid_Category" xml:space="preserve"><value>Kategoria</value></data>
+  <data name="Grid_Title" xml:space="preserve"><value>Tytuł</value></data>
+  <data name="Grid_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Grid_Priority" xml:space="preserve"><value>Priorytet</value></data>
+  <data name="Grid_CreatedAt" xml:space="preserve"><value>Utworzono</value></data>
+  <data name="Grid_Login" xml:space="preserve"><value>Login</value></data>
+  <data name="Grid_Email" xml:space="preserve"><value>E-mail</value></data>
+  <data name="Grid_Role" xml:space="preserve"><value>Rola</value></data>
+  <data name="Grid_Active" xml:space="preserve"><value>Aktywny</value></data>
+  <data name="Grid_Ban" xml:space="preserve"><value>Ban</value></data>
+  <data name="Tickets_PageSizeLabel" xml:space="preserve"><value>Na stronę:</value></data>
+  <data name="Tickets_PageFirst" xml:space="preserve"><value>Pierwsza</value></data>
+  <data name="Tickets_PagePrevious" xml:space="preserve"><value>← Poprzednia</value></data>
+  <data name="Tickets_PageLabel" xml:space="preserve"><value>Strona:</value></data>
+  <data name="Tickets_PageNext" xml:space="preserve"><value>Następna →</value></data>
+  <data name="Tickets_PageLast" xml:space="preserve"><value>Ostatnia</value></data>
+  <data name="Tickets_NewSubtitle" xml:space="preserve"><value>Uzupełnij pola i utwórz zgłoszenie w systemie.</value></data>
+  <data name="Tickets_FieldCategory" xml:space="preserve"><value>Kategoria</value></data>
+  <data name="Tickets_FieldPriority" xml:space="preserve"><value>Priorytet</value></data>
+  <data name="Tickets_FieldTitle" xml:space="preserve"><value>Tytuł</value></data>
+  <data name="Tickets_FieldDescription" xml:space="preserve"><value>Opis</value></data>
+  <data name="Tickets_NewTitlePlaceholder" xml:space="preserve"><value>Tytuł zgłoszenia</value></data>
+  <data name="Tickets_NewDescriptionPlaceholder" xml:space="preserve"><value>Opis problemu</value></data>
+  <data name="Tickets_CreateButton" xml:space="preserve"><value>Utwórz zgłoszenie</value></data>
+  <data name="Tickets_EmptyList" xml:space="preserve"><value>Brak zgłoszeń</value></data>
+  <data name="Details_BackToList" xml:space="preserve"><value>← Wróć do listy</value></data>
+  <data name="Details_InfoTitle" xml:space="preserve"><value>Informacje o zgłoszeniu</value></data>
+  <data name="Details_Processing" xml:space="preserve"><value>Przetwarzanie...</value></data>
+  <data name="Details_Reporter" xml:space="preserve"><value>Zgłaszający</value></data>
+  <data name="Details_AssignedIt" xml:space="preserve"><value>Przypisany IT</value></data>
+  <data name="Details_Description" xml:space="preserve"><value>Opis</value></data>
+  <data name="Details_CloseOwnHint" xml:space="preserve"><value>Możesz zamknąć własne zgłoszenie, jeśli backend na to pozwala. Przy błędzie 403 operacja jest zablokowana po stronie API.</value></data>
+  <data name="Details_StaffHint" xml:space="preserve"><value>Masz dostęp do podglądu zgłoszenia i wiadomości. Edycja statusu, priorytetu oraz przypisywanie są dostępne dla ról admin/it.</value></data>
+  <data name="Details_OfflineHint" xml:space="preserve"><value>Tryb offline — edycja, przypisywanie i wiadomości są niedostępne.</value></data>
+  <data name="Details_ManageTitle" xml:space="preserve"><value>Zarządzanie zgłoszeniem</value></data>
+  <data name="Details_SaveChanges" xml:space="preserve"><value>Zapisz zmiany</value></data>
+  <data name="Details_AssignToMe" xml:space="preserve"><value>Przypisz do mnie</value></data>
+  <data name="Details_CloseTicket" xml:space="preserve"><value>Zamknij zgłoszenie</value></data>
+  <data name="Details_DeleteTicket" xml:space="preserve"><value>Usuń zgłoszenie</value></data>
+  <data name="Details_LocalAuditTitle" xml:space="preserve"><value>Historia lokalnych zmian</value></data>
+  <data name="Details_LocalAuditSubtitle" xml:space="preserve"><value>Historia działań wykonanych w tej aplikacji.</value></data>
+  <data name="Details_LocalAuditEmpty" xml:space="preserve"><value>Brak lokalnych wpisów dla tego zgłoszenia.</value></data>
+  <data name="Details_MessagesTitle" xml:space="preserve"><value>Wiadomości</value></data>
+  <data name="Details_MessagesSubtitle" xml:space="preserve"><value>Korespondencja w ramach zgłoszenia.</value></data>
+  <data name="Details_MessagePlaceholder" xml:space="preserve"><value>Wpisz wiadomość...</value></data>
+  <data name="Details_Send" xml:space="preserve"><value>Wyślij</value></data>
+  <data name="Details_NoMessages" xml:space="preserve"><value>Brak wiadomości w tym zgłoszeniu.</value></data>
+  <data name="Details_AssignedHint" xml:space="preserve"><value>Przypisany do zadania:</value></data>
+  <data name="Details_NotAssignedHint" xml:space="preserve"><value>Nikt nie jest przypisany do tego zadania</value></data>
+  <data name="RequestAccount_Title" xml:space="preserve"><value>Zgłoś nowe konto</value></data>
+  <data name="RequestAccount_Subtitle" xml:space="preserve"><value>Wypełnij dane nowego użytkownika. Prośba zostanie wysłana do administratora.</value></data>
+  <data name="RequestAccount_FullName" xml:space="preserve"><value>Imię i nazwisko</value></data>
+  <data name="RequestAccount_Login" xml:space="preserve"><value>Login</value></data>
+  <data name="RequestAccount_Email" xml:space="preserve"><value>E-mail</value></data>
+  <data name="RequestAccount_Password" xml:space="preserve"><value>Hasło</value></data>
+  <data name="RequestAccount_PasswordConfirm" xml:space="preserve"><value>Potwierdzenie hasła</value></data>
+  <data name="RequestAccount_PlaceholderName" xml:space="preserve"><value>np. Jan Kowalski</value></data>
+  <data name="RequestAccount_PlaceholderLogin" xml:space="preserve"><value>np. j.kowalski</value></data>
+  <data name="RequestAccount_PlaceholderEmail" xml:space="preserve"><value>np. jan.kowalski@firma.pl</value></data>
+  <data name="RequestAccount_PlaceholderPassword" xml:space="preserve"><value>Hasło</value></data>
+  <data name="RequestAccount_PlaceholderPasswordConfirm" xml:space="preserve"><value>Powtórz hasło</value></data>
+  <data name="RequestAccount_Submit" xml:space="preserve"><value>Wyślij prośbę</value></data>
+  <data name="Admin_RegisterTitle" xml:space="preserve"><value>Rejestracja użytkownika</value></data>
+  <data name="Admin_RegisterSubtitle" xml:space="preserve"><value>Utwórz prośbę o nowe konto w systemie (POST /api/request-account).</value></data>
+  <data name="Admin_StatusInactive" xml:space="preserve"><value>Nieaktywny</value></data>
+  <data name="Stats_LoadingAllPages" xml:space="preserve"><value>Trwa agregacja wielu stron listy...</value></data>
+  <data name="Stats_ChartByStatus" xml:space="preserve"><value>Według statusu</value></data>
+  <data name="Stats_ChartByPriority" xml:space="preserve"><value>Według priorytetu</value></data>
+  <data name="Stats_ChartAssignment" xml:space="preserve"><value>Przypisanie</value></data>
+  <data name="Stats_Assigned" xml:space="preserve"><value>Przypisane</value></data>
+  <data name="Stats_Unassigned" xml:space="preserve"><value>Nieprzypisane</value></data>
+  <data name="Stats_PriorityLow" xml:space="preserve"><value>Niski</value></data>
+  <data name="Stats_PriorityMedium" xml:space="preserve"><value>Średni</value></data>
+  <data name="Stats_PriorityHigh" xml:space="preserve"><value>Wysoki</value></data>
+  <data name="Audit_Title" xml:space="preserve"><value>Lokalny audyt aplikacji</value></data>
+  <data name="Audit_Subtitle" xml:space="preserve"><value>Lista akcji wykonanych lokalnie w aplikacji desktopowej.</value></data>
+  <data name="Audit_Refresh" xml:space="preserve"><value>Odśwież audyt</value></data>
+  <data name="Audit_Clear" xml:space="preserve"><value>Wyczyść audyt</value></data>
+  <data name="Audit_Empty" xml:space="preserve"><value>Brak lokalnych wpisów audytu.</value></data>
+  <data name="Audit_ColumnTimestamp" xml:space="preserve"><value>Data i czas</value></data>
+  <data name="Audit_ColumnUser" xml:space="preserve"><value>Użytkownik</value></data>
+  <data name="Audit_ColumnAction" xml:space="preserve"><value>Akcja</value></data>
+  <data name="Audit_ColumnTicketId" xml:space="preserve"><value>ID zgłoszenia</value></data>
+  <data name="Audit_ColumnDescription" xml:space="preserve"><value>Opis</value></data>
+  <data name="Toast_AuditCleared" xml:space="preserve"><value>Lokalny audyt został wyczyszczony.</value></data>
+﻿  <data name="Status_New" xml:space="preserve"><value>Nowe</value></data>
+  <data name="Status_InProgress" xml:space="preserve"><value>W toku</value></data>
+  <data name="Status_Closed" xml:space="preserve"><value>Zamknięte</value></data>
+  <data name="Status_Unknown" xml:space="preserve"><value>Nieznany</value></data>
+  <data name="Priority_Low" xml:space="preserve"><value>Niski</value></data>
+  <data name="Priority_Medium" xml:space="preserve"><value>Średni</value></data>
+  <data name="Priority_High" xml:space="preserve"><value>Wysoki</value></data>
+  <data name="Priority_Unknown" xml:space="preserve"><value>Nieznany</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>Wszystkie</value></data>
+  <data name="Filter_Active" xml:space="preserve"><value>Aktywne</value></data>
+  <data name="Filter_Unassigned" xml:space="preserve"><value>Nieprzypisane</value></data>
+  <data name="Filter_Closed" xml:space="preserve"><value>Zamknięte</value></data>
+  <data name="Filter_Banned" xml:space="preserve"><value>Zbanowani</value></data>
+  <data name="Filter_Inactive" xml:space="preserve"><value>Nieaktywni</value></data>
+  <data name="Tickets_Filter_StatusAll" xml:space="preserve"><value>Wszystkie statusy</value></data>
+  <data name="Tickets_Filter_PriorityAll" xml:space="preserve"><value>Wszystkie priorytety</value></data>
+  <data name="Category_Hardware" xml:space="preserve"><value>Sprzęt / Hardware</value></data>
+  <data name="Category_Software" xml:space="preserve"><value>Oprogramowanie / Software</value></data>
+  <data name="Category_Network" xml:space="preserve"><value>Sieć</value></data>
+  <data name="Category_DescriptionPrefix" xml:space="preserve"><value>Kategoria:</value></data>
+  <data name="Stats_Scope_NoData" xml:space="preserve"><value>Brak pobranych zgłoszeń.</value></data>
+  <data name="Stats_Scope_NoTickets" xml:space="preserve"><value>Brak zgłoszeń do analizy.</value></data>
+  <data name="Stats_Scope_CurrentPage" xml:space="preserve"><value>Statystyki dla {0} zgłoszeń na bieżącej stronie listy (łącznie w systemie: {1}).</value></data>
+  <data name="Stats_Scope_AllPages" xml:space="preserve"><value>Statystyki dla {0} zgłoszeń (łącznie w systemie: {1}).</value></data>
+  <data name="Stats_AllPagesRequiresOnline" xml:space="preserve"><value>Statystyki wielostronicowe wymagają połączenia z API.</value></data>
+  <data name="Stats_LoadAllPagesFailed" xml:space="preserve"><value>Nie udało się pobrać statystyk ze wszystkich stron.</value></data>
+  <data name="Stats_LoadAllFailed" xml:space="preserve"><value>Nie udało się pobrać statystyk.</value></data>
+  <data name="Stats_Loaded" xml:space="preserve"><value>Zaktualizowano statystyki ({0} zgłoszeń).</value></data>
+  <data name="Stats_ResponseTimeTitle" xml:space="preserve"><value>Czas pierwszej reakcji IT</value></data>
+  <data name="Stats_ResponseTimeUnavailable" xml:space="preserve"><value>API nie dostarcza danych czasu pierwszej odpowiedzi.</value></data>
+  <data name="Stats_ResponseTimeMethodApi" xml:space="preserve"><value>Średnia: {0} (first_response_at − created_at, {1} zgłoszeń).</value></data>
+  <data name="Stats_ResponseTimeMethodMessages" xml:space="preserve"><value>Średnia: {0} (pierwsza wiadomość IT/admin − created_at, {1} zgłoszeń).</value></data>
+  <data name="Stats_ResponseTimeMethodMixed" xml:space="preserve"><value>Średnia: {0} (first_response_at lub wiadomość IT/admin − created_at, {1} zgłoszeń).</value></data>
+  <data name="Stats_Duration_DaysHours" xml:space="preserve"><value>{0} d {1} h</value></data>
+  <data name="Stats_Duration_HoursMinutes" xml:space="preserve"><value>{0} h {1} min</value></data>
+  <data name="Stats_Duration_Minutes" xml:space="preserve"><value>{0} min</value></data>
+  <data name="Settings_StatusReady" xml:space="preserve"><value>Ustawienia gotowe.</value></data>
+  <data name="Settings_StatusSessionRefreshing" xml:space="preserve"><value>Odświeżanie sesji...</value></data>
+  <data name="Settings_StatusSessionRefreshed" xml:space="preserve"><value>Sesja została odświeżona.</value></data>
+  <data name="Settings_StatusSessionNoToken" xml:space="preserve"><value>Serwer nie zwrócił nowego tokenu (sprawdź POST /api/refresh).</value></data>
+  <data name="Settings_StatusSessionRefreshFailed" xml:space="preserve"><value>Nie udało się odświeżyć sesji.</value></data>
+  <data name="Tickets_StatusReady" xml:space="preserve"><value>Gotowy.</value></data>
+  <data name="Tickets_Loading" xml:space="preserve"><value>Pobieranie zgłoszeń...</value></data>
+  <data name="Tickets_Loaded" xml:space="preserve"><value>Pobrano zgłoszeń: {0} z {1}</value></data>
+  <data name="Tickets_QueueFetchTruncated" xml:space="preserve"><value>Filtry lokalne: pobrano do {0} zgłoszeń (limit {1} stron API). Lista może być niepełna.</value></data>
+  <data name="Tickets_NoTickets" xml:space="preserve"><value>Brak zgłoszeń.</value></data>
+  <data name="Tickets_OfflineShowingCache" xml:space="preserve"><value>Brak połączenia z API. Pokazuję dane offline: {0} zgłoszeń.</value></data>
+  <data name="Tickets_OfflineNoCache" xml:space="preserve"><value>Brak połączenia z API i brak zapisanych danych offline.</value></data>
+  <data name="Tickets_AutoRefreshStatus" xml:space="preserve"><value>Aplikacja automatycznie odświeża listę co {0} sekund.</value></data>
+  <data name="Tickets_OfflineAutoRefreshPaused" xml:space="preserve"><value>Brak połączenia z API. Automatyczne odświeżanie wstrzymane.</value></data>
+  <data name="Tickets_AutoRefreshFailed" xml:space="preserve"><value>Nie udało się automatycznie odświeżyć listy.</value></data>
+  <data name="Tickets_CreateOffline" xml:space="preserve"><value>Nie można utworzyć zgłoszenia w trybie offline.</value></data>
+  <data name="Tickets_ValidationTitle" xml:space="preserve"><value>Podaj tytuł zgłoszenia.</value></data>
+  <data name="Tickets_ValidationDescription" xml:space="preserve"><value>Podaj opis zgłoszenia.</value></data>
+  <data name="Tickets_ValidationCategory" xml:space="preserve"><value>Wybierz kategorię zgłoszenia.</value></data>
+  <data name="Tickets_Creating" xml:space="preserve"><value>Tworzenie zgłoszenia...</value></data>
+  <data name="Tickets_Created" xml:space="preserve"><value>Zgłoszenie zostało utworzone.</value></data>
+  <data name="Tickets_CreateError" xml:space="preserve"><value>Wystąpił błąd podczas tworzenia zgłoszenia.</value></data>
+  <data name="Tickets_CreateUnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas tworzenia zgłoszenia.</value></data>
+  <data name="Tickets_CreateOfflineError" xml:space="preserve"><value>Brak połączenia z API. Nie można utworzyć zgłoszenia offline.</value></data>
+  <data name="Details_SelectFromList" xml:space="preserve"><value>Wybierz zgłoszenie z listy.</value></data>
+  <data name="Details_SelectFirst" xml:space="preserve"><value>Najpierw wybierz zgłoszenie.</value></data>
+  <data name="Details_SelectStatus" xml:space="preserve"><value>Wybierz status zgłoszenia.</value></data>
+  <data name="Details_SelectPriority" xml:space="preserve"><value>Wybierz priorytet zgłoszenia.</value></data>
+  <data name="Details_Saving" xml:space="preserve"><value>Zapisywanie zmian...</value></data>
+  <data name="Details_Saved" xml:space="preserve"><value>Zmiany zostały zapisane.</value></data>
+  <data name="Details_Loading" xml:space="preserve"><value>Pobieranie szczegółów zgłoszenia...</value></data>
+  <data name="Details_Selected" xml:space="preserve"><value>Wybrano zgłoszenie #{0}.</value></data>
+  <data name="Details_OfflineCacheSelected" xml:space="preserve"><value>Wybrano zgłoszenie #{0} z cache offline.</value></data>
+  <data name="Details_NotFoundOffline" xml:space="preserve"><value>Nie znaleziono zgłoszenia w danych offline.</value></data>
+  <data name="Details_LoadFailed" xml:space="preserve"><value>Nie udało się pobrać szczegółów zgłoszenia.</value></data>
+  <data name="Details_InvalidServerData" xml:space="preserve"><value>Serwer zwrócił nieprawidłowe dane zgłoszenia. Poprzednie dane pozostają na ekranie.</value></data>
+  <data name="Details_NoEditPermission" xml:space="preserve"><value>Brak uprawnień do edycji zgłoszenia.</value></data>
+  <data name="Details_OfflineEdit" xml:space="preserve"><value>Nie można edytować zgłoszenia w trybie offline.</value></data>
+  <data name="Details_NoClosePermission" xml:space="preserve"><value>Brak uprawnień do zamknięcia zgłoszenia.</value></data>
+  <data name="Details_OfflineClose" xml:space="preserve"><value>Nie można zamknąć zgłoszenia w trybie offline.</value></data>
+  <data name="Details_Closing" xml:space="preserve"><value>Zamykanie zgłoszenia...</value></data>
+  <data name="Details_Closed" xml:space="preserve"><value>Zgłoszenie zostało zamknięte.</value></data>
+  <data name="Details_CloseFailed" xml:space="preserve"><value>Nie udało się zamknąć zgłoszenia.</value></data>
+  <data name="Details_CloseForbidden" xml:space="preserve"><value>Nie udało się zamknąć zgłoszenia: brak uprawnień lub błąd serwera.</value></data>
+  <data name="Details_NoDeletePermission" xml:space="preserve"><value>Brak uprawnień do usunięcia zgłoszenia.</value></data>
+  <data name="Details_Deleting" xml:space="preserve"><value>Usuwanie zgłoszenia...</value></data>
+  <data name="Details_Deleted" xml:space="preserve"><value>Zgłoszenie zostało usunięte.</value></data>
+  <data name="Details_DeleteFailed" xml:space="preserve"><value>Nie udało się usunąć zgłoszenia.</value></data>
+  <data name="Details_NoAssignPermission" xml:space="preserve"><value>Brak uprawnień do przypisania zgłoszenia.</value></data>
+  <data name="Details_OfflineAssign" xml:space="preserve"><value>Nie można przypisać zgłoszenia w trybie offline.</value></data>
+  <data name="Details_Assigning" xml:space="preserve"><value>Przypisywanie zgłoszenia...</value></data>
+  <data name="Details_Assigned" xml:space="preserve"><value>Zgłoszenie zostało przypisane do Ciebie.</value></data>
+  <data name="Details_AssignFailed" xml:space="preserve"><value>Wystąpił błąd podczas przypisywania zgłoszenia.</value></data>
+  <data name="Details_AssignUnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas przypisywania zgłoszenia.</value></data>
+  <data name="Details_OfflineAssignFailed" xml:space="preserve"><value>Brak połączenia z API. Nie można przypisać zgłoszenia offline.</value></data>
+  <data name="Details_OfflineSend" xml:space="preserve"><value>Nie można wysłać wiadomości w trybie offline.</value></data>
+  <data name="Details_EmptyMessage" xml:space="preserve"><value>Treść wiadomości nie może być pusta.</value></data>
+  <data name="Details_Sending" xml:space="preserve"><value>Wysyłanie wiadomości...</value></data>
+  <data name="Details_MessageSent" xml:space="preserve"><value>Wiadomość została wysłana.</value></data>
+  <data name="Details_MessageSendFailed" xml:space="preserve"><value>Wystąpił błąd podczas wysyłania wiadomości.</value></data>
+  <data name="Details_MessageSendUnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas wysyłania wiadomości.</value></data>
+  <data name="Details_OfflineSendFailed" xml:space="preserve"><value>Brak połączenia z API. Nie można wysłać wiadomości offline.</value></data>
+  <data name="Details_OfflineDetails" xml:space="preserve"><value>Brak połączenia z API. Szczegóły zgłoszenia są dostępne offline.</value></data>
+  <data name="Details_LoadUnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas pobierania szczegółów zgłoszenia.</value></data>
+  <data name="Details_SaveUnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas zapisywania zmian.</value></data>
+  <data name="Details_SaveFailed" xml:space="preserve"><value>Wystąpił błąd podczas zapisywania zmian.</value></data>
+  <data name="Details_OfflineSaveFailed" xml:space="preserve"><value>Brak połączenia z API. Nie można zapisać zmian offline.</value></data>
+  <data name="Details_CloseUnexpectedError" xml:space="preserve"><value>Wystąpił błąd podczas zamykania zgłoszenia.</value></data>
+  <data name="Details_UpdateAuditDesc" xml:space="preserve"><value>Zmieniono status na „{0}”, priorytet na „{1}”.</value></data>
+  <data name="Details_CloseAuditDesc" xml:space="preserve"><value>Zamknięto zgłoszenie.</value></data>
+  <data name="Details_DeleteAuditDesc" xml:space="preserve"><value>Usunięto zgłoszenie.</value></data>
+  <data name="Details_AssignAuditDesc" xml:space="preserve"><value>Przypisano zgłoszenie do użytkownika {0}.</value></data>
+  <data name="Details_MessageAuditDesc" xml:space="preserve"><value>Wysłano wiadomość w zgłoszeniu.</value></data>
+  <data name="RequestAccount_Offline" xml:space="preserve"><value>Nie można wysłać prośby w trybie offline.</value></data>
+  <data name="RequestAccount_ValidationName" xml:space="preserve"><value>Podaj imię i nazwisko.</value></data>
+  <data name="RequestAccount_ValidationPassword" xml:space="preserve"><value>Podaj hasło.</value></data>
+  <data name="RequestAccount_ValidationPasswordConfirm" xml:space="preserve"><value>Potwierdź hasło.</value></data>
+  <data name="RequestAccount_ValidationPasswordMismatch" xml:space="preserve"><value>Hasła nie są identyczne.</value></data>
+  <data name="RequestAccount_Sending" xml:space="preserve"><value>Wysyłanie prośby...</value></data>
+  <data name="RequestAccount_Failed" xml:space="preserve"><value>Nie udało się wysłać prośby o utworzenie konta.</value></data>
+  <data name="RequestAccount_Sent" xml:space="preserve"><value>Prośba o utworzenie konta została wysłana.</value></data>
+  <data name="RequestAccount_UnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas wysyłania prośby.</value></data>
+  <data name="RequestAccount_OfflineError" xml:space="preserve"><value>Brak połączenia z API. Nie można wysłać prośby offline.</value></data>
+  <data name="RequestAccount_AuditDesc" xml:space="preserve"><value>Wysłano prośbę o utworzenie konta: {0}.</value></data>
+  <data name="Audit_Action_Login" xml:space="preserve"><value>Logowanie</value></data>
+  <data name="Audit_Action_Logout" xml:space="preserve"><value>Wylogowanie</value></data>
+  <data name="Audit_Action_RequestAccount" xml:space="preserve"><value>Prośba o konto</value></data>
+  <data name="Audit_Action_SettingsSaved" xml:space="preserve"><value>Zapis ustawień</value></data>
+  <data name="Audit_Action_TicketCreated" xml:space="preserve"><value>Utworzenie zgłoszenia</value></data>
+  <data name="Audit_Action_TicketUpdated" xml:space="preserve"><value>Aktualizacja zgłoszenia</value></data>
+  <data name="Audit_Action_TicketAssigned" xml:space="preserve"><value>Przypisanie zgłoszenia</value></data>
+  <data name="Audit_Action_TicketClosed" xml:space="preserve"><value>Zamknięcie zgłoszenia</value></data>
+  <data name="Audit_Action_TicketDeleted" xml:space="preserve"><value>Usunięcie zgłoszenia</value></data>
+  <data name="Audit_Action_MessageSent" xml:space="preserve"><value>Wysłanie wiadomości</value></data>
+  <data name="Audit_Action_UserBanned" xml:space="preserve"><value>Zbanowanie użytkownika</value></data>
+  <data name="Audit_Action_UserActivated" xml:space="preserve"><value>Aktywacja użytkownika</value></data>
+  <data name="Audit_Action_UserUnbanned" xml:space="preserve"><value>Odbanowanie użytkownika</value></data>
+  <data name="Audit_Desc_SettingsSaved" xml:space="preserve"><value>Zmieniono ustawienia aplikacji.</value></data>
+  <data name="Audit_Desc_LoginAuto" xml:space="preserve"><value>Automatyczne logowanie przy starcie aplikacji.</value></data>
+  <data name="Audit_Desc_LoginForm" xml:space="preserve"><value>Zalogowano przez formularz logowania.</value></data>
+  <data name="Audit_Desc_LogoutDesktop" xml:space="preserve"><value>Wylogowano użytkownika z aplikacji desktopowej.</value></data>
+  <data name="Audit_Desc_UserBanned" xml:space="preserve"><value>Zbanowano użytkownika: {0}.</value></data>
+  <data name="Audit_Desc_UserActivated" xml:space="preserve"><value>Aktywowano użytkownika: {0}.</value></data>
+  <data name="Audit_Desc_UserUnbanned" xml:space="preserve"><value>Odbanowano użytkownika: {0}.</value></data>
+  <data name="Audit_Desc_TicketCreated" xml:space="preserve"><value>Utworzono zgłoszenie: {0}</value></data>
+  <data name="Audit_User" xml:space="preserve"><value>Użytkownik: {0}</value></data>
+  <data name="Audit_Ticket" xml:space="preserve"><value>Zgłoszenie #{0}</value></data>
+  <data name="Admin_StatusCount" xml:space="preserve"><value>Znaleziono: {0} użytkowników — {1}</value></data>
+  <data name="Admin_ListForbidden" xml:space="preserve"><value>Brak uprawnień do wyświetlenia tej listy użytkowników.</value></data>
+  <data name="Admin_BannedListNotSupported" xml:space="preserve"><value>Backend nie udostępnia listy zbanowanych użytkowników.</value></data>
+  <data name="Admin_ActionNotSupported" xml:space="preserve"><value>Backend nie obsługuje tej akcji dla wybranego użytkownika.</value></data>
+  <data name="Admin_StatusActive" xml:space="preserve"><value>Aktywny</value></data>
+  <data name="Admin_StatusBan" xml:space="preserve"><value>Ban</value></data>
+  <data name="Toast_LoggedIn" xml:space="preserve"><value>Zalogowano jako {0}.</value></data>
+  <data name="Toast_LoggedOut" xml:space="preserve"><value>Wylogowano z aplikacji.</value></data>
+  <data name="Toast_RequestAccountSent" xml:space="preserve"><value>Prośba o utworzenie konta została wysłana.</value></data>
+  <data name="Toast_RequestAccountOffline" xml:space="preserve"><value>Brak połączenia z API. Nie można wysłać prośby offline.</value></data>
+  <data name="Toast_TicketsOfflineCache" xml:space="preserve"><value>Brak połączenia z API. Pokazuję dane offline.</value></data>
+  <data name="Toast_TicketsFetchError" xml:space="preserve"><value>Wystąpił błąd podczas pobierania zgłoszeń.</value></data>
+  <data name="Toast_TicketsLostConnection" xml:space="preserve"><value>Utracono połączenie z API.</value></data>
+  <data name="Toast_TicketsRefreshFailed" xml:space="preserve"><value>Nie udało się odświeżyć listy zgłoszeń.</value></data>
+  <data name="Toast_TicketCreated" xml:space="preserve"><value>Nowe zgłoszenie zostało utworzone.</value></data>
+  <data name="Toast_TicketCreateOffline" xml:space="preserve"><value>Brak połączenia z API. Nie można utworzyć zgłoszenia.</value></data>
+  <data name="Toast_TicketSaved" xml:space="preserve"><value>Zmiany w zgłoszeniu zostały zapisane.</value></data>
+  <data name="Toast_TicketSaveOffline" xml:space="preserve"><value>Brak połączenia z API. Zmiany nie zostały zapisane.</value></data>
+  <data name="Toast_TicketClosed" xml:space="preserve"><value>Zgłoszenie zostało zamknięte.</value></data>
+  <data name="Toast_TicketDeleted" xml:space="preserve"><value>Zgłoszenie zostało usunięte.</value></data>
+  <data name="Toast_TicketAssigned" xml:space="preserve"><value>Zgłoszenie zostało przypisane do Ciebie.</value></data>
+  <data name="Toast_TicketAssignOffline" xml:space="preserve"><value>Brak połączenia z API. Zgłoszenie nie zostało przypisane.</value></data>
+  <data name="Toast_MessageSent" xml:space="preserve"><value>Wiadomość została wysłana.</value></data>
+  <data name="Toast_MessageSendOffline" xml:space="preserve"><value>Brak połączenia z API. Wiadomość nie została wysłana.</value></data>
+  <data name="Toast_DetailsOffline" xml:space="preserve"><value>Brak połączenia z API. Szczegóły zgłoszenia są dostępne offline.</value></data>
+  <data name="Toast_DetailsLoadError" xml:space="preserve"><value>Wystąpił błąd podczas pobierania szczegółów zgłoszenia.</value></data>
+  <data name="Toast_TicketCreateOfflineBlocked" xml:space="preserve"><value>Nie można utworzyć zgłoszenia w trybie offline.</value></data>
+  <data name="Toast_DetailsEditForbidden" xml:space="preserve"><value>Brak uprawnień do edycji zgłoszenia.</value></data>
+  <data name="Toast_DetailsEditOffline" xml:space="preserve"><value>Nie można edytować zgłoszenia w trybie offline.</value></data>
+  <data name="Toast_DetailsAssignForbidden" xml:space="preserve"><value>Brak uprawnień do przypisania zgłoszenia.</value></data>
+  <data name="Toast_DetailsAssignOffline" xml:space="preserve"><value>Nie można przypisać zgłoszenia w trybie offline.</value></data>
+  <data name="Toast_DetailsMessageOffline" xml:space="preserve"><value>Nie można wysłać wiadomości w trybie offline.</value></data>
+  <data name="RequestAccount_ValidationEmail" xml:space="preserve"><value>Podaj adres e-mail.</value></data>
 </root>

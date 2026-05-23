@@ -2,103 +2,126 @@
     x:Class="ZgrzytDesktop.Views.DashboardParts.SettingsPanelView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:ZgrzytDesktop.Converters"
     x:CompileBindings="False">
-<ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel Classes="page-content" Spacing="20">
-                    <Border Classes="app-card">
-                        <StackPanel Spacing="14">
-                            <TextBlock Classes="section-title-large" Text="{Binding SettingsPanel.LblSettingsTitle}" />
-                            <TextBlock Classes="section-subtitle" Text="{Binding SettingsPanel.LblSettingsSubtitle}" />
 
-                            <TextBlock Classes="field-label" Text="{Binding SettingsPanel.LblSettingsTheme}" Margin="0" />
-                            <ComboBox
-                                ItemsSource="{Binding SettingsPanel.ThemeModes}"
-                                SelectedItem="{Binding SettingsPanel.SelectedThemeMode}"
-                                MinHeight="38"
-                                HorizontalAlignment="Stretch" />
+    <UserControl.Resources>
+        <conv:CollectionIsEmptyConverter x:Key="CollectionIsEmptyConverter" />
+        <conv:ObjectIsNotNullConverter x:Key="ObjectIsNotNullConverter" />
+    </UserControl.Resources>
 
-                            <TextBlock Classes="field-label" Text="{Binding SettingsPanel.LblSettingsLanguage}" Margin="0,8,0,0" />
-                            <ComboBox
-                                ItemsSource="{Binding SettingsPanel.UiCultures}"
-                                SelectedItem="{Binding SettingsPanel.SelectedUiCulture}"
-                                MinHeight="38"
-                                HorizontalAlignment="Stretch" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Classes="page-content">
+            <Border Classes="app-card settings-panel-card">
+                <StackPanel Spacing="16">
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="section-title-large" Text="{Binding SettingsPanel.LblSettingsTitle}" />
+                        <TextBlock Classes="section-subtitle" Text="{Binding SettingsPanel.LblSettingsSubtitle}" />
+                    </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button
-                                    Classes="btn-primary"
-                                    Content="{Binding SettingsPanel.LblSettingsSave}"
-                                    Command="{Binding SettingsPanel.SaveSettingsCommand}"
-                                    MinWidth="160"
-                                    MinHeight="36" />
-                                <Button
-                                    Classes="btn-secondary"
-                                    Content="{Binding SettingsPanel.LblSettingsRefreshSession}"
-                                    Command="{Binding SettingsPanel.RefreshSessionCommand}"
-                                    MinWidth="180"
-                                    MinHeight="36" />
-                            </StackPanel>
+                    <StackPanel Spacing="8" MaxWidth="480" HorizontalAlignment="Left">
+                        <TextBlock Classes="account-form-label" Text="{Binding SettingsPanel.LblSettingsLanguage}" />
+                        <ComboBox
+                            Classes="settings-select"
+                            ItemsSource="{Binding SettingsPanel.UiCultures}"
+                            SelectedItem="{Binding SettingsPanel.SelectedUiCulture}"
+                            MinHeight="44"
+                            HorizontalAlignment="Stretch" />
+                    </StackPanel>
 
-                            <TextBlock Text="{Binding SettingsPanel.SettingsStatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource AppSecondaryTextBrush}" />
-                        </StackPanel>
-                    </Border>
+                    <WrapPanel Classes="settings-actions-wrap" Orientation="Horizontal">
+                        <Button
+                            Classes="btn-primary"
+                            Content="{Binding SettingsPanel.LblSettingsSave}"
+                            Command="{Binding SettingsPanel.SaveSettingsCommand}"
+                            MinWidth="160"
+                            MinHeight="40"
+                            Margin="0,0,8,8" />
+                        <Button
+                            Classes="btn-secondary"
+                            Content="{Binding SettingsPanel.LblSettingsRefreshSession}"
+                            Command="{Binding SettingsPanel.RefreshSessionCommand}"
+                            MinWidth="180"
+                            MinHeight="40"
+                            Margin="0,0,8,8" />
+                    </WrapPanel>
 
-                    <Border Classes="app-card">
-                        <StackPanel Spacing="14">
-                            <TextBlock Classes="section-title-large" Text="Lokalny audyt aplikacji" />
-                            <TextBlock
-                                Classes="section-subtitle"
-                                Text="Lista akcji wykonanych lokalnie w aplikacji desktopowej." />
-
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button
-                                    Classes="btn-secondary"
-                                    Content="Odśwież audyt"
-                                    Command="{Binding AuditPanel.LoadAuditLogsCommand}"
-                                    MinWidth="130"
-                                    MinHeight="36" />
-                                <Button
-                                    Classes="btn-secondary"
-                                    Content="Wyczyść audyt"
-                                    Command="{Binding AuditPanel.ClearAuditLogsCommand}"
-                                    MinWidth="130"
-                                    MinHeight="36" />
-                            </StackPanel>
-
-                            <DataGrid
-                                ItemsSource="{Binding AuditPanel.AuditLogEntries}"
-                                AutoGenerateColumns="False"
-                                IsReadOnly="True"
-                                CanUserSortColumns="False"
-                                MinHeight="200"
-                                MaxHeight="420"
-                                GridLinesVisibility="Horizontal"
-                                HeadersVisibility="Column">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Data i czas" Binding="{Binding Timestamp}" Width="180" />
-                                    <DataGridTextColumn Header="Użytkownik" Binding="{Binding UserLogin}" Width="160" />
-                                    <DataGridTextColumn Header="Akcja" Binding="{Binding Action}" Width="200" />
-                                    <DataGridTextColumn Header="ID zgłoszenia" Binding="{Binding TicketId}" Width="100" />
-                                    <DataGridTemplateColumn Header="Opis" Width="*" MinWidth="350">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock
-                                                    Text="{Binding Description}"
-                                                    TextWrapping="Wrap"
-                                                    MaxHeight="72"
-                                                    ToolTip.Tip="{Binding Description}" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-
-                            <TextBlock
-                                Classes="empty-state"
-                                Text="Brak lokalnych wpisów audytu."
-                                IsVisible="{Binding AuditPanel.HasNoAuditLogEntries}" />
-                        </StackPanel>
-                    </Border>
+                    <TextBlock
+                        Classes="account-form-status"
+                        Text="{Binding SettingsPanel.SettingsStatusMessage}"
+                        TextWrapping="Wrap" />
                 </StackPanel>
-            </ScrollViewer>
+            </Border>
+
+            <Border Classes="app-card settings-panel-card">
+                <StackPanel Spacing="14">
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="section-title-large" Text="{Binding LblAuditTitle}" />
+                        <TextBlock Classes="section-subtitle" Text="{Binding LblAuditSubtitle}" />
+                    </StackPanel>
+
+                    <WrapPanel Classes="settings-actions-wrap" Orientation="Horizontal">
+                        <Button
+                            Classes="btn-secondary"
+                            Content="{Binding LblAuditRefresh}"
+                            Command="{Binding AuditPanel.LoadAuditLogsCommand}"
+                            MinWidth="130"
+                            MinHeight="38"
+                            Margin="0,0,8,8" />
+                    </WrapPanel>
+
+                    <Panel MinHeight="160">
+                        <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl
+                                Classes="audit-log-list"
+                                ItemsSource="{Binding AuditPanel.AuditLogEntries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Classes="audit-log-row">
+                                            <StackPanel Spacing="6">
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <TextBlock
+                                                        Grid.Column="0"
+                                                        Classes="audit-log-action"
+                                                        Text="{Binding DisplayAction}"
+                                                        TextWrapping="Wrap" />
+                                                    <TextBlock
+                                                        Grid.Column="1"
+                                                        Classes="audit-log-timestamp"
+                                                        Text="{Binding Timestamp, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" />
+                                                </Grid>
+                                                <TextBlock
+                                                    Classes="audit-log-description"
+                                                    Text="{Binding DisplayDescription}"
+                                                    TextWrapping="Wrap" />
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock
+                                                        Classes="audit-log-meta"
+                                                        Text="{Binding DisplayUserLogin}" />
+                                                    <TextBlock
+                                                        Classes="audit-log-meta"
+                                                        Text="·"
+                                                        IsVisible="{Binding TicketId, Converter={StaticResource ObjectIsNotNullConverter}}" />
+                                                    <TextBlock
+                                                        Classes="audit-log-meta"
+                                                        Text="{Binding DisplayTicketLabel}"
+                                                        IsVisible="{Binding TicketId, Converter={StaticResource ObjectIsNotNullConverter}}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <TextBlock
+                            Classes="empty-state"
+                            Text="{Binding LblAuditEmpty}"
+                            IsVisible="{Binding AuditPanel.HasNoAuditLogEntries}"
+                            IsHitTestVisible="False" />
+                    </Panel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

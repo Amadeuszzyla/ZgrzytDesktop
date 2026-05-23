@@ -14,6 +14,9 @@ public static class AppStrings
     public static string Get(string name) =>
         Manager.GetString(name, CultureInfo.CurrentUICulture) ?? name;
 
+    public static string GetFormat(string name, params object[] args) =>
+        string.Format(CultureInfo.CurrentUICulture, Get(name), args);
+
     public static void ApplyCulture(string? uiCulture)
     {
         var normalized = string.Equals(uiCulture, "en", StringComparison.OrdinalIgnoreCase) ||

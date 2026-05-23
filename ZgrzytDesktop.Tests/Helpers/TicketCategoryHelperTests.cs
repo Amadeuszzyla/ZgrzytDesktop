@@ -1,10 +1,14 @@
 using Xunit;
 using ZgrzytDesktop.Helpers;
+using ZgrzytDesktop.Resources;
+using ZgrzytDesktop.Tests.ViewModels;
 
 namespace ZgrzytDesktop.Tests.Helpers;
 
 public class TicketCategoryHelperTests
 {
+    public TicketCategoryHelperTests() => ViewModelTestSetup.EnsureAppStrings();
+
     [Theory]
     [InlineData("Hardware")]
     [InlineData("Software")]
@@ -25,6 +29,7 @@ public class TicketCategoryHelperTests
     [Fact]
     public void ExtractCategory_ShouldReadFromDescriptionLine()
     {
+        AppStrings.ApplyCulture("pl");
         var category = TicketCategoryHelper.ExtractCategory(
             "Tytuł",
             "Kategoria: Sieć\n\nBrak internetu");
@@ -47,12 +52,33 @@ public class TicketCategoryHelperTests
     }
 
     [Fact]
-    public void FormatDescription_ShouldAddCategoryLine()
+    public void FormatDescription_ShouldAddCategoryLineInPolish()
     {
+        AppStrings.ApplyCulture("pl");
         var result = TicketCategoryHelper.FormatDescription("Software", "Błąd aplikacji");
 
         Assert.StartsWith("Kategoria: Software", result, StringComparison.Ordinal);
         Assert.Contains("Błąd aplikacji", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void FormatDescription_ShouldAddCategoryLineInEnglish()
+    {
+        AppStrings.ApplyCulture("en");
+        var result = TicketCategoryHelper.FormatDescription("Software", "Application error");
+
+        Assert.StartsWith("Category: Software", result, StringComparison.Ordinal);
+        Assert.Contains("Application error", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ToDisplayCategory_ShouldLocalizeLabels()
+    {
+        AppStrings.ApplyCulture("pl");
+        Assert.Equal("Sieć", TicketCategoryHelper.ToDisplayCategory("Sieć"));
+
+        AppStrings.ApplyCulture("en");
+        Assert.Equal("Network", TicketCategoryHelper.ToDisplayCategory("Sieć"));
     }
 
     [Fact]

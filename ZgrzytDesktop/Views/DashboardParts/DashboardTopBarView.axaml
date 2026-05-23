@@ -1,0 +1,86 @@
+<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.DashboardTopBarView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:CompileBindings="False">
+
+    <Border Classes="app-topbar">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="12">
+            <StackPanel
+                Grid.Column="0"
+                Orientation="Horizontal"
+                Spacing="10"
+                VerticalAlignment="Center">
+                <Image
+                    Classes="topbar-logo"
+                    Source="/Assets/zgrzyt-logo.png"
+                    Width="36"
+                    Height="36" />
+                <TextBlock
+                    Classes="topbar-brand"
+                    Text="{Binding LblAppBrandName}" />
+            </StackPanel>
+
+            <StackPanel
+                Grid.Column="1"
+                Orientation="Horizontal"
+                Spacing="4"
+                VerticalAlignment="Center"
+                Margin="8,0,0,0">
+                <Button
+                    Classes="topbar-nav"
+                    Classes.active="{Binding IsTicketsNavActive}"
+                    Content="{Binding LblNavTickets}"
+                    Command="{Binding ShowTicketsPageCommand}" />
+                <Button
+                    Classes="topbar-nav"
+                    Classes.active="{Binding IsRequestAccountNavActive}"
+                    Content="{Binding LblNavRequestAccount}"
+                    Command="{Binding ShowRequestAccountPageCommand}"
+                    IsVisible="{Binding ShowRequestAccountNav}" />
+                <Button
+                    Classes="topbar-nav"
+                    Classes.active="{Binding IsStatisticsNavActive}"
+                    Content="{Binding LblNavStatistics}"
+                    Command="{Binding ShowStatisticsPageCommand}" />
+                <Button
+                    Classes="topbar-nav"
+                    Classes.active="{Binding IsSettingsNavActive}"
+                    Content="{Binding LblNavSettings}"
+                    Command="{Binding ShowSettingsPageCommand}" />
+                <Button
+                    Classes="topbar-nav"
+                    Classes.active="{Binding IsAdminNavActive}"
+                    Content="{Binding LblNavAdmin}"
+                    Command="{Binding ShowAdminPageCommand}"
+                    IsVisible="{Binding ShowAdministrationNav}" />
+            </StackPanel>
+
+            <Border
+                Grid.Column="3"
+                Classes="user-badge"
+                VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Classes="user-badge-text" Text="{Binding CurrentUser.Name}" />
+                <TextBlock Classes="user-badge-text" Text=" - " />
+                <TextBlock Classes="user-badge-text" Text="{Binding CurrentUser.Role}" />
+            </StackPanel>
+            </Border>
+
+            <Button
+                Grid.Column="4"
+                Classes="btn-outline-danger"
+                Content="{Binding LblNavLogout}"
+                Command="{Binding LogoutCommand}"
+                VerticalAlignment="Center"
+                MinWidth="120" />
+
+            <Border
+                Grid.Column="5"
+                Classes="version-badge"
+                VerticalAlignment="Center">
+                <TextBlock Classes="version-badge-text" Text="v0.1.0-alpha" />
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

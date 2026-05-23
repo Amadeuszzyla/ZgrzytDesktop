@@ -21,17 +21,15 @@ public class LocalTicketCacheService : ILocalTicketCacheService
 
     public LocalTicketCacheService(string? customDirectory = null)
     {
-        var directory = customDirectory;
-
-        if (string.IsNullOrWhiteSpace(directory))
+        if (string.IsNullOrWhiteSpace(customDirectory))
         {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            directory = Path.Combine(appData, "ZgrzytDesktop", "Cache");
+            AppDataPaths.EnsureDirectoryForFile(AppDataPaths.TicketsCacheFilePath);
+            _filePath = AppDataPaths.TicketsCacheFilePath;
+            return;
         }
 
-        Directory.CreateDirectory(directory);
-
-        _filePath = Path.Combine(directory, "tickets-cache.json");
+        Directory.CreateDirectory(customDirectory);
+        _filePath = Path.Combine(customDirectory, "tickets-cache.json");
     }
 
     public async Task SaveTicketsAsync(IEnumerable<Ticket> tickets)
@@ -39,8 +37,7 @@ public class LocalTicketCacheService : ILocalTicketCacheService
         try
         {
             var json = JsonSerializer.Serialize(tickets, _jsonOptions);
-            var protectedJson = LocalDataProtector.ProtectString(json);
-            await File.WriteAllTextAsync(_filePath, protectedJson);
+            await SecureLocalFileStorage.WriteEncryptedAsync(_filePath, json);
         }
         catch
         {
@@ -52,36 +49,24 @@ public class LocalTicketCacheService : ILocalTicketCacheService
     {
         try
         {
-            if (!File.Exists(_filePath))
-                return new List<Ticket>();
-
-            var stored = await File.ReadAllTextAsync(_filePath);
-            var json = LocalDataProtector.UnprotectString(stored);
+            var json = await SecureLocalFileStorage.ReadDecryptedAsync(
+                _filePath,
+                SecureLocalFileStorage.LooksLikeJsonDocument);
 
             if (string.IsNullOrWhiteSpace(json))
-                return new List<Ticket>();
+                return [];
 
-            return JsonSerializer.Deserialize<List<Ticket>>(json, _jsonOptions)
-                   ?? new List<Ticket>();
+            return JsonSerializer.Deserialize<List<Ticket>>(json, _jsonOptions) ?? [];
         }
         catch
         {
-            return new List<Ticket>();
+            return [];
         }
     }
 
     public Task ClearAsync()
     {
-        try
-        {
-            if (File.Exists(_filePath))
-                File.Delete(_filePath);
-        }
-        catch
-        {
-            // Czyszczenie cache nie może zatrzymać aplikacji.
-        }
-
+        SecureLocalFileStorage.TryDelete(_filePath);
         return Task.CompletedTask;
     }
 }

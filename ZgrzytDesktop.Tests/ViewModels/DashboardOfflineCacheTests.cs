@@ -39,12 +39,12 @@ public class DashboardOfflineCacheTests
                 }
             ]);
 
-            await vm.RefreshTicketsNowCommand.ExecuteAsync(null);
+            await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
             Assert.True(vm.IsOffline);
-            Assert.Single(vm.Tickets);
-            Assert.Equal(99, vm.Tickets[0].Id);
-            Assert.Contains("offline", vm.StatusMessage, StringComparison.OrdinalIgnoreCase);
+            Assert.Single(vm.TicketsPanel.Tickets);
+            Assert.Equal(99, vm.TicketsPanel.Tickets[0].Id);
+            Assert.Contains("offline", vm.TicketsPanel.StatusMessage, StringComparison.OrdinalIgnoreCase);
         }
         finally
         {
@@ -64,11 +64,11 @@ public class DashboardOfflineCacheTests
 
         try
         {
-            await vm.RefreshTicketsNowCommand.ExecuteAsync(null);
+            await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
             Assert.True(vm.IsOffline);
-            Assert.Empty(vm.Tickets);
-            Assert.Equal("Brak połączenia z API i brak zapisanych danych offline.", vm.StatusMessage);
+            Assert.Empty(vm.TicketsPanel.Tickets);
+            Assert.Equal("Brak połączenia z API i brak zapisanych danych offline.", vm.TicketsPanel.StatusMessage);
         }
         finally
         {

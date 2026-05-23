@@ -15,13 +15,7 @@ public partial class DashboardViewModel
                 OnPropertyChanged(nameof(ConnectionStatusText));
                 OnPropertyChanged(nameof(CanUseOnlineActions));
                 OnPropertyChanged(nameof(CanRequestAccount));
-                OnPropertyChanged(nameof(CanUseOnlineDetailsActions));
-                OnPropertyChanged(nameof(CanSendMessage));
-                OnPropertyChanged(nameof(CanEditTicket));
-                OnPropertyChanged(nameof(CanAssignTicket));
-                OnPropertyChanged(nameof(CanCloseOwnTicket));
-                OnPropertyChanged(nameof(CanCloseTicket));
-                OnPropertyChanged(nameof(CanDeleteTicket));
+                TicketDetailsPanel?.NotifyCapabilityProperties();
             }
         }
     }

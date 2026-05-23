@@ -24,6 +24,29 @@ public class TokenStorageTests
 
         var storedAfterMigration = await File.ReadAllTextAsync(Path.Combine(directory, "token.txt"));
         Assert.NotEqual(legacyToken, storedAfterMigration.Trim());
-        Assert.NotEqual(token, storedAfterMigration.Trim());
+        Assert.DoesNotContain(legacyToken, storedAfterMigration, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task SaveTokenAsync_StoresDpapiBlob_NotPlaintext()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "ZgrzytDesktop.Tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+
+        var token = "eyJhbGciOiJIUzI1NiJ9.payload.signature";
+
+        try
+        {
+            var storage = new TokenStorage(directory);
+            await storage.SaveTokenAsync(token);
+
+            var raw = await File.ReadAllTextAsync(Path.Combine(directory, "token.txt"));
+            Assert.DoesNotContain(token, raw, StringComparison.Ordinal);
+        }
+        finally
+        {
+            if (Directory.Exists(directory))
+                Directory.Delete(directory, recursive: true);
+        }
     }
 }

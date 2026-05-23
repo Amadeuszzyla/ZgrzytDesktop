@@ -11,6 +11,4 @@ public interface ILocalAuditLogService
     Task<List<AuditLogEntry>> LoadAsync();
 
     Task<List<AuditLogEntry>> LoadForTicketAsync(int ticketId);
-
-    Task ClearAsync();
 }
