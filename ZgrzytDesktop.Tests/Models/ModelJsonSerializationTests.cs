@@ -24,6 +24,17 @@ public class ModelJsonSerializationTests
     }
 
     [Fact]
+    public void Message_ShouldDeserializeMessageAliasWhenBodyMissing()
+    {
+        const string json = """{"id":2,"message":"Odpowiedź IT","ticket_id":8}""";
+
+        var message = JsonSerializer.Deserialize<ZgrzytDesktop.Models.Message>(json, _options);
+
+        Assert.NotNull(message);
+        Assert.Equal("Odpowiedź IT", message!.Content);
+    }
+
+    [Fact]
     public void Message_ShouldSerializeContentAsBody()
     {
         var message = new ZgrzytDesktop.Models.Message { Content = "Treść wiadomości" };

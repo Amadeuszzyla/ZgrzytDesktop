@@ -1,5 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
+using ZgrzytDesktop.Helpers;
+using ZgrzytDesktop.Resources;
 
 namespace ZgrzytDesktop.Models;
 
@@ -10,6 +12,40 @@ public class Message
 
     [JsonPropertyName("body")]
     public string Content { get; set; } = string.Empty;
+
+    [JsonPropertyName("message")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]
+    public string MessageBodyAlias
+    {
+        set
+        {
+            if (string.IsNullOrWhiteSpace(Content))
+                Content = value ?? string.Empty;
+        }
+    }
+
+    [JsonPropertyName("content")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]
+    public string ContentBodyAlias
+    {
+        set
+        {
+            if (string.IsNullOrWhiteSpace(Content))
+                Content = value ?? string.Empty;
+        }
+    }
+
+    [JsonIgnore]
+    public string DisplayBody
+    {
+        get
+        {
+            var plain = HtmlTextSanitizer.ToPlainText(Content);
+            return string.IsNullOrWhiteSpace(plain)
+                ? AppStrings.Get("Details_MessageBodyEmpty")
+                : plain;
+        }
+    }
 
     [JsonPropertyName("ticket_id")]
     public int TicketId { get; set; }

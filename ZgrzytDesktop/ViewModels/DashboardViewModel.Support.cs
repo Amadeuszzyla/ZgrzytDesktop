@@ -24,7 +24,7 @@ public partial class DashboardViewModel
     private bool HandleApiError(
         ApiException ex,
         Action<string>? setStatusMessage = null,
-        string? offlineToastMessage = null,
+        string? offlineToastMessageKey = null,
         bool showToast = true,
         bool setOfflineOnServiceUnavailable = true)
     {
@@ -33,8 +33,8 @@ public partial class DashboardViewModel
         {
             IsOffline = true;
 
-            if (!string.IsNullOrWhiteSpace(offlineToastMessage) && showToast)
-                ShowToast(offlineToastMessage, ToastTypes.Warning);
+            if (!string.IsNullOrWhiteSpace(offlineToastMessageKey) && showToast)
+                ShowToastKey(offlineToastMessageKey, ToastTypes.Warning);
 
             return true;
         }
@@ -50,22 +50,25 @@ public partial class DashboardViewModel
 
     private void HandleUnexpectedError(
         Action<string>? setStatusMessage,
-        string statusMessage,
-        string? toastMessage = null,
+        string? statusMessageKey,
+        string? toastMessageKey = null,
         bool showToast = true)
     {
-        setStatusMessage?.Invoke(statusMessage);
+        var statusKey = string.IsNullOrWhiteSpace(statusMessageKey)
+            ? "Api_UnexpectedError"
+            : statusMessageKey;
+        setStatusMessage?.Invoke(AppStrings.Get(statusKey));
 
-        if (showToast && !string.IsNullOrWhiteSpace(toastMessage))
-            ShowToast(toastMessage, ToastTypes.Error);
+        if (showToast && !string.IsNullOrWhiteSpace(toastMessageKey))
+            ShowToastKey(toastMessageKey, ToastTypes.Error);
     }
 
     internal async Task<bool> ExecuteApiAsync(
         Func<Task> action,
         Action<string>? setStatusMessage = null,
-        string? unexpectedStatusMessage = null,
-        string? unexpectedToastMessage = null,
-        string? offlineToastMessage = null,
+        string? unexpectedStatusMessageKey = null,
+        string? unexpectedToastMessageKey = null,
+        string? offlineToastMessageKey = null,
         bool showApiErrorToast = true,
         bool setOfflineOnServiceUnavailable = true,
         Func<ApiException, Task>? onServiceUnavailableAsync = null)
@@ -89,7 +92,7 @@ public partial class DashboardViewModel
             HandleApiError(
                 ex,
                 setStatusMessage,
-                offlineToastMessage,
+                offlineToastMessageKey,
                 showApiErrorToast,
                 setOfflineOnServiceUnavailable);
             return false;
@@ -103,8 +106,8 @@ public partial class DashboardViewModel
         {
             HandleUnexpectedError(
                 setStatusMessage,
-                unexpectedStatusMessage ?? AppStrings.Get("Api_UnexpectedError"),
-                unexpectedToastMessage);
+                unexpectedStatusMessageKey,
+                unexpectedToastMessageKey);
             return false;
         }
     }
@@ -124,7 +127,7 @@ public partial class DashboardViewModel
     {
         await Dispatcher.UIThread.InvokeAsync(async () =>
         {
-            ShowToast(AppStrings.Get("Api_SessionExpired"), ToastTypes.Error);
+            ShowToastKey("Api_SessionExpired", ToastTypes.Error);
             await _onLogoutRequested();
         });
     }

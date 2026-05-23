@@ -31,12 +31,9 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
     private double _statsPriorityChartMaximum = 1;
     private double _statsAssignmentChartMaximum = 1;
     private string _statsScopeMessage = AppStrings.Get("Stats_Scope_NoData");
-    private string _statsResponseTimeMessage = AppStrings.Get("Stats_ResponseTimeUnavailable");
-    private bool _isResponseTimeAvailable;
     private bool _isLoadingAllStatistics;
     private bool _fromCurrentPageOnly;
     private int _totalInSystem;
-    private ResponseTimeStatistics? _lastResponseTimeStatistics;
 
     public StatisticsPanelViewModel(
         ITicketService ticketService,
@@ -128,18 +125,6 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
         private set => SetProperty(ref _statsScopeMessage, value);
     }
 
-    public string StatsResponseTimeMessage
-    {
-        get => _statsResponseTimeMessage;
-        private set => SetProperty(ref _statsResponseTimeMessage, value);
-    }
-
-    public bool IsResponseTimeAvailable
-    {
-        get => _isResponseTimeAvailable;
-        private set => SetProperty(ref _isResponseTimeAvailable, value);
-    }
-
     public bool IsLoadingAllStatistics
     {
         get => _isLoadingAllStatistics;
@@ -184,8 +169,6 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
 
     public string LblStatsPriorityHigh => AppStrings.Get("Stats_PriorityHigh");
 
-    public string LblStatsResponseTime => AppStrings.Get("Stats_ResponseTimeTitle");
-
     public IAsyncRelayCommand LoadAllPagesStatisticsCommand { get; }
 
     public void NotifyLocalization()
@@ -206,9 +189,7 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
         OnPropertyChanged(nameof(LblStatsPriorityLow));
         OnPropertyChanged(nameof(LblStatsPriorityMedium));
         OnPropertyChanged(nameof(LblStatsPriorityHigh));
-        OnPropertyChanged(nameof(LblStatsResponseTime));
         RefreshStatsScopeMessage();
-        RefreshResponseTimeMessage();
     }
 
     public void NotifyTicketsLoadingChanged() => OnPropertyChanged(nameof(IsNotLoading));
@@ -242,35 +223,7 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
 
         _fromCurrentPageOnly = fromCurrentPageOnly;
         _totalInSystem = totalInSystem;
-        _lastResponseTimeStatistics = snapshot.ResponseTime;
         RefreshStatsScopeMessage();
-        RefreshResponseTimeMessage();
-    }
-
-    private void RefreshResponseTimeMessage()
-    {
-        var responseTime = _lastResponseTimeStatistics ?? new ResponseTimeStatistics();
-        IsResponseTimeAvailable = responseTime.IsAvailable;
-
-        if (!responseTime.IsAvailable || responseTime.Average is null)
-        {
-            StatsResponseTimeMessage = AppStrings.Get("Stats_ResponseTimeUnavailable");
-            return;
-        }
-
-        var durationText = StatisticsDurationFormatter.Format(responseTime.Average.Value);
-        var methodKey = responseTime.Source switch
-        {
-            ResponseTimeSampleSource.FirstResponseAtField => "Stats_ResponseTimeMethodApi",
-            ResponseTimeSampleSource.EmbeddedStaffMessages => "Stats_ResponseTimeMethodMessages",
-            ResponseTimeSampleSource.Mixed => "Stats_ResponseTimeMethodMixed",
-            _ => "Stats_ResponseTimeMethodMixed"
-        };
-
-        StatsResponseTimeMessage = AppStrings.GetFormat(
-            methodKey,
-            durationText,
-            responseTime.SampleCount);
     }
 
     private void RefreshStatsScopeMessage()
@@ -319,11 +272,11 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
                     } while (page <= lastPage);
 
                     ApplyTicketStatistics(aggregated, totalInSystem, fromCurrentPageOnly: false);
-                    _bridge.ShowToast(AppStrings.GetFormat("Stats_Loaded", aggregated.Count), ToastTypes.Success);
+                    _bridge.ShowToastKey("Stats_Loaded", ToastTypes.Success, aggregated.Count);
                 },
                 setStatusMessage: message => StatsScopeMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("Stats_LoadAllPagesFailed"),
-                unexpectedToastMessage: AppStrings.Get("Stats_LoadAllFailed"),
+                unexpectedStatusMessageKey: "Stats_LoadAllPagesFailed",
+                unexpectedToastMessageKey: "Stats_LoadAllFailed",
                 setOfflineOnServiceUnavailable: false);
         }
         finally

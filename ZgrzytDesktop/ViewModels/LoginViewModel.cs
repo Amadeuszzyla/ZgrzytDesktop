@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
-using ZgrzytDesktop.Exceptions;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services.Interfaces;
@@ -125,22 +125,9 @@ public partial class LoginViewModel : ViewModelBase
             ErrorMessage = string.Empty;
             _onLoginSuccess(user);
         }
-        catch (ApiException ex)
+        catch (Exception ex)
         {
-            ErrorMessage = ex.StatusCode switch
-            {
-                System.Net.HttpStatusCode.Unauthorized =>
-                    AppStrings.Get("Login_InvalidCredentials"),
-
-                System.Net.HttpStatusCode.ServiceUnavailable =>
-                    AppStrings.Get("Login_Offline"),
-
-                _ => ex.Message
-            };
-        }
-        catch
-        {
-            ErrorMessage = AppStrings.Get("Login_UnexpectedError");
+            ErrorMessage = LoginErrorMapper.GetErrorMessage(ex);
         }
         finally
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Resources;
 
@@ -15,20 +16,42 @@ public static class PriorityDisplayHelper
             [TicketPriorities.High] = "Priority_High"
         };
 
-    public static string ToDisplayPriority(string? apiPriority)
+    private static Dictionary<string, string>? _displayLabelToApiPriority;
+
+    public static string NormalizeApiPriority(string? value)
     {
-        if (string.IsNullOrWhiteSpace(apiPriority))
+        if (string.IsNullOrWhiteSpace(value))
             return string.Empty;
 
-        var normalized = apiPriority.Trim();
+        var trimmed = value.Trim();
+        foreach (var apiPriority in ApiToResourceKey.Keys)
+        {
+            if (string.Equals(apiPriority, trimmed, StringComparison.OrdinalIgnoreCase))
+                return apiPriority;
+        }
 
-        if (ApiToResourceKey.TryGetValue(normalized, out var key))
+        return trimmed.ToLowerInvariant() switch
+        {
+            "low" => TicketPriorities.Low,
+            "medium" => TicketPriorities.Medium,
+            "high" => TicketPriorities.High,
+            _ => trimmed
+        };
+    }
+
+    public static string ToDisplayPriority(string? apiOrDisplayPriority)
+    {
+        if (string.IsNullOrWhiteSpace(apiOrDisplayPriority))
+            return string.Empty;
+
+        var apiPriority = NormalizeApiPriority(apiOrDisplayPriority);
+        if (ApiToResourceKey.TryGetValue(apiPriority, out var key))
             return AppStrings.Get(key);
 
-        if (IsKnownDisplayLabel(normalized, out var apiFromDisplay))
-            return ToDisplayPriority(apiFromDisplay);
+        if (TryResolveApiFromDisplayLabel(apiOrDisplayPriority.Trim(), out var apiFromLabel))
+            return ToDisplayPriority(apiFromLabel);
 
-        return normalized;
+        return apiOrDisplayPriority.Trim();
     }
 
     public static string ToApiPriority(string? displayOrApiPriority)
@@ -37,43 +60,62 @@ public static class PriorityDisplayHelper
             return TicketPriorities.Low;
 
         var normalized = displayOrApiPriority.Trim();
+        var apiFromNormalized = NormalizeApiPriority(normalized);
+        if (ApiToResourceKey.ContainsKey(apiFromNormalized))
+            return apiFromNormalized;
 
-        foreach (var pair in ApiToResourceKey)
-        {
-            if (string.Equals(pair.Key, normalized, StringComparison.OrdinalIgnoreCase))
-                return pair.Key;
-        }
+        if (TryResolveApiFromDisplayLabel(normalized, out var apiFromLabel))
+            return apiFromLabel;
 
-        foreach (var pair in ApiToResourceKey)
-        {
-            if (string.Equals(AppStrings.Get(pair.Value), normalized, StringComparison.OrdinalIgnoreCase))
-                return pair.Key;
-        }
-
-        return normalized switch
-        {
-            var value when string.Equals(value, TicketPriorities.Low, StringComparison.OrdinalIgnoreCase) =>
-                TicketPriorities.Low,
-            var value when string.Equals(value, TicketPriorities.Medium, StringComparison.OrdinalIgnoreCase) =>
-                TicketPriorities.Medium,
-            var value when string.Equals(value, TicketPriorities.High, StringComparison.OrdinalIgnoreCase) =>
-                TicketPriorities.High,
-            _ => TicketPriorities.Low
-        };
+        return ApiToResourceKey.ContainsKey(apiFromNormalized)
+            ? apiFromNormalized
+            : TicketPriorities.Low;
     }
 
-    private static bool IsKnownDisplayLabel(string value, out string apiPriority)
+    public static string GetPriorityBadgeClasses(string? apiOrDisplayPriority)
     {
-        foreach (var pair in ApiToResourceKey)
-        {
-            if (string.Equals(AppStrings.Get(pair.Value), value, StringComparison.OrdinalIgnoreCase))
-            {
-                apiPriority = pair.Key;
-                return true;
-            }
-        }
+        var apiPriority = NormalizeApiPriority(apiOrDisplayPriority);
+        if (string.IsNullOrWhiteSpace(apiPriority))
+            return "ticket-badge ticket-badge-priority-default";
+
+        if (string.Equals(apiPriority, TicketPriorities.High, StringComparison.OrdinalIgnoreCase))
+            return "ticket-badge ticket-badge-priority-high";
+
+        if (string.Equals(apiPriority, TicketPriorities.Medium, StringComparison.OrdinalIgnoreCase))
+            return "ticket-badge ticket-badge-priority-medium";
+
+        if (string.Equals(apiPriority, TicketPriorities.Low, StringComparison.OrdinalIgnoreCase))
+            return "ticket-badge ticket-badge-priority-low";
+
+        return "ticket-badge ticket-badge-priority-default";
+    }
+
+    private static bool TryResolveApiFromDisplayLabel(string label, out string apiPriority)
+    {
+        EnsureDisplayLabelMap();
+        if (_displayLabelToApiPriority!.TryGetValue(label, out apiPriority!))
+            return true;
 
         apiPriority = TicketPriorities.Low;
         return false;
+    }
+
+    private static void EnsureDisplayLabelMap()
+    {
+        if (_displayLabelToApiPriority is not null)
+            return;
+
+        var previousCulture = CultureInfo.CurrentUICulture.Name;
+        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var culture in new[] { "pl", "en" })
+        {
+            AppStrings.ApplyCulture(culture);
+            foreach (var pair in ApiToResourceKey)
+                map[AppStrings.Get(pair.Value)] = pair.Key;
+        }
+
+        AppStrings.ApplyCulture(previousCulture.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? "en" : "pl");
+        _displayLabelToApiPriority = map;
     }
 }

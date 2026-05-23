@@ -192,7 +192,7 @@ public class TicketsPanelViewModelTests
                 CreateCallbacks(
                     tempDir,
                     setOffline: value => offlineSet = value,
-                    showToast: (_, _) => { }));
+                    showToastKey: null));
 
             await panel.LoadTicketsAsync();
 
@@ -590,7 +590,8 @@ public class TicketsPanelViewModelTests
     private static TicketsPanelCallbacks CreateCallbacks(
         string tempDir,
         Action<bool>? setOffline = null,
-        Action<string, string>? showToast = null,
+        ToastKeyCallback? showToastKey = null,
+        Action<string, string>? showToastRaw = null,
         Action<int>? ticketSelected = null,
         Func<string, int?, string?, object?[]?, Task>? logAudit = null)
     {
@@ -598,7 +599,7 @@ public class TicketsPanelViewModelTests
 
         return new TicketsPanelCallbacks
         {
-            ShowToast = showToast ?? ((_, _) => { }),
+            ShowToastKey = showToastKey ?? TestToastCallbacks.NoopKey, ShowToastRaw = showToastRaw ?? TestToastCallbacks.NoopRaw,
             SetIsOffline = value =>
             {
                 isOffline = value;
@@ -637,7 +638,10 @@ public class TicketsPanelViewModelTests
                 }
 
                 if (setOfflineOnServiceUnavailable)
-                    setStatusMessage?.Invoke(offlineToastMessage ?? ex.Message);
+                    setStatusMessage?.Invoke(
+                        offlineToastMessage is not null
+                            ? AppStrings.Get(offlineToastMessage)
+                            : ex.Message);
 
                 return false;
             }
@@ -650,7 +654,10 @@ public class TicketsPanelViewModelTests
             }
             catch
             {
-                setStatusMessage?.Invoke(unexpectedStatusMessage ?? AppStrings.Get("Api_UnexpectedError"));
+                setStatusMessage?.Invoke(
+                    unexpectedStatusMessage is not null
+                        ? AppStrings.Get(unexpectedStatusMessage)
+                        : AppStrings.Get("Api_UnexpectedError"));
                 return false;
             }
         };

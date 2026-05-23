@@ -12,7 +12,7 @@ Aplikacja (Avalonia, .NET 10, MVVM) komunikuje się z backendem Laravel przez RE
 | **Zgłoszenia** | Listy: wszystkie / aktywne / nieprzypisane (`tickets`, `active-tickets`, `unassigned-tickets`); filtry statusu i priorytetu, wyszukiwanie, sortowanie, paginacja |
 | **Szczegóły** | Podgląd zgłoszenia, wątek wiadomości (`GET`/`POST .../messages`), edycja statusu i priorytetu, przypisanie do siebie, zamknięcie, usunięcie (wg uprawnień API) |
 | **Administracja** | (**admin**) listy użytkowników, ban, aktywacja, odbanowanie; (**it** i **admin**) zakładka **Nowe konto** → `POST /api/register` z wyborem roli `user` / `it` / `admin` |
-| **Statystyki** | KPI i wykresy z bieżącej strony lub agregacja wielu stron listy |
+| **Statystyki** | Liczba zgłoszeń, statusy, priorytety, przypisania/nieprzypisane; zakres: bieżąca strona lub wszystkie strony listy. Czas pierwszej reakcji **nie** jest prezentowany — API nie dostarcza stabilnych danych do jego obliczenia. |
 | **Lokalny audyt** | Historia działań w aplikacji (ustawienia + szczegóły zgłoszenia), plik szyfrowany DPAPI — **bez** `GET /api/logs` z backendu |
 | **i18n** | Polski / angielski (`AppStrings`) |
 | **Motyw** | Wyłącznie **jasny** (light-only) |
@@ -39,7 +39,6 @@ Lokalny development (opcjonalnie): `http://127.0.0.1:9000/api/`
 ### Uwagi techniczne
 
 - **`GET /api/tickets`:** OpenAPI czasem opisuje tablicę; runtime API zwraca **paginację Laravel** (`current_page`, `data`, `last_page`, …) — desktop jest zgodny z API produkcyjnym.
-- **`first_response_at`:** opcjonalne w modelu; gdy API go nie zwraca, statystyki czasu reakcji pokazują **N/A** (brak fałszywego SLA).
 - **Kolejki active/unassigned:** do API idą `page`, `per_page`, `search`; przy filtrach status/priorytet/sort — pobranie wielu stron i przetwarzanie lokalne (`TicketQueueListProcessor`).
 
 ## Wymagania

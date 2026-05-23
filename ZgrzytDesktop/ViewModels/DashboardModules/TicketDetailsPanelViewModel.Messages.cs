@@ -36,7 +36,7 @@ public sealed partial class TicketDetailsPanelViewModel
         if (_callbacks.GetIsOffline())
         {
             DetailsStatusMessage = AppStrings.Get("Details_OfflineSend");
-            _callbacks.ShowToast(AppStrings.Get("Toast_DetailsMessageOffline"), ToastTypes.Warning);
+            _callbacks.ShowToastKey("Toast_DetailsMessageOffline", ToastTypes.Warning);
             return;
         }
 
@@ -72,7 +72,7 @@ public sealed partial class TicketDetailsPanelViewModel
                     await LoadTicketDetailsAsync(ticketId);
 
                     DetailsStatusMessage = AppStrings.Get("Details_MessageSent");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_MessageSent"), ToastTypes.Success);
+                    _callbacks.ShowToastKey("Toast_MessageSent", ToastTypes.Success);
 
                     await _callbacks.LogAuditAsync(
                         "SendMessage",
@@ -81,13 +81,13 @@ public sealed partial class TicketDetailsPanelViewModel
                         null);
                 },
                 setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("Details_MessageSendUnexpectedError"),
-                unexpectedToastMessage: AppStrings.Get("Details_MessageSendFailed"),
+                unexpectedStatusMessageKey: "Details_MessageSendUnexpectedError",
+                unexpectedToastMessageKey: "Details_MessageSendFailed",
                 onServiceUnavailableAsync: async _ =>
                 {
                     _callbacks.SetIsOffline(true);
                     DetailsStatusMessage = AppStrings.Get("Details_OfflineSendFailed");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_MessageSendOffline"), ToastTypes.Error);
+                    _callbacks.ShowToastKey("Toast_MessageSendOffline", ToastTypes.Error);
                     await Task.CompletedTask;
                 });
         }

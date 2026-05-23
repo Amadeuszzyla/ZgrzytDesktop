@@ -33,7 +33,7 @@ public sealed partial class TicketDetailsPanelViewModel
             if (!IsValidTicketForDisplay(ticket))
             {
                 DetailsStatusMessage = AppStrings.Get("Details_InvalidServerData");
-                _callbacks.ShowToast(AppStrings.Get("Api_HtmlResponse"), ToastTypes.Error);
+                _callbacks.ShowToastKey("Api_HtmlResponse", ToastTypes.Error);
                 return;
             }
 
@@ -51,18 +51,18 @@ public sealed partial class TicketDetailsPanelViewModel
         {
             _callbacks.SetIsOffline(true);
             DetailsStatusMessage = AppStrings.Get("Details_OfflineDetails");
-            _callbacks.ShowToast(AppStrings.Get("Toast_DetailsOffline"), ToastTypes.Warning);
+            _callbacks.ShowToastKey("Toast_DetailsOffline", ToastTypes.Warning);
             ApplyCachedTicket(ticketId);
         }
         catch (ApiException ex)
         {
             DetailsStatusMessage = _callbacks.GetApiErrorMessage(ex);
-            _callbacks.ShowToast(_callbacks.GetApiErrorMessage(ex), ToastTypes.Error);
+            _callbacks.ShowToastRaw(_callbacks.GetApiErrorMessage(ex), ToastTypes.Error);
         }
         catch
         {
             DetailsStatusMessage = AppStrings.Get("Details_LoadUnexpectedError");
-            _callbacks.ShowToast(AppStrings.Get("Toast_DetailsLoadError"), ToastTypes.Error);
+            _callbacks.ShowToastKey("Toast_DetailsLoadError", ToastTypes.Error);
         }
         finally
         {

@@ -164,7 +164,7 @@ public sealed partial class AdminPanelViewModel
                     NewUserPasswordConfirmation = string.Empty;
 
                     RegisterUserStatusMessage = AppStrings.Get("RegisterUser_Success");
-                    _callbacks.ShowToast(AppStrings.Get("RegisterUser_Success"), ToastTypes.Success);
+                    _callbacks.ShowToastKey("RegisterUser_Success", ToastTypes.Success);
 
                     await _callbacks.LogAuditAsync(
                         "RegisterUser",
@@ -173,8 +173,8 @@ public sealed partial class AdminPanelViewModel
                         [request.Login, request.Role]);
                 },
                 setStatusMessage: message => RegisterUserStatusMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("RegisterUser_Failed"),
-                unexpectedToastMessage: AppStrings.Get("RegisterUser_Failed"),
+                unexpectedStatusMessageKey: "RegisterUser_Failed",
+                unexpectedToastMessageKey: "RegisterUser_Failed",
                 setOfflineOnServiceUnavailable: false);
         }
         finally

@@ -175,7 +175,7 @@ public partial class DashboardViewModel : ViewModelBase
 
         if (bootstrap.ShowLoginToast)
 
-            ShowToast(AppStrings.GetFormat("Toast_LoggedIn", CurrentUser.Name), ToastTypes.Info);
+            ShowToastKey("Toast_LoggedIn", ToastTypes.Info, CurrentUser.Name);
 
 
 

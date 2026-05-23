@@ -114,7 +114,7 @@ public partial class DashboardViewModel
                     RequestPasswordConfirmation = string.Empty;
 
                     RequestAccountStatusMessage = AppStrings.Get("RequestAccount_Sent");
-                    ShowToast(AppStrings.Get("Toast_RequestAccountSent"), ToastTypes.Success);
+                    ShowToastKey("Toast_RequestAccountSent", ToastTypes.Success);
 
                     await LogAuditAsync(
                         "RequestAccount",
@@ -123,13 +123,13 @@ public partial class DashboardViewModel
                         [request.Login]);
                 },
                 setStatusMessage: message => RequestAccountStatusMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("RequestAccount_UnexpectedError"),
-                unexpectedToastMessage: AppStrings.Get("RequestAccount_UnexpectedError"),
+                unexpectedStatusMessageKey: "RequestAccount_UnexpectedError",
+                unexpectedToastMessageKey: "RequestAccount_UnexpectedError",
                 onServiceUnavailableAsync: async _ =>
                 {
                     IsOffline = true;
                     RequestAccountStatusMessage = AppStrings.Get("RequestAccount_OfflineError");
-                    ShowToast(AppStrings.Get("Toast_RequestAccountOffline"), ToastTypes.Warning);
+                    ShowToastKey("Toast_RequestAccountOffline", ToastTypes.Warning);
                     await Task.CompletedTask;
                 });
         }
@@ -146,7 +146,7 @@ public partial class DashboardViewModel
 
         await LogAuditAsync("Logout", null, "Audit_Desc_LogoutDesktop", null);
 
-        ShowToast(AppStrings.Get("Toast_LoggedOut"), ToastTypes.Info);
+        ShowToastKey("Toast_LoggedOut", ToastTypes.Info);
 
         await _onLogoutRequested();
     }

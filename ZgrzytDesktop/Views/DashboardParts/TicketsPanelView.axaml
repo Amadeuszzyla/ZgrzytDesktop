@@ -177,15 +177,15 @@
                                             Orientation="Horizontal"
                                             Spacing="6"
                                             VerticalAlignment="Top">
-                                            <parts:TicketPriorityBadgeView Priority="{Binding DisplayPriority}" />
-                                            <parts:TicketStatusBadgeView DisplayStatus="{Binding DisplayStatus}" />
+                                            <parts:TicketPriorityBadgeView ApiPriority="{Binding Priority}" />
+                                            <parts:TicketStatusBadgeView ApiStatus="{Binding Status}" />
                                         </StackPanel>
                                     </Grid>
 
                                     <TextBlock
                                         Grid.Row="1"
                                         Classes="ticket-card-description"
-                                        Text="{Binding Description}"
+                                        Text="{Binding DisplayDescription}"
                                         TextWrapping="Wrap"
                                         MaxHeight="48"
                                         TextTrimming="CharacterEllipsis"

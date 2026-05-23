@@ -16,14 +16,14 @@ public sealed partial class TicketDetailsPanelViewModel
         if (!_callbacks.GetCanManageTickets())
         {
             DetailsStatusMessage = AppStrings.Get("Details_NoEditPermission");
-            _callbacks.ShowToast(AppStrings.Get("Toast_DetailsEditForbidden"), ToastTypes.Warning);
+            _callbacks.ShowToastKey("Toast_DetailsEditForbidden", ToastTypes.Warning);
             return;
         }
 
         if (_callbacks.GetIsOffline())
         {
             DetailsStatusMessage = AppStrings.Get("Details_OfflineEdit");
-            _callbacks.ShowToast(AppStrings.Get("Toast_DetailsEditOffline"), ToastTypes.Warning);
+            _callbacks.ShowToastKey("Toast_DetailsEditOffline", ToastTypes.Warning);
             return;
         }
 
@@ -69,7 +69,7 @@ public sealed partial class TicketDetailsPanelViewModel
                     await _callbacks.RefreshTicketsAsync();
 
                     DetailsStatusMessage = AppStrings.Get("Details_Saved");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_TicketSaved"), ToastTypes.Success);
+                    _callbacks.ShowToastKey("Toast_TicketSaved", ToastTypes.Success);
 
                     await _callbacks.LogAuditAsync(
                         "UpdateTicket",
@@ -78,13 +78,13 @@ public sealed partial class TicketDetailsPanelViewModel
                         [SelectedStatus, SelectedPriority]);
                 },
                 setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("Details_SaveUnexpectedError"),
-                unexpectedToastMessage: AppStrings.Get("Details_SaveFailed"),
+                unexpectedStatusMessageKey: "Details_SaveUnexpectedError",
+                unexpectedToastMessageKey: "Details_SaveFailed",
                 onServiceUnavailableAsync: async _ =>
                 {
                     _callbacks.SetIsOffline(true);
                     DetailsStatusMessage = AppStrings.Get("Details_OfflineSaveFailed");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_TicketSaveOffline"), ToastTypes.Error);
+                    _callbacks.ShowToastKey("Toast_TicketSaveOffline", ToastTypes.Error);
                     await Task.CompletedTask;
                 });
         }
@@ -147,7 +147,7 @@ public sealed partial class TicketDetailsPanelViewModel
                     await _callbacks.RefreshTicketsAsync();
 
                     DetailsStatusMessage = AppStrings.Get("Details_Closed");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_TicketClosed"), ToastTypes.Success);
+                    _callbacks.ShowToastKey("Toast_TicketClosed", ToastTypes.Success);
 
                     await _callbacks.LogAuditAsync(
                         "CloseTicket",
@@ -156,8 +156,8 @@ public sealed partial class TicketDetailsPanelViewModel
                         null);
                 },
                 setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("Details_CloseUnexpectedError"),
-                unexpectedToastMessage: AppStrings.Get("Details_CloseFailed"),
+                unexpectedStatusMessageKey: "Details_CloseUnexpectedError",
+                unexpectedToastMessageKey: "Details_CloseFailed",
                 showApiErrorToast: true);
 
             if (!closed)
@@ -206,7 +206,7 @@ public sealed partial class TicketDetailsPanelViewModel
                     await _callbacks.RefreshTicketsAsync();
 
                     DetailsStatusMessage = AppStrings.Get("Details_Deleted");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_TicketDeleted"), ToastTypes.Success);
+                    _callbacks.ShowToastKey("Toast_TicketDeleted", ToastTypes.Success);
 
                     await _callbacks.LogAuditAsync(
                         "DeleteTicket",
@@ -215,8 +215,8 @@ public sealed partial class TicketDetailsPanelViewModel
                         null);
                 },
                 setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("Details_DeleteFailed"),
-                unexpectedToastMessage: AppStrings.Get("Details_DeleteFailed"));
+                unexpectedStatusMessageKey: "Details_DeleteFailed",
+                unexpectedToastMessageKey: "Details_DeleteFailed");
         }
         finally
         {
@@ -229,14 +229,14 @@ public sealed partial class TicketDetailsPanelViewModel
         if (!_callbacks.GetCanManageTickets())
         {
             DetailsStatusMessage = AppStrings.Get("Details_NoAssignPermission");
-            _callbacks.ShowToast(AppStrings.Get("Toast_DetailsAssignForbidden"), ToastTypes.Warning);
+            _callbacks.ShowToastKey("Toast_DetailsAssignForbidden", ToastTypes.Warning);
             return;
         }
 
         if (_callbacks.GetIsOffline())
         {
             DetailsStatusMessage = AppStrings.Get("Details_OfflineAssign");
-            _callbacks.ShowToast(AppStrings.Get("Toast_DetailsAssignOffline"), ToastTypes.Warning);
+            _callbacks.ShowToastKey("Toast_DetailsAssignOffline", ToastTypes.Warning);
             return;
         }
 
@@ -270,7 +270,7 @@ public sealed partial class TicketDetailsPanelViewModel
                     await _callbacks.RefreshTicketsAsync();
 
                     DetailsStatusMessage = AppStrings.Get("Details_Assigned");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_TicketAssigned"), ToastTypes.Success);
+                    _callbacks.ShowToastKey("Toast_TicketAssigned", ToastTypes.Success);
 
                     await _callbacks.LogAuditAsync(
                         "AssignToMe",
@@ -279,13 +279,13 @@ public sealed partial class TicketDetailsPanelViewModel
                         [user.Login]);
                 },
                 setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("Details_AssignUnexpectedError"),
-                unexpectedToastMessage: AppStrings.Get("Details_AssignFailed"),
+                unexpectedStatusMessageKey: "Details_AssignUnexpectedError",
+                unexpectedToastMessageKey: "Details_AssignFailed",
                 onServiceUnavailableAsync: async _ =>
                 {
                     _callbacks.SetIsOffline(true);
                     DetailsStatusMessage = AppStrings.Get("Details_OfflineAssignFailed");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_TicketAssignOffline"), ToastTypes.Error);
+                    _callbacks.ShowToastKey("Toast_TicketAssignOffline", ToastTypes.Error);
                     await Task.CompletedTask;
                 });
         }

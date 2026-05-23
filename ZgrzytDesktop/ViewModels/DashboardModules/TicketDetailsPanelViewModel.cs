@@ -118,9 +118,21 @@ public sealed partial class TicketDetailsPanelViewModel : ViewModelBase
         {
             SelectedStatus = StatusDisplayHelper.ToDisplayStatus(TicketDetails.Status);
             SelectedPriority = PriorityDisplayHelper.ToDisplayPriority(TicketDetails.Priority);
+            RefreshTicketDetailsDisplayBindings();
         }
 
         RefreshTicketAuditDisplayBindings();
+    }
+
+    private void RefreshTicketDetailsDisplayBindings()
+    {
+        if (TicketDetails is null)
+            return;
+
+        var snapshot = TicketDetails;
+        TicketDetails = null;
+        TicketDetails = snapshot;
+        OnPropertyChanged(nameof(TicketDetails));
     }
 
     private void RefreshTicketAuditDisplayBindings()

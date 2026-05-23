@@ -86,7 +86,8 @@ public partial class DashboardViewModel
         new()
         {
             ExecuteApiAsyncCore = ExecuteApiAsync,
-            ShowToast = ShowToast,
+            ShowToastKey = ShowToastKey,
+            ShowToastRaw = ShowToast,
             LogAuditAsync = LogAuditAsync,
             GetIsOffline = () => IsOffline,
             SetIsOffline = value => IsOffline = value,

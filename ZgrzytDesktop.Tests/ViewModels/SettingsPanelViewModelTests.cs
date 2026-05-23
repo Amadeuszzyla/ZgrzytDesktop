@@ -85,7 +85,8 @@ public class SettingsPanelViewModelTests
                     return false;
                 }
             },
-            ShowToast = (_, _) => { },
+            ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
             LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
             GetIsOffline = () => false,
             SetIsOffline = _ => { },

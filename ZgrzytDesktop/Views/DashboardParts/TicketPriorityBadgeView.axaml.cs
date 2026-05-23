@@ -1,19 +1,17 @@
 using System;
-using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
-using ZgrzytDesktop.Converters;
+using ZgrzytDesktop.Helpers;
 
 namespace ZgrzytDesktop.Views.DashboardParts;
 
 public partial class TicketPriorityBadgeView : UserControl
 {
-    private static readonly TicketPriorityBadgeClassConverter ClassConverter = new();
     private readonly Border _badgeRoot;
     private readonly TextBlock _badgeText;
 
-    public static readonly StyledProperty<string?> PriorityProperty =
-        AvaloniaProperty.Register<TicketPriorityBadgeView, string?>(nameof(Priority));
+    public static readonly StyledProperty<string?> ApiPriorityProperty =
+        AvaloniaProperty.Register<TicketPriorityBadgeView, string?>(nameof(ApiPriority));
 
     public TicketPriorityBadgeView()
     {
@@ -22,23 +20,24 @@ public partial class TicketPriorityBadgeView : UserControl
         _badgeText = this.FindControl<TextBlock>("BadgeText")!;
         this.PropertyChanged += (_, e) =>
         {
-            if (e.Property == PriorityProperty)
-                UpdateBadge(Priority);
+            if (e.Property == ApiPriorityProperty)
+                UpdateBadge(ApiPriority);
         };
-        UpdateBadge(Priority);
+        UpdateBadge(ApiPriority);
     }
 
-    public string? Priority
+    public string? ApiPriority
     {
-        get => GetValue(PriorityProperty);
-        set => SetValue(PriorityProperty, value);
+        get => GetValue(ApiPriorityProperty);
+        set => SetValue(ApiPriorityProperty, value);
     }
 
-    private void UpdateBadge(string? priority)
+    public void RefreshDisplay() => UpdateBadge(ApiPriority);
+
+    private void UpdateBadge(string? apiPriority)
     {
-        _badgeText.Text = priority ?? string.Empty;
-        ApplyClasses(
-            ClassConverter.Convert(priority, typeof(string), null, CultureInfo.CurrentCulture) as string);
+        _badgeText.Text = PriorityDisplayHelper.ToDisplayPriority(apiPriority);
+        ApplyClasses(PriorityDisplayHelper.GetPriorityBadgeClasses(apiPriority));
     }
 
     private void ApplyClasses(string? classString)

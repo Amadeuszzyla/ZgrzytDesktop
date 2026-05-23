@@ -5,6 +5,7 @@ using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
+using ZgrzytDesktop.Tests.Infrastructure;
 using ZgrzytDesktop.Tests.Infrastructure.Fakes;
 using ZgrzytDesktop.ViewModels.DashboardModules;
 
@@ -314,6 +315,71 @@ public class AdminPanelViewModelTests
         Assert.Equal(0, userAdmin.GetUsersCallCount);
     }
 
+    [Fact]
+    public async Task LoadUsersAsync_WithUsers_HasAdminUsersAndNoEmptyState()
+    {
+        var userAdmin = new FakeUserAdminService
+        {
+            NextUsers = [new User { Id = 1, Login = "alpha", Active = true, Ban = false }]
+        };
+
+        var panel = CreatePanel(userAdmin, isAdminRole: true);
+        await panel.LoadAdminUsersCommand.ExecuteAsync(null);
+
+        Assert.True(panel.HasAdminUsers);
+        Assert.False(panel.HasNoAdminUsers);
+        Assert.NotEqual(panel.LblAdminNoUsersFound, panel.AdminStatusMessage);
+        Assert.Contains("1", panel.AdminStatusMessage, StringComparison.Ordinal);
+        Assert.DoesNotContain("Znaleziono", panel.LblAdminNoUsersFound, StringComparison.Ordinal);
+        Assert.DoesNotContain("Found:", panel.LblAdminNoUsersFound, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task LoadUsersAsync_EmptyList_ShowsEmptyStateAndCountInHeader()
+    {
+        var userAdmin = new FakeUserAdminService { NextUsers = [] };
+
+        var panel = CreatePanel(userAdmin, isAdminRole: true);
+        await panel.LoadAdminUsersCommand.ExecuteAsync(null);
+
+        Assert.True(panel.HasNoAdminUsers);
+        Assert.False(panel.HasAdminUsers);
+        Assert.Equal(AppStrings.Get("Admin_NoUsersFound"), panel.LblAdminNoUsersFound);
+        Assert.Equal(
+            AppStrings.GetFormat("Admin_StatusCount", 0, AppStrings.Get("Admin_Filter_All")),
+            panel.AdminStatusMessage);
+        Assert.DoesNotContain(panel.AdminStatusMessage, panel.LblAdminNoUsersFound, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task LoadUsersAsync_EmptyList_StatusUsesEnglishInHeader()
+    {
+        AppStrings.ApplyCulture("en");
+
+        var userAdmin = new FakeUserAdminService { NextUsers = [] };
+        var panel = CreatePanel(userAdmin, isAdminRole: true);
+
+        await panel.LoadAdminUsersCommand.ExecuteAsync(null);
+
+        Assert.Contains("Found:", panel.AdminStatusMessage, StringComparison.Ordinal);
+        Assert.Equal("No users found.", panel.LblAdminNoUsersFound);
+        Assert.True(panel.HasNoAdminUsers);
+    }
+
+    [Fact]
+    public async Task LoadUsersAsync_EmptyList_StatusUsesPolishInHeader()
+    {
+        AppStrings.ApplyCulture("pl");
+
+        var userAdmin = new FakeUserAdminService { NextUsers = [] };
+        var panel = CreatePanel(userAdmin, isAdminRole: true);
+
+        await panel.LoadAdminUsersCommand.ExecuteAsync(null);
+
+        Assert.Contains("Znaleziono:", panel.AdminStatusMessage, StringComparison.Ordinal);
+        Assert.Equal("Nie znaleziono użytkowników.", panel.LblAdminNoUsersFound);
+    }
+
     private sealed class AdminTestContext
     {
         public bool IsOffline { get; set; }
@@ -335,7 +401,8 @@ public class AdminPanelViewModelTests
             userAdmin,
             new AdminPanelCallbacks
             {
-                ShowToast = (message, _) => context.LastToastMessage = message,
+                ShowToastKey = TestToastCallbacks.ResolveKeyTo(m => context.LastToastMessage = m),
+                ShowToastRaw = (message, _) => context.LastToastMessage = message,
                 GetIsOffline = () => context.IsOffline,
                 GetIsAdminRole = () => isAdminRole,
                 GetIsStaffRole = () => isStaffRole,
@@ -384,7 +451,10 @@ public class AdminPanelViewModelTests
             }
             catch
             {
-                setStatusMessage?.Invoke(unexpectedStatusMessage ?? AppStrings.Get("Api_UnexpectedError"));
+                setStatusMessage?.Invoke(
+                    unexpectedStatusMessage is not null
+                        ? AppStrings.Get(unexpectedStatusMessage)
+                        : AppStrings.Get("Api_UnexpectedError"));
                 return false;
             }
         };

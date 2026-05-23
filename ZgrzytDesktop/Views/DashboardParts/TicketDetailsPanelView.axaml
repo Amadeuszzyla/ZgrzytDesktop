@@ -105,8 +105,8 @@
                                 Orientation="Horizontal"
                                 Spacing="6"
                                 VerticalAlignment="Top">
-                                <parts:TicketPriorityBadgeView Priority="{Binding TicketDetailsPanel.TicketDetails.DisplayPriority}" />
-                                <parts:TicketStatusBadgeView DisplayStatus="{Binding TicketDetailsPanel.TicketDetails.DisplayStatus}" />
+                                <parts:TicketPriorityBadgeView ApiPriority="{Binding TicketDetailsPanel.TicketDetails.Priority}" />
+                                <parts:TicketStatusBadgeView ApiStatus="{Binding TicketDetailsPanel.TicketDetails.Status}" />
                             </StackPanel>
                         </Grid>
 
@@ -147,7 +147,7 @@
                             <TextBlock Classes="field-label" Text="{Binding LblDetailsDescription}" Margin="0" />
                             <Border Classes="app-subtle-panel">
                                 <TextBlock
-                                    Text="{Binding TicketDetailsPanel.TicketDetails.Description}"
+                                    Text="{Binding TicketDetailsPanel.TicketDetails.DisplayDescription}"
                                     TextWrapping="Wrap"
                                     Foreground="{DynamicResource AppSecondaryTextBrush}" />
                             </Border>
@@ -236,23 +236,26 @@
                                 <ItemsControl ItemsSource="{Binding TicketDetailsPanel.Messages}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Classes="message-bubble">
-                                                <StackPanel Spacing="6">
-                                                    <Grid ColumnDefinitions="*,Auto">
+                                            <Border Classes="message-bubble" MaxWidth="520">
+                                                <StackPanel Spacing="8">
+                                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                                         <TextBlock
                                                             Text="{Binding Sender.Name}"
                                                             FontWeight="SemiBold"
-                                                            Foreground="{DynamicResource AppPrimaryTextBrush}" />
+                                                            Foreground="{DynamicResource AppPrimaryTextBrush}"
+                                                            TextWrapping="Wrap" />
                                                         <TextBlock
                                                             Grid.Column="1"
-                                                            Text="{Binding CreatedAt}"
+                                                            Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy, HH:mm}'}"
                                                             FontSize="11"
-                                                            Foreground="{DynamicResource AppMutedTextBrush}" />
+                                                            Foreground="{DynamicResource AppMutedTextBrush}"
+                                                            VerticalAlignment="Top" />
                                                     </Grid>
                                                     <TextBlock
-                                                        Text="{Binding Content}"
+                                                        Classes="message-body"
+                                                        Text="{Binding DisplayBody}"
                                                         TextWrapping="Wrap"
-                                                        Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                                                        Foreground="{DynamicResource AppPrimaryTextBrush}" />
                                                 </StackPanel>
                                             </Border>
                                         </DataTemplate>

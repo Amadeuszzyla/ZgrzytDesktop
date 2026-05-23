@@ -14,7 +14,8 @@ public partial class DashboardViewModel
             _ticketCacheService,
             new TicketsPanelCallbacks
             {
-                ShowToast = ShowToast,
+                ShowToastKey = ShowToastKey,
+                ShowToastRaw = ShowToast,
                 SetIsOffline = value => IsOffline = value,
                 GetIsOffline = () => IsOffline,
                 NotifyStatistics = (tickets, total) =>

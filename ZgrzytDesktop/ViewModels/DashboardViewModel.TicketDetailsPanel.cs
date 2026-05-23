@@ -14,7 +14,8 @@ public partial class DashboardViewModel
             _auditLogService,
             new TicketDetailsPanelCallbacks
             {
-                ShowToast = ShowToast,
+                ShowToastKey = ShowToastKey,
+                ShowToastRaw = ShowToast,
                 SetIsOffline = value => IsOffline = value,
                 GetIsOffline = () => IsOffline,
                 GetApiErrorMessage = GetApiErrorMessage,

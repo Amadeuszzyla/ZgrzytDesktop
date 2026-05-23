@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Resources;
 
@@ -15,65 +16,104 @@ public static class StatusDisplayHelper
             [TicketStatuses.Zamkniete] = "Status_Closed"
         };
 
-    public static string ToDisplayStatus(string? apiStatus)
+    private static Dictionary<string, string>? _displayLabelToApiStatus;
+
+    public static string NormalizeApiStatus(string? value)
     {
-        if (string.IsNullOrWhiteSpace(apiStatus))
+        if (string.IsNullOrWhiteSpace(value))
             return string.Empty;
 
-        var normalized = apiStatus.Trim();
-
-        if (ApiToResourceKey.TryGetValue(normalized, out var key))
-            return AppStrings.Get(key);
-
-        if (IsKnownDisplayLabel(normalized, out var apiFromDisplay))
-            return ToDisplayStatus(apiFromDisplay);
-
-        return normalized;
-    }
-
-    public static string ToApiStatus(string? displayStatus)
-    {
-        if (string.IsNullOrWhiteSpace(displayStatus))
-            return TicketStatuses.Nowe;
-
-        var normalized = displayStatus.Trim();
-
-        foreach (var pair in ApiToResourceKey)
+        var trimmed = value.Trim();
+        foreach (var apiStatus in ApiToResourceKey.Keys)
         {
-            if (string.Equals(pair.Key, normalized, StringComparison.OrdinalIgnoreCase))
-                return pair.Key;
+            if (string.Equals(apiStatus, trimmed, StringComparison.OrdinalIgnoreCase))
+                return apiStatus;
         }
 
-        foreach (var pair in ApiToResourceKey)
+        return trimmed.ToLowerInvariant() switch
         {
-            if (string.Equals(AppStrings.Get(pair.Value), normalized, StringComparison.OrdinalIgnoreCase))
-                return pair.Key;
-        }
-
-        return normalized switch
-        {
-            var value when string.Equals(value, TicketStatuses.Nowe, StringComparison.OrdinalIgnoreCase) =>
-                TicketStatuses.Nowe,
-            var value when string.Equals(value, TicketStatuses.WTrakcie, StringComparison.OrdinalIgnoreCase) =>
-                TicketStatuses.WTrakcie,
-            var value when string.Equals(value, TicketStatuses.Zamkniete, StringComparison.OrdinalIgnoreCase) =>
-                TicketStatuses.Zamkniete,
-            _ => TicketStatuses.Nowe
+            "new" => TicketStatuses.Nowe,
+            "in progress" or "in_progress" => TicketStatuses.WTrakcie,
+            "closed" => TicketStatuses.Zamkniete,
+            _ => trimmed
         };
     }
 
-    private static bool IsKnownDisplayLabel(string value, out string apiStatus)
+    public static string ToDisplayStatus(string? apiOrDisplayStatus)
     {
-        foreach (var pair in ApiToResourceKey)
-        {
-            if (string.Equals(AppStrings.Get(pair.Value), value, StringComparison.OrdinalIgnoreCase))
-            {
-                apiStatus = pair.Key;
-                return true;
-            }
-        }
+        if (string.IsNullOrWhiteSpace(apiOrDisplayStatus))
+            return string.Empty;
+
+        var apiStatus = NormalizeApiStatus(apiOrDisplayStatus);
+        if (ApiToResourceKey.TryGetValue(apiStatus, out var key))
+            return AppStrings.Get(key);
+
+        if (TryResolveApiFromDisplayLabel(apiOrDisplayStatus.Trim(), out var apiFromLabel))
+            return ToDisplayStatus(apiFromLabel);
+
+        return apiOrDisplayStatus.Trim();
+    }
+
+    public static string ToApiStatus(string? displayOrApiStatus)
+    {
+        if (string.IsNullOrWhiteSpace(displayOrApiStatus))
+            return TicketStatuses.Nowe;
+
+        var normalized = displayOrApiStatus.Trim();
+        var apiFromNormalized = NormalizeApiStatus(normalized);
+        if (ApiToResourceKey.ContainsKey(apiFromNormalized))
+            return apiFromNormalized;
+
+        if (TryResolveApiFromDisplayLabel(normalized, out var apiFromLabel))
+            return apiFromLabel;
+
+        return TicketStatuses.Nowe;
+    }
+
+    public static string GetStatusBadgeClasses(string? apiOrDisplayStatus)
+    {
+        var apiStatus = NormalizeApiStatus(apiOrDisplayStatus);
+        if (string.IsNullOrWhiteSpace(apiStatus))
+            return "ticket-badge ticket-badge-status-default";
+
+        if (string.Equals(apiStatus, TicketStatuses.Nowe, StringComparison.OrdinalIgnoreCase))
+            return "ticket-badge ticket-badge-status-new";
+
+        if (string.Equals(apiStatus, TicketStatuses.WTrakcie, StringComparison.OrdinalIgnoreCase))
+            return "ticket-badge ticket-badge-status-progress";
+
+        if (string.Equals(apiStatus, TicketStatuses.Zamkniete, StringComparison.OrdinalIgnoreCase))
+            return "ticket-badge ticket-badge-status-closed";
+
+        return "ticket-badge ticket-badge-status-default";
+    }
+
+    private static bool TryResolveApiFromDisplayLabel(string label, out string apiStatus)
+    {
+        EnsureDisplayLabelMap();
+        if (_displayLabelToApiStatus!.TryGetValue(label, out apiStatus!))
+            return true;
 
         apiStatus = TicketStatuses.Nowe;
         return false;
+    }
+
+    private static void EnsureDisplayLabelMap()
+    {
+        if (_displayLabelToApiStatus is not null)
+            return;
+
+        var previousCulture = CultureInfo.CurrentUICulture.Name;
+        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var culture in new[] { "pl", "en" })
+        {
+            AppStrings.ApplyCulture(culture);
+            foreach (var pair in ApiToResourceKey)
+                map[AppStrings.Get(pair.Value)] = pair.Key;
+        }
+
+        AppStrings.ApplyCulture(previousCulture.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? "en" : "pl");
+        _displayLabelToApiStatus = map;
     }
 }

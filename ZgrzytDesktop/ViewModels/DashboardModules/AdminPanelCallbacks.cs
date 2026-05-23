@@ -2,12 +2,15 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Exceptions;
+using ZgrzytDesktop.Helpers;
 
 namespace ZgrzytDesktop.ViewModels.DashboardModules;
 
 public sealed class AdminPanelCallbacks
 {
-    public required Action<string, string> ShowToast { get; init; }
+    public required ToastKeyCallback ShowToastKey { get; init; }
+
+    public required Action<string, string> ShowToastRaw { get; init; }
 
     public required Func<bool> GetIsOffline { get; init; }
 
@@ -26,18 +29,18 @@ public sealed class AdminPanelCallbacks
     public Task<bool> ExecuteApiAsync(
         Func<Task> action,
         Action<string>? setStatusMessage = null,
-        string? unexpectedStatusMessage = null,
-        string? unexpectedToastMessage = null,
-        string? offlineToastMessage = null,
+        string? unexpectedStatusMessageKey = null,
+        string? unexpectedToastMessageKey = null,
+        string? offlineToastMessageKey = null,
         bool showApiErrorToast = true,
         bool setOfflineOnServiceUnavailable = true,
         Func<ApiException, Task>? onServiceUnavailableAsync = null) =>
         ExecuteApiAsyncCore(
             action,
             setStatusMessage,
-            unexpectedStatusMessage,
-            unexpectedToastMessage,
-            offlineToastMessage,
+            unexpectedStatusMessageKey,
+            unexpectedToastMessageKey,
+            offlineToastMessageKey,
             showApiErrorToast,
             setOfflineOnServiceUnavailable,
             onServiceUnavailableAsync);

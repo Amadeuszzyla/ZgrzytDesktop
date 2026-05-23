@@ -2,6 +2,7 @@ using System;
 using Avalonia.Threading;
 using System.Net;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 
 namespace ZgrzytDesktop.ViewModels;
@@ -12,6 +13,8 @@ public partial class DashboardViewModel
     private bool _isToastVisible;
     private string _toastBackground = "#7C3AED";
     private string _toastForeground = "#FFFFFF";
+    private string? _activeToastKey;
+    private object[]? _activeToastArgs;
 
     public string ToastMessage
     {
@@ -37,19 +40,48 @@ public partial class DashboardViewModel
         private set => SetProperty(ref _toastForeground, value);
     }
 
+    /// <summary>Localized toast from <see cref="AppStrings"/>; refreshes when UI culture changes.</summary>
+    public void ShowToastKey(string key, string type = ToastTypes.Info, params object[] args)
+    {
+        _activeToastKey = key;
+        _activeToastArgs = args.Length > 0 ? args : null;
+        DisplayToast(ResolveToastMessage(key, _activeToastArgs), type);
+    }
+
+    /// <summary>Raw message (e.g. sanitized API error); not updated on culture change.</summary>
     public void ShowToast(string message, string type = ToastTypes.Info)
     {
         if (ApiErrorSanitizer.IsHtmlResponse(message))
         {
             message = ApiErrorSanitizer.SanitizeForDisplay(
                 message,
-                System.Net.HttpStatusCode.InternalServerError);
+                HttpStatusCode.InternalServerError);
         }
 
-        void DisplayToast()
+        _activeToastKey = null;
+        _activeToastArgs = null;
+        DisplayToast(message, type);
+    }
+
+    internal void RefreshActiveLocalizedToast()
+    {
+        if (!IsToastVisible || string.IsNullOrEmpty(_activeToastKey))
+            return;
+
+        ToastMessage = ResolveToastMessage(_activeToastKey, _activeToastArgs);
+    }
+
+    private static string ResolveToastMessage(string key, object[]? args) =>
+        args is { Length: > 0 }
+            ? AppStrings.GetFormat(key, args)
+            : AppStrings.Get(key);
+
+    private void DisplayToast(string message, string type)
+    {
+        void Show()
         {
             EnsureToastHideTimer();
-            _toastHideTimer.Stop();
+            _toastHideTimer!.Stop();
 
             ToastMessage = message;
             ApplyToastStyle(type);
@@ -58,9 +90,9 @@ public partial class DashboardViewModel
         }
 
         if (Dispatcher.UIThread.CheckAccess() || Avalonia.Application.Current is null)
-            DisplayToast();
+            Show();
         else
-            Dispatcher.UIThread.Post(DisplayToast);
+            Dispatcher.UIThread.Post(Show);
     }
 
     private void EnsureToastHideTimer()
@@ -77,6 +109,8 @@ public partial class DashboardViewModel
         {
             _toastHideTimer.Stop();
             IsToastVisible = false;
+            _activeToastKey = null;
+            _activeToastArgs = null;
         };
     }
 

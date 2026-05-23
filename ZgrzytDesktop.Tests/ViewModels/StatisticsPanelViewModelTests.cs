@@ -45,59 +45,18 @@ public class StatisticsPanelViewModelTests
     }
 
     [Fact]
-    public void ApplyFromTickets_WithoutResponseData_ShowsUnavailableMessage_Pl()
-    {
-        AppStrings.ApplyCulture("pl");
-
-        var panel = CreatePanel();
-        panel.ApplyFromTickets(TicketTestDataBuilder.CreateMixedStatisticsSet(), 5, fromCurrentPageOnly: true);
-
-        Assert.False(panel.IsResponseTimeAvailable);
-        Assert.Equal(
-            "API nie dostarcza danych czasu pierwszej odpowiedzi.",
-            panel.StatsResponseTimeMessage);
-    }
-
-    [Fact]
-    public void ApplyFromTickets_WithoutResponseData_ShowsUnavailableMessage_En()
-    {
-        AppStrings.ApplyCulture("en");
-
-        var panel = CreatePanel();
-        panel.ApplyFromTickets(TicketTestDataBuilder.CreateMixedStatisticsSet(), 5, fromCurrentPageOnly: true);
-
-        Assert.False(panel.IsResponseTimeAvailable);
-        Assert.Equal(
-            "The API does not provide first response time data.",
-            panel.StatsResponseTimeMessage);
-    }
-
-    [Fact]
-    public void NotifyLocalization_RefreshesResponseTimeMessage_WhenCultureChanges()
+    public void NotifyLocalization_RefreshesScopeMessage_PlAndEn()
     {
         var panel = CreatePanel();
-        var created = new DateTime(2026, 4, 1, 12, 0, 0);
-
-        panel.ApplyFromTickets(
-        [
-            new Ticket
-            {
-                Id = 1,
-                CreatedAt = created,
-                FirstResponseAt = created.AddHours(2)
-            }
-        ],
-            totalInSystem: 1,
-            fromCurrentPageOnly: true);
+        panel.ApplyFromTickets(TicketTestDataBuilder.CreateMixedStatisticsSet(), totalInSystem: 12, fromCurrentPageOnly: true);
 
         AppStrings.ApplyCulture("pl");
         panel.NotifyLocalization();
-        Assert.Contains("first_response_at", panel.StatsResponseTimeMessage, StringComparison.Ordinal);
+        Assert.Contains("bieżącej stronie", panel.StatsScopeMessage, StringComparison.Ordinal);
 
         AppStrings.ApplyCulture("en");
         panel.NotifyLocalization();
-        Assert.Contains("first_response_at", panel.StatsResponseTimeMessage, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("nie dostarcza", panel.StatsResponseTimeMessage, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("current list", panel.StatsScopeMessage, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -130,7 +89,8 @@ public class StatisticsPanelViewModelTests
                 await action();
                 return true;
             },
-            ShowToast = (_, _) => { },
+            ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
             LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
             GetIsOffline = () => false,
             SetIsOffline = _ => { },

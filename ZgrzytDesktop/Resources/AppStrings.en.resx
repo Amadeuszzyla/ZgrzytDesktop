@@ -7,6 +7,11 @@
   <data name="Login_ProvideLogin" xml:space="preserve"><value>Enter login.</value></data>
   <data name="Login_ProvidePassword" xml:space="preserve"><value>Enter password.</value></data>
   <data name="Login_InvalidCredentials" xml:space="preserve"><value>Invalid login or password.</value></data>
+  <data name="Login_NoDesktopAccess" xml:space="preserve"><value>This account does not have access to the desktop application.</value></data>
+  <data name="Login_CheckCredentials" xml:space="preserve"><value>Check your login and password.</value></data>
+  <data name="Login_ApiServerError" xml:space="preserve"><value>The API server returned an error. Try again later.</value></data>
+  <data name="Login_ConnectionError" xml:space="preserve"><value>Could not connect to the API. Check your internet connection or server URL.</value></data>
+  <data name="Login_InvalidApiResponse" xml:space="preserve"><value>The API returned an invalid response.</value></data>
   <data name="Login_Offline" xml:space="preserve"><value>Cannot reach API. Check that the backend is running.</value></data>
   <data name="Login_UnexpectedError" xml:space="preserve"><value>An unexpected error occurred during login.</value></data>
   <data name="Login_DesktopAccessDenied" xml:space="preserve"><value>The desktop application is available only for IT staff and administrators.</value></data>
@@ -68,6 +73,7 @@
   <data name="Admin_Unban" xml:space="preserve"><value>Unban</value></data>
   <data name="Admin_UnbanPassword" xml:space="preserve"><value>Password (unban)</value></data>
   <data name="Admin_NoUsers" xml:space="preserve"><value>No users to display.</value></data>
+  <data name="Admin_NoUsersFound" xml:space="preserve"><value>No users found.</value></data>
   <data name="Admin_LoadingUsers" xml:space="preserve"><value>Loading users...</value></data>
   <data name="Admin_TabUsers" xml:space="preserve"><value>Users</value></data>
   <data name="Admin_TabNewAccount" xml:space="preserve"><value>New account</value></data>
@@ -233,14 +239,6 @@
   <data name="Stats_LoadAllPagesFailed" xml:space="preserve"><value>Could not load statistics from all pages.</value></data>
   <data name="Stats_LoadAllFailed" xml:space="preserve"><value>Could not load statistics.</value></data>
   <data name="Stats_Loaded" xml:space="preserve"><value>Statistics updated ({0} tickets).</value></data>
-  <data name="Stats_ResponseTimeTitle" xml:space="preserve"><value>IT first response time</value></data>
-  <data name="Stats_ResponseTimeUnavailable" xml:space="preserve"><value>The API does not provide first response time data.</value></data>
-  <data name="Stats_ResponseTimeMethodApi" xml:space="preserve"><value>Average: {0} (first_response_at − created_at, {1} tickets).</value></data>
-  <data name="Stats_ResponseTimeMethodMessages" xml:space="preserve"><value>Average: {0} (first IT/admin message − created_at, {1} tickets).</value></data>
-  <data name="Stats_ResponseTimeMethodMixed" xml:space="preserve"><value>Average: {0} (first_response_at or IT/admin message − created_at, {1} tickets).</value></data>
-  <data name="Stats_Duration_DaysHours" xml:space="preserve"><value>{0} d {1} h</value></data>
-  <data name="Stats_Duration_HoursMinutes" xml:space="preserve"><value>{0} h {1} min</value></data>
-  <data name="Stats_Duration_Minutes" xml:space="preserve"><value>{0} min</value></data>
   <data name="Settings_StatusReady" xml:space="preserve"><value>Settings ready.</value></data>
   <data name="Settings_StatusSessionRefreshing" xml:space="preserve"><value>Refreshing session...</value></data>
   <data name="Settings_StatusSessionRefreshed" xml:space="preserve"><value>Session refreshed.</value></data>
@@ -298,6 +296,7 @@
   <data name="Details_OfflineAssignFailed" xml:space="preserve"><value>Cannot reach API. Cannot assign ticket offline.</value></data>
   <data name="Details_OfflineSend" xml:space="preserve"><value>Cannot send messages while offline.</value></data>
   <data name="Details_EmptyMessage" xml:space="preserve"><value>Message body cannot be empty.</value></data>
+  <data name="Details_MessageBodyEmpty" xml:space="preserve"><value>Message body is empty.</value></data>
   <data name="Details_Sending" xml:space="preserve"><value>Sending message...</value></data>
   <data name="Details_MessageSent" xml:space="preserve"><value>Message sent.</value></data>
   <data name="Details_MessageSendFailed" xml:space="preserve"><value>An error occurred while sending the message.</value></data>

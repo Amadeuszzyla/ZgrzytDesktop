@@ -5,6 +5,7 @@ using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
+using ZgrzytDesktop.Tests.Infrastructure;
 using ZgrzytDesktop.Tests.Infrastructure.Fakes;
 using ZgrzytDesktop.ViewModels.DashboardModules;
 using TicketMessage = ZgrzytDesktop.Models.Message;
@@ -199,6 +200,30 @@ public class TicketDetailsPanelViewModelTests
         Assert.Equal(string.Empty, panel.NewMessageText);
         Assert.Equal(1, tickets.SendMessageCallCount);
         Assert.Contains(panel.Messages, m => m.Content == "Nowa wiadomość");
+        Assert.Contains(panel.Messages, m => m.DisplayBody == "Nowa wiadomość");
+    }
+
+    [Fact]
+    public async Task LoadMessagesAsync_HtmlBody_ShowsPlainDisplayBody()
+    {
+        var tickets = new FakeTicketService();
+        tickets.TicketsById[20] = new Ticket { Id = 20, Title = "Chat", Status = TicketStatuses.Nowe };
+        tickets.MessagesByTicketId[20] =
+        [
+            new TicketMessage
+            {
+                Id = 1,
+                Content = "<p>Widoczna treść</p>",
+                Sender = new User { Id = 1, Name = "User", Login = "user" }
+            }
+        ];
+
+        var (panel, _) = CreatePanel(tickets);
+
+        await panel.LoadTicketDetailsAsync(20);
+
+        Assert.Single(panel.Messages);
+        Assert.Equal("Widoczna treść", panel.Messages[0].DisplayBody);
     }
 
     [Fact]
@@ -454,7 +479,8 @@ public class TicketDetailsPanelViewModelTests
 
         return new TicketDetailsPanelCallbacks
         {
-            ShowToast = (_, _) => { },
+            ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
             SetIsOffline = _ => { },
             GetIsOffline = () => false,
             GetApiErrorMessage = ex => ApiErrorSanitizer.SanitizeApiErrorMessage(
@@ -500,7 +526,10 @@ public class TicketDetailsPanelViewModelTests
                     return false;
                 }
 
-                setStatusMessage?.Invoke(offlineToastMessage ?? ex.Message);
+                setStatusMessage?.Invoke(
+                    offlineToastMessage is not null
+                        ? AppStrings.Get(offlineToastMessage)
+                        : ex.Message);
                 return false;
             }
             catch (ApiException ex)
@@ -512,7 +541,10 @@ public class TicketDetailsPanelViewModelTests
             }
             catch
             {
-                setStatusMessage?.Invoke(unexpectedStatusMessage ?? AppStrings.Get("Api_UnexpectedError"));
+                setStatusMessage?.Invoke(
+                    unexpectedStatusMessage is not null
+                        ? AppStrings.Get(unexpectedStatusMessage)
+                        : AppStrings.Get("Api_UnexpectedError"));
                 return false;
             }
         };

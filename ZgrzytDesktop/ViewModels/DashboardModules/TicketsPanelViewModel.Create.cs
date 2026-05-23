@@ -51,7 +51,7 @@ public sealed partial class TicketsPanelViewModel
         if (_callbacks.GetIsOffline())
         {
             CreateTicketStatusMessage = AppStrings.Get("Tickets_CreateOffline");
-            _callbacks.ShowToast(AppStrings.Get("Toast_TicketCreateOfflineBlocked"), ToastTypes.Warning);
+            _callbacks.ShowToastKey("Toast_TicketCreateOfflineBlocked", ToastTypes.Warning);
             return;
         }
 
@@ -106,7 +106,7 @@ public sealed partial class TicketsPanelViewModel
                         SelectedTicket = Tickets.FirstOrDefault(ticket => ticket.Id == createdTicket.Id);
 
                     CreateTicketStatusMessage = AppStrings.Get("Tickets_Created");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_TicketCreated"), ToastTypes.Success);
+                    _callbacks.ShowToastKey("Toast_TicketCreated", ToastTypes.Success);
 
                     if (createdTicket is not null)
                     {
@@ -118,13 +118,13 @@ public sealed partial class TicketsPanelViewModel
                     }
                 },
                 setStatusMessage: message => CreateTicketStatusMessage = message,
-                unexpectedStatusMessage: AppStrings.Get("Tickets_CreateUnexpectedError"),
-                unexpectedToastMessage: AppStrings.Get("Tickets_CreateError"),
+                unexpectedStatusMessageKey: "Tickets_CreateUnexpectedError",
+                unexpectedToastMessageKey: "Tickets_CreateError",
                 onServiceUnavailableAsync: async _ =>
                 {
                     _callbacks.SetIsOffline(true);
                     CreateTicketStatusMessage = AppStrings.Get("Tickets_CreateOfflineError");
-                    _callbacks.ShowToast(AppStrings.Get("Toast_TicketCreateOffline"), ToastTypes.Error);
+                    _callbacks.ShowToastKey("Toast_TicketCreateOffline", ToastTypes.Error);
                     await Task.CompletedTask;
                 });
         }

@@ -123,7 +123,8 @@ public class LocalizationRuntimeTests
     private static DashboardVmBridge CreateBridge() =>
         new()
         {
-            ShowToast = (_, _) => { },
+            ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
             LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
             NotifyLocalization = () => { },
             GetIsOffline = () => false,
@@ -155,7 +156,8 @@ public class LocalizationRuntimeTests
             new LocalTicketCacheService(tempDir),
             new TicketsPanelCallbacks
             {
-                ShowToast = (_, _) => { },
+                ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
                 SetIsOffline = _ => { },
                 GetIsOffline = () => false,
                 NotifyStatistics = (_, _) => { },

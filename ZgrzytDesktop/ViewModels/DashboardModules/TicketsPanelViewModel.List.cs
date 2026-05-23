@@ -78,7 +78,7 @@ public sealed partial class TicketsPanelViewModel
             _callbacks.SetIsOffline(true);
 
             if (!silentRefresh)
-                _callbacks.ShowToast(AppStrings.Get("Toast_TicketsOfflineCache"), ToastTypes.Warning);
+                _callbacks.ShowToastKey("Toast_TicketsOfflineCache", ToastTypes.Warning);
 
             await LoadTicketsFromCacheAsync();
         }
@@ -87,14 +87,14 @@ public sealed partial class TicketsPanelViewModel
             StatusMessage = _callbacks.GetApiErrorMessage(ex);
 
             if (!silentRefresh)
-                _callbacks.ShowToast(_callbacks.GetApiErrorMessage(ex), ToastTypes.Error);
+                _callbacks.ShowToastRaw(_callbacks.GetApiErrorMessage(ex), ToastTypes.Error);
         }
         catch
         {
             StatusMessage = AppStrings.Get("Api_UnexpectedError");
 
             if (!silentRefresh)
-                _callbacks.ShowToast(AppStrings.Get("Toast_TicketsFetchError"), ToastTypes.Error);
+                _callbacks.ShowToastKey("Toast_TicketsFetchError", ToastTypes.Error);
         }
         finally
         {
@@ -158,7 +158,7 @@ public sealed partial class TicketsPanelViewModel
             if (!_autoRefreshErrorToastShown)
             {
                 _autoRefreshErrorToastShown = true;
-                _callbacks.ShowToast(AppStrings.Get("Toast_TicketsLostConnection"), ToastTypes.Warning);
+                _callbacks.ShowToastKey("Toast_TicketsLostConnection", ToastTypes.Warning);
             }
         }
         catch
@@ -168,7 +168,7 @@ public sealed partial class TicketsPanelViewModel
             if (!_autoRefreshErrorToastShown)
             {
                 _autoRefreshErrorToastShown = true;
-                _callbacks.ShowToast(AppStrings.Get("Toast_TicketsRefreshFailed"), ToastTypes.Error);
+                _callbacks.ShowToastKey("Toast_TicketsRefreshFailed", ToastTypes.Error);
             }
         }
     }

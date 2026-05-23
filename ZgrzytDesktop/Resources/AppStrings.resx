@@ -6,7 +6,12 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Login_ProvideLogin" xml:space="preserve"><value>Podaj login.</value></data>
   <data name="Login_ProvidePassword" xml:space="preserve"><value>Podaj hasło.</value></data>
-  <data name="Login_InvalidCredentials" xml:space="preserve"><value>Nieprawidłowy login albo hasło.</value></data>
+  <data name="Login_InvalidCredentials" xml:space="preserve"><value>Nieprawidłowy login lub hasło.</value></data>
+  <data name="Login_NoDesktopAccess" xml:space="preserve"><value>To konto nie ma dostępu do aplikacji desktopowej.</value></data>
+  <data name="Login_CheckCredentials" xml:space="preserve"><value>Sprawdź login i hasło.</value></data>
+  <data name="Login_ApiServerError" xml:space="preserve"><value>Serwer API zwrócił błąd. Spróbuj ponownie później.</value></data>
+  <data name="Login_ConnectionError" xml:space="preserve"><value>Nie można połączyć się z API. Sprawdź internet lub adres serwera.</value></data>
+  <data name="Login_InvalidApiResponse" xml:space="preserve"><value>API zwróciło nieprawidłową odpowiedź.</value></data>
   <data name="Login_Offline" xml:space="preserve"><value>Brak połączenia z API. Sprawdź, czy backend jest uruchomiony.</value></data>
   <data name="Login_UnexpectedError" xml:space="preserve"><value>Wystąpił nieoczekiwany błąd podczas logowania.</value></data>
   <data name="Login_DesktopAccessDenied" xml:space="preserve"><value>Aplikacja desktopowa jest dostępna tylko dla pracowników IT i administratorów.</value></data>
@@ -68,6 +73,7 @@
   <data name="Admin_Unban" xml:space="preserve"><value>Odbanuj</value></data>
   <data name="Admin_UnbanPassword" xml:space="preserve"><value>Hasło (odbanowanie)</value></data>
   <data name="Admin_NoUsers" xml:space="preserve"><value>Brak użytkowników do wyświetlenia.</value></data>
+  <data name="Admin_NoUsersFound" xml:space="preserve"><value>Nie znaleziono użytkowników.</value></data>
   <data name="Admin_LoadingUsers" xml:space="preserve"><value>Pobieranie użytkowników...</value></data>
   <data name="Admin_TabUsers" xml:space="preserve"><value>Użytkownicy</value></data>
   <data name="Admin_TabNewAccount" xml:space="preserve"><value>Nowe konto</value></data>
@@ -233,14 +239,6 @@
   <data name="Stats_LoadAllPagesFailed" xml:space="preserve"><value>Nie udało się pobrać statystyk ze wszystkich stron.</value></data>
   <data name="Stats_LoadAllFailed" xml:space="preserve"><value>Nie udało się pobrać statystyk.</value></data>
   <data name="Stats_Loaded" xml:space="preserve"><value>Zaktualizowano statystyki ({0} zgłoszeń).</value></data>
-  <data name="Stats_ResponseTimeTitle" xml:space="preserve"><value>Czas pierwszej reakcji IT</value></data>
-  <data name="Stats_ResponseTimeUnavailable" xml:space="preserve"><value>API nie dostarcza danych czasu pierwszej odpowiedzi.</value></data>
-  <data name="Stats_ResponseTimeMethodApi" xml:space="preserve"><value>Średnia: {0} (first_response_at − created_at, {1} zgłoszeń).</value></data>
-  <data name="Stats_ResponseTimeMethodMessages" xml:space="preserve"><value>Średnia: {0} (pierwsza wiadomość IT/admin − created_at, {1} zgłoszeń).</value></data>
-  <data name="Stats_ResponseTimeMethodMixed" xml:space="preserve"><value>Średnia: {0} (first_response_at lub wiadomość IT/admin − created_at, {1} zgłoszeń).</value></data>
-  <data name="Stats_Duration_DaysHours" xml:space="preserve"><value>{0} d {1} h</value></data>
-  <data name="Stats_Duration_HoursMinutes" xml:space="preserve"><value>{0} h {1} min</value></data>
-  <data name="Stats_Duration_Minutes" xml:space="preserve"><value>{0} min</value></data>
   <data name="Settings_StatusReady" xml:space="preserve"><value>Ustawienia gotowe.</value></data>
   <data name="Settings_StatusSessionRefreshing" xml:space="preserve"><value>Odświeżanie sesji...</value></data>
   <data name="Settings_StatusSessionRefreshed" xml:space="preserve"><value>Sesja została odświeżona.</value></data>
@@ -298,6 +296,7 @@
   <data name="Details_OfflineAssignFailed" xml:space="preserve"><value>Brak połączenia z API. Nie można przypisać zgłoszenia offline.</value></data>
   <data name="Details_OfflineSend" xml:space="preserve"><value>Nie można wysłać wiadomości w trybie offline.</value></data>
   <data name="Details_EmptyMessage" xml:space="preserve"><value>Treść wiadomości nie może być pusta.</value></data>
+  <data name="Details_MessageBodyEmpty" xml:space="preserve"><value>Brak treści wiadomości.</value></data>
   <data name="Details_Sending" xml:space="preserve"><value>Wysyłanie wiadomości...</value></data>
   <data name="Details_MessageSent" xml:space="preserve"><value>Wiadomość została wysłana.</value></data>
   <data name="Details_MessageSendFailed" xml:space="preserve"><value>Wystąpił błąd podczas wysyłania wiadomości.</value></data>

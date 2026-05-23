@@ -319,7 +319,8 @@ public class TicketQueueFilteringTests
             new LocalTicketCacheService(tempDir),
             new TicketsPanelCallbacks
             {
-                ShowToast = (_, _) => { },
+                ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
                 SetIsOffline = _ => { },
                 GetIsOffline = () => false,
                 NotifyStatistics = (_, _) => { },

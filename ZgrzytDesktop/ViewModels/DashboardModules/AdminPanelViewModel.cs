@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-
+using System.Collections.Specialized;
 using System.Linq;
 
 using System.Threading.Tasks;
@@ -44,6 +44,8 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
     private User? _selectedAdminUser;
 
+    private bool _isLoadingAdminUsers;
+
 
 
     public AdminPanelViewModel(IUserAdminService userAdminService, AdminPanelCallbacks callbacks)
@@ -53,6 +55,8 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
         _userAdminService = userAdminService;
 
         _callbacks = callbacks;
+
+        AdminUsers.CollectionChanged += OnAdminUsersCollectionChanged;
 
 
 
@@ -81,7 +85,21 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
     public ObservableCollection<User> AdminUsers { get; } = new();
 
+    public bool IsLoadingAdminUsers
+    {
+        get => _isLoadingAdminUsers;
+        private set
+        {
+            if (SetProperty(ref _isLoadingAdminUsers, value))
+                RefreshAdminUsersVisibility();
+        }
+    }
 
+    public bool HasNoAdminUsers => !IsLoadingAdminUsers && AdminUsers.Count == 0;
+
+    public bool HasAdminUsers => !IsLoadingAdminUsers && AdminUsers.Count > 0;
+
+    public string LblAdminNoUsersFound => AppStrings.Get("Admin_NoUsersFound");
 
     public ObservableCollection<AdminListFilterOption> AdminUserListFilterOptions { get; } = new();
 
@@ -321,6 +339,10 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
             AdminStatusMessage = BuildAdminStatusMessage(AdminUsers.Count);
 
+        OnPropertyChanged(nameof(LblAdminNoUsersFound));
+
+        RefreshAdminUsersVisibility();
+
         NotifyRegisterUserLocalization();
     }
 
@@ -358,55 +380,64 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
 
 
-        await _callbacks.ExecuteApiAsync(
+        try
+        {
+            IsLoadingAdminUsers = true;
 
-            async () =>
+            await _callbacks.ExecuteApiAsync(
 
-            {
-
-                AdminStatusMessage = AppStrings.Get("Admin_LoadingUsers");
-
-
-
-                var filter = GetSelectedAdminUserListFilter();
-
-                var result = await _userAdminService.GetUsersAsync(filter);
-
-
-
-                AdminUsers.Clear();
-
-
-
-                if (result.Users.Count == 0)
+                async () =>
 
                 {
 
-                    AdminStatusMessage = ResolveEmptyListStatusMessage(result);
-
-                    return;
-
-                }
+                    AdminStatusMessage = AppStrings.Get("Admin_LoadingUsers");
 
 
 
-                foreach (var user in result.Users.OrderBy(user => user.Login))
+                    var filter = GetSelectedAdminUserListFilter();
 
-                    AdminUsers.Add(user);
+                    var result = await _userAdminService.GetUsersAsync(filter);
 
 
 
-                AdminStatusMessage = BuildAdminStatusMessage(AdminUsers.Count);
+                    AdminUsers.Clear();
 
-            },
+
+
+                    if (result.Users.Count == 0)
+
+                    {
+
+                        AdminStatusMessage = ResolveEmptyListHeaderMessage(result);
+
+                        return;
+
+                    }
+
+
+
+                    foreach (var user in result.Users.OrderBy(user => user.Login))
+
+                        AdminUsers.Add(user);
+
+
+
+                    AdminStatusMessage = BuildAdminStatusMessage(AdminUsers.Count);
+
+                },
 
             setStatusMessage: message => AdminStatusMessage = message,
 
-            unexpectedStatusMessage: AppStrings.Get("Toast_AdminUsersLoadFailed"),
+            unexpectedStatusMessageKey: "Toast_AdminUsersLoadFailed",
 
-            unexpectedToastMessage: AppStrings.Get("Toast_AdminUsersLoadFailed"),
+            unexpectedToastMessageKey: "Toast_AdminUsersLoadFailed",
 
             setOfflineOnServiceUnavailable: false);
+        }
+        finally
+        {
+            IsLoadingAdminUsers = false;
+        }
 
     }
 
@@ -436,7 +467,7 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
                 await LoadUsersAsync();
 
-                _callbacks.ShowToast(AppStrings.Get("Toast_UserBanned"), ToastTypes.Success);
+                _callbacks.ShowToastKey("Toast_UserBanned", ToastTypes.Success);
 
                 await _callbacks.LogAuditAsync("BanUser", null, "Audit_Desc_UserBanned", [login]);
 
@@ -444,9 +475,9 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
             setStatusMessage: message => AdminStatusMessage = message,
 
-            unexpectedStatusMessage: AppStrings.Get("Toast_AdminBanFailed"),
+            unexpectedStatusMessageKey: "Toast_AdminBanFailed",
 
-            unexpectedToastMessage: AppStrings.Get("Toast_AdminBanFailed"),
+            unexpectedToastMessageKey: "Toast_AdminBanFailed",
 
             setOfflineOnServiceUnavailable: false);
 
@@ -478,7 +509,7 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
                 await LoadUsersAsync();
 
-                _callbacks.ShowToast(AppStrings.Get("Toast_UserActivated"), ToastTypes.Success);
+                _callbacks.ShowToastKey("Toast_UserActivated", ToastTypes.Success);
 
                 await _callbacks.LogAuditAsync("ActivateUser", null, "Audit_Desc_UserActivated", [login]);
 
@@ -486,9 +517,9 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
             setStatusMessage: message => AdminStatusMessage = message,
 
-            unexpectedStatusMessage: AppStrings.Get("Toast_AdminActivateFailed"),
+            unexpectedStatusMessageKey: "Toast_AdminActivateFailed",
 
-            unexpectedToastMessage: AppStrings.Get("Toast_AdminActivateFailed"),
+            unexpectedToastMessageKey: "Toast_AdminActivateFailed",
 
             setOfflineOnServiceUnavailable: false);
 
@@ -510,7 +541,7 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
         {
 
-            _callbacks.ShowToast(AppStrings.Get("Toast_AdminUnbanPasswordRequired"), ToastTypes.Warning);
+            _callbacks.ShowToastKey("Toast_AdminUnbanPasswordRequired", ToastTypes.Warning);
 
             return;
 
@@ -534,7 +565,7 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
                 await LoadUsersAsync();
 
-                _callbacks.ShowToast(AppStrings.Get("Toast_UserUnbanned"), ToastTypes.Success);
+                _callbacks.ShowToastKey("Toast_UserUnbanned", ToastTypes.Success);
 
                 await _callbacks.LogAuditAsync("UnbanUser", null, "Audit_Desc_UserUnbanned", [login]);
 
@@ -542,9 +573,9 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
             setStatusMessage: message => AdminStatusMessage = message,
 
-            unexpectedStatusMessage: AppStrings.Get("Toast_AdminUnbanFailed"),
+            unexpectedStatusMessageKey: "Toast_AdminUnbanFailed",
 
-            unexpectedToastMessage: AppStrings.Get("Toast_AdminUnbanFailed"),
+            unexpectedToastMessageKey: "Toast_AdminUnbanFailed",
 
             setOfflineOnServiceUnavailable: false);
 
@@ -564,7 +595,7 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
 
 
-    private static string ResolveEmptyListStatusMessage(UserAdminListResult result) =>
+    private string ResolveEmptyListHeaderMessage(UserAdminListResult result) =>
 
         result.InfoKind switch
 
@@ -572,9 +603,18 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
 
             UserAdminListInfoKind.BannedListNotSupported => AppStrings.Get("Admin_BannedListNotSupported"),
 
-            _ => AppStrings.Get("Admin_NoUsers")
+            _ => BuildAdminStatusMessage(0)
 
         };
+
+    private void OnAdminUsersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
+        RefreshAdminUsersVisibility();
+
+    private void RefreshAdminUsersVisibility()
+    {
+        OnPropertyChanged(nameof(HasNoAdminUsers));
+        OnPropertyChanged(nameof(HasAdminUsers));
+    }
 
 
 

@@ -34,7 +34,7 @@ Lokalny development: `http://127.0.0.1:9000/api/`
 - Listy zgłoszeń z paginacją Laravel (`GET /api/tickets` i kolejki staff)
 - Wiadomości: pole JSON `body`
 - **Brak `GET /api/logs`** w API — desktop prowadzi **lokalny audyt** (plik w AppData, **DPAPI**); historia zmian w szczegółach zgłoszenia jest lokalna
-- **`first_response_at`:** opcjonalne; gdy API nie zwraca pola, statystyki pokazują **N/A**
+- **Statystyki:** liczba zgłoszeń, statusy, priorytety, przypisania; bez czasu pierwszej reakcji w UI (API nie dostarcza stabilnych danych)
 
 ### Interfejs
 

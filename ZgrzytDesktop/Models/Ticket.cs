@@ -16,6 +16,9 @@ public class Ticket
     [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
 
+    [JsonIgnore]
+    public string DisplayDescription => HtmlTextSanitizer.ToPlainText(Description);
+
     [JsonPropertyName("status")]
     public string Status { get; set; } = string.Empty;
 

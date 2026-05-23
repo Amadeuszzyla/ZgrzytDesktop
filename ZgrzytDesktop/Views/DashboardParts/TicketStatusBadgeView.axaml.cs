@@ -1,19 +1,17 @@
 using System;
-using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
-using ZgrzytDesktop.Converters;
+using ZgrzytDesktop.Helpers;
 
 namespace ZgrzytDesktop.Views.DashboardParts;
 
 public partial class TicketStatusBadgeView : UserControl
 {
-    private static readonly TicketStatusBadgeClassConverter ClassConverter = new();
     private readonly Border _badgeRoot;
     private readonly TextBlock _badgeText;
 
-    public static readonly StyledProperty<string?> DisplayStatusProperty =
-        AvaloniaProperty.Register<TicketStatusBadgeView, string?>(nameof(DisplayStatus));
+    public static readonly StyledProperty<string?> ApiStatusProperty =
+        AvaloniaProperty.Register<TicketStatusBadgeView, string?>(nameof(ApiStatus));
 
     public TicketStatusBadgeView()
     {
@@ -22,23 +20,24 @@ public partial class TicketStatusBadgeView : UserControl
         _badgeText = this.FindControl<TextBlock>("BadgeText")!;
         this.PropertyChanged += (_, e) =>
         {
-            if (e.Property == DisplayStatusProperty)
-                UpdateBadge(DisplayStatus);
+            if (e.Property == ApiStatusProperty)
+                UpdateBadge(ApiStatus);
         };
-        UpdateBadge(DisplayStatus);
+        UpdateBadge(ApiStatus);
     }
 
-    public string? DisplayStatus
+    public string? ApiStatus
     {
-        get => GetValue(DisplayStatusProperty);
-        set => SetValue(DisplayStatusProperty, value);
+        get => GetValue(ApiStatusProperty);
+        set => SetValue(ApiStatusProperty, value);
     }
 
-    private void UpdateBadge(string? status)
+    public void RefreshDisplay() => UpdateBadge(ApiStatus);
+
+    private void UpdateBadge(string? apiStatus)
     {
-        _badgeText.Text = status ?? string.Empty;
-        ApplyClasses(
-            ClassConverter.Convert(status, typeof(string), null, CultureInfo.CurrentCulture) as string);
+        _badgeText.Text = StatusDisplayHelper.ToDisplayStatus(apiStatus);
+        ApplyClasses(StatusDisplayHelper.GetStatusBadgeClasses(apiStatus));
     }
 
     private void ApplyClasses(string? classString)

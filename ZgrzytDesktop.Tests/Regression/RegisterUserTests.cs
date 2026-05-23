@@ -199,7 +199,8 @@ public class RegisterUserTests
             userAdmin,
             new AdminPanelCallbacks
             {
-                ShowToast = (_, _) => { },
+                ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
                 GetIsOffline = () => context.IsOffline,
                 GetIsAdminRole = () => isAdminRole,
                 GetIsStaffRole = () => isStaffRole,

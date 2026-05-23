@@ -71,4 +71,33 @@ public class StatusDisplayHelperTests
         Assert.Equal("W toku", display);
         Assert.Equal(api, back);
     }
+
+    [Theory]
+    [InlineData("pl", "Closed", "zamknięte")]
+    [InlineData("en", "Zamknięte", "zamknięte")]
+    public void ToApiStatus_ShouldResolveLabelsFromAnyCulture(string currentCulture, string label, string expected)
+    {
+        AppStrings.ApplyCulture(currentCulture);
+        Assert.Equal(expected, StatusDisplayHelper.ToApiStatus(label));
+    }
+
+    [Fact]
+    public void ToDisplayStatus_EnglishApiAlias_ShouldUseCurrentCultureLabel()
+    {
+        AppStrings.ApplyCulture("pl");
+        Assert.Equal("Zamknięte", StatusDisplayHelper.ToDisplayStatus("closed"));
+
+        AppStrings.ApplyCulture("en");
+        Assert.Equal("Closed", StatusDisplayHelper.ToDisplayStatus("closed"));
+    }
+
+    [Theory]
+    [InlineData("nowe", "ticket-badge ticket-badge-status-new")]
+    [InlineData("Closed", "ticket-badge ticket-badge-status-closed")]
+    [InlineData("w trakcie", "ticket-badge ticket-badge-status-progress")]
+    public void GetStatusBadgeClasses_ShouldUseNormalizedApiValue(string input, string expectedClasses)
+    {
+        AppStrings.ApplyCulture("pl");
+        Assert.Equal(expectedClasses, StatusDisplayHelper.GetStatusBadgeClasses(input));
+    }
 }

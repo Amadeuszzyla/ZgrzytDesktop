@@ -246,7 +246,7 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
 
 
-                _bridge.ShowToast(AppStrings.Get("Toast_SettingsSaved"), ToastTypes.Success);
+                _bridge.ShowToastKey("Toast_SettingsSaved", ToastTypes.Success);
 
 
 
@@ -256,7 +256,7 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
             },
 
-            unexpectedToastMessage: AppStrings.Get("Toast_SettingsSaveFailed"),
+            unexpectedToastMessageKey: "Toast_SettingsSaveFailed",
 
             showApiErrorToast: false);
 
@@ -288,7 +288,7 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
                     SettingsStatusMessage = AppStrings.Get("Settings_StatusSessionRefreshed");
 
-                    _bridge.ShowToast(AppStrings.Get("Toast_SessionRefreshed"), ToastTypes.Success);
+                    _bridge.ShowToastKey("Toast_SessionRefreshed", ToastTypes.Success);
 
                     return;
 
@@ -298,15 +298,15 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
                 SettingsStatusMessage = AppStrings.Get("Settings_StatusSessionNoToken");
 
-                _bridge.ShowToast(AppStrings.Get("Toast_SessionRefreshFailed"), ToastTypes.Warning);
+                _bridge.ShowToastKey("Toast_SessionRefreshFailed", ToastTypes.Warning);
 
             },
 
             setStatusMessage: message => SettingsStatusMessage = message,
 
-            unexpectedStatusMessage: AppStrings.Get("Settings_StatusSessionRefreshFailed"),
+            unexpectedStatusMessageKey: "Settings_StatusSessionRefreshFailed",
 
-            unexpectedToastMessage: AppStrings.Get("Toast_SessionRefreshFailed"));
+            unexpectedToastMessageKey: "Toast_SessionRefreshFailed");
 
     }
 

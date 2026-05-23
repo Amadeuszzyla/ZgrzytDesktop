@@ -67,5 +67,6 @@ public partial class DashboardViewModel
         AdminPanel.NotifyLocalization();
         RefreshAvailableStatusAndPriorityOptions();
         NotifyUiLabels();
+        RefreshActiveLocalizedToast();
     }
 }

@@ -29,6 +29,11 @@ public sealed class MockHttpMessageHandler : HttpMessageHandler
         Enqueue(statusCode, html, "text/html");
     }
 
+    public void EnqueueException(Exception exception)
+    {
+        _responses.Enqueue(_ => throw exception);
+    }
+
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)

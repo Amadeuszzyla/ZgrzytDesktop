@@ -343,7 +343,8 @@ public class LocalizationAndEmptyStateRegressionTests
     private static DashboardVmBridge CreateStatisticsBridge() =>
         new()
         {
-            ShowToast = (_, _) => { },
+            ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
             LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
             NotifyLocalization = () => { },
             GetIsOffline = () => false,
@@ -366,7 +367,8 @@ public class LocalizationAndEmptyStateRegressionTests
             new FakeAuthService(),
             new DashboardVmBridge
             {
-                ShowToast = (message, _) => onToast?.Invoke(message),
+                ShowToastKey = TestToastCallbacks.ResolveKeyTo(onToast),
+                ShowToastRaw = (message, _) => onToast?.Invoke(message),
                 LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
                 NotifyLocalization = () => { },
                 GetIsOffline = () => false,
@@ -386,7 +388,8 @@ public class LocalizationAndEmptyStateRegressionTests
             userAdmin,
             new AdminPanelCallbacks
             {
-                ShowToast = (_, _) => { },
+                ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
                 GetIsOffline = () => false,
                 GetIsAdminRole = () => true,
                 GetIsStaffRole = () => true,
@@ -421,7 +424,8 @@ public class LocalizationAndEmptyStateRegressionTests
             new LocalTicketCacheService(tempDir),
             new TicketsPanelCallbacks
             {
-                ShowToast = (_, _) => { },
+                ShowToastKey = TestToastCallbacks.NoopKey,
+            ShowToastRaw = TestToastCallbacks.NoopRaw,
                 SetIsOffline = _ => { },
                 GetIsOffline = () => false,
                 NotifyStatistics = (_, _) => { },

@@ -9,7 +9,6 @@
     x:DataType="vm:DashboardViewModel">
 
     <UserControl.Resources>
-        <conv:CollectionIsEmptyConverter x:Key="CollectionIsEmptyConverter" />
         <conv:InvertBoolConverter x:Key="InvertBoolConverter" />
         <conv:UserCanActivateConverter x:Key="UserCanActivateConverter" />
         <conv:UserCanUnbanConverter x:Key="UserCanUnbanConverter" />
@@ -158,8 +157,8 @@
 
                     <TextBlock
                         Classes="tickets-empty-state"
-                        Text="{Binding AdminStatusMessage}"
-                        IsVisible="{Binding AdminUsers, Converter={StaticResource CollectionIsEmptyConverter}}"
+                        Text="{Binding LblAdminNoUsersFound}"
+                        IsVisible="{Binding HasNoAdminUsers}"
                         IsHitTestVisible="False" />
                 </Panel>
             </StackPanel>

@@ -16,7 +16,8 @@ public partial class DashboardViewModel
             _userAdminService,
             new AdminPanelCallbacks
             {
-                ShowToast = ShowToast,
+                ShowToastKey = ShowToastKey,
+                ShowToastRaw = ShowToast,
                 GetIsOffline = () => IsOffline,
                 GetIsAdminRole = () => IsAdminRole,
                 GetIsStaffRole = () => IsStaffRole,
@@ -67,6 +68,14 @@ public partial class DashboardViewModel
     }
 
     public string AdminStatusMessage => AdminPanel.AdminStatusMessage;
+
+    public bool IsLoadingAdminUsers => AdminPanel.IsLoadingAdminUsers;
+
+    public bool HasNoAdminUsers => AdminPanel.HasNoAdminUsers;
+
+    public bool HasAdminUsers => AdminPanel.HasAdminUsers;
+
+    public string LblAdminNoUsersFound => AdminPanel.LblAdminNoUsersFound;
 
     public User? SelectedAdminUser
     {
