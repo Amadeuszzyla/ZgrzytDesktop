@@ -11,9 +11,9 @@ using ZgrzytDesktop.ViewModels.DashboardModules;
 
 namespace ZgrzytDesktop.Tests.Regression;
 
-public class Phase17BAuditTests
+public class AuditImmutabilityTests
 {
-    public Phase17BAuditTests() => ViewModelTestSetup.EnsureAppStrings();
+    public AuditImmutabilityTests() => ViewModelTestSetup.EnsureAppStrings();
 
     [Fact]
     public void DashboardViewModel_DoesNotExposeClearAuditLogsCommand()

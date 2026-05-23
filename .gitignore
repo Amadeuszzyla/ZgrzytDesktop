@@ -13,16 +13,13 @@ x86/
 # IDE / editor
 .vs/
 .idea/
+.vscode/
 *.user
 *.suo
 *.rsuser
 *.userosscache
 *.sln.docstates
 *.DotSettings.user
-
-# Optional local VS Code settings
-.vscode/
-!.vscode/extensions.json
 
 # Test results / coverage
 TestResults/
@@ -80,9 +77,8 @@ tickets-cache.json
 user-cache.json
 settings.json
 
-# ZGRZYT generated helper files
+# Generated helper files
 i18n_*_keys.txt
-scripts/phase15_*_snippet.xml
 
 # OS files
 .DS_Store
@@ -100,6 +96,6 @@ project.nuget.cache
 # Avalonia generated files
 ZgrzytDesktop/obj/Generated/
 
-# Keep useful scripts, ignore temporary script outputs
+# Script temporary outputs
 scripts/*.tmp
 scripts/*.log

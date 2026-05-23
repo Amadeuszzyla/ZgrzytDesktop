@@ -19,6 +19,8 @@ public partial class DashboardViewModel
 
     public IAsyncRelayCommand RequestAccountCommand { get; private set; } = null!;
 
+    public IAsyncRelayCommand RegisterUserCommand { get; private set; } = null!;
+
     public IAsyncRelayCommand LoadAdminUsersCommand { get; private set; } = null!;
 
     public IAsyncRelayCommand BanAdminUserCommand { get; private set; } = null!;
@@ -46,6 +48,7 @@ public partial class DashboardViewModel
         BanAdminUserCommand = AdminPanel.BanAdminUserCommand;
         ActivateAdminUserCommand = AdminPanel.ActivateAdminUserCommand;
         UnbanAdminUserCommand = AdminPanel.UnbanAdminUserCommand;
+        RegisterUserCommand = AdminPanel.RegisterUserCommand;
 
         LogoutCommand = new AsyncRelayCommand(LogoutAsync);
     }

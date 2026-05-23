@@ -1,0 +1,86 @@
+<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.RegisterUserFormView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ZgrzytDesktop.ViewModels"
+    x:CompileBindings="False"
+    x:DataType="vm:DashboardViewModel">
+
+    <StackPanel Spacing="16">
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRegisterUserFullName}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding NewUserName}"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderName}"
+                IsEnabled="{Binding CanRegisterUser}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRegisterUserLogin}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding NewUserLogin}"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderLogin}"
+                IsEnabled="{Binding CanRegisterUser}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRegisterUserEmail}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding NewUserEmail}"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderEmail}"
+                IsEnabled="{Binding CanRegisterUser}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRegisterUserPassword}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding NewUserPassword}"
+                PasswordChar="•"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderPassword}"
+                IsEnabled="{Binding CanRegisterUser}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRegisterUserPasswordConfirm}" />
+            <TextBox
+                Classes="account-form-field"
+                Text="{Binding NewUserPasswordConfirmation}"
+                PasswordChar="•"
+                PlaceholderText="{Binding LblRequestAccountPlaceholderPasswordConfirm}"
+                IsEnabled="{Binding CanRegisterUser}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="account-form-label" Text="{Binding LblRegisterUserRole}" />
+            <ComboBox
+                Classes="account-form-field"
+                MinHeight="38"
+                ItemsSource="{Binding NewUserRoles}"
+                SelectedItem="{Binding SelectedNewUserRole}"
+                IsEnabled="{Binding CanRegisterUser}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Label}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <Button
+            Classes="btn-primary account-form-submit"
+            Content="{Binding LblRegisterUserSubmit}"
+            Command="{Binding RegisterUserCommand}"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            IsEnabled="{Binding CanRegisterUser}" />
+
+        <TextBlock
+            Classes="account-form-status"
+            Text="{Binding RegisterUserStatusMessage}"
+            TextWrapping="Wrap" />
+    </StackPanel>
+</UserControl>

@@ -11,9 +11,9 @@ using ZgrzytDesktop.ViewModels.DashboardModules;
 
 namespace ZgrzytDesktop.Tests.Regression;
 
-public class Phase16IQueueFilterTests
+public class TicketQueueFilteringTests
 {
-    public Phase16IQueueFilterTests() => ViewModelTestSetup.EnsureAppStrings();
+    public TicketQueueFilteringTests() => ViewModelTestSetup.EnsureAppStrings();
 
     [Fact]
     public async Task GetTicketsAsync_All_StillSendsStatusPriorityAndSortQueryParams()

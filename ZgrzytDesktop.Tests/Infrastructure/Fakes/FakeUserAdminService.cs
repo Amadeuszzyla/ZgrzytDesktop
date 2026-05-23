@@ -43,6 +43,14 @@ public sealed class FakeUserAdminService : IUserAdminService
 
     public ApiException? UnbanApiException { get; set; }
 
+    public int RegisterUserCallCount { get; private set; }
+
+    public RegisterUserRequest? LastRegisterUserRequest { get; private set; }
+
+    public RegisterUserResponse? NextRegisterUserResponse { get; set; }
+
+    public ApiException? RegisterUserApiException { get; set; }
+
     public Task<UserAdminListResult> GetUsersAsync(UserAdminListFilter filter = UserAdminListFilter.All)
     {
         GetUsersCallCount++;
@@ -98,5 +106,20 @@ public sealed class FakeUserAdminService : IUserAdminService
             throw UnbanApiException;
 
         return Task.CompletedTask;
+    }
+
+    public Task<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request)
+    {
+        RegisterUserCallCount++;
+        LastRegisterUserRequest = request;
+
+        if (RegisterUserApiException is not null)
+            throw RegisterUserApiException;
+
+        return Task.FromResult(NextRegisterUserResponse ?? new RegisterUserResponse
+        {
+            Message = "ok",
+            User = new User { Login = request.Login, Role = request.Role }
+        });
     }
 }

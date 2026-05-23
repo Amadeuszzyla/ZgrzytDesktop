@@ -511,10 +511,18 @@ public class HeadlessViewsTests
                     .FirstOrDefault();
 
                 Assert.NotNull(adminPanel);
-                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblAdminRegisterTitle));
-                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblAdminRegisterSubtitle));
-                Assert.True(HeadlessViewTestHelper.FindDescendants<RequestAccountFormView>(adminPanel!).Any());
+                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblRegisterUserTitle));
+                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblRegisterUserSubtitle));
+                Assert.True(HeadlessViewTestHelper.FindDescendants<RegisterUserFormView>(adminPanel!).Any());
                 Assert.True(HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.TextBox>(adminPanel!) >= 5);
+                Assert.True(HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(adminPanel!) >= 1);
+
+                var submitButton = HeadlessViewTestHelper
+                    .FindDescendants<Avalonia.Controls.Button>(adminPanel!)
+                    .FirstOrDefault(b => b.Content as string == vm.LblRegisterUserSubmit);
+
+                Assert.NotNull(submitButton);
+                Assert.Equal(vm.RegisterUserCommand, submitButton.Command);
             }
             finally
             {

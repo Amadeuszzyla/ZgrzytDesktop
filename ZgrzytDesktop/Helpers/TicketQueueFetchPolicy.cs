@@ -1,7 +1,7 @@
 namespace ZgrzytDesktop.Helpers;
 
 /// <summary>
-/// Safety limits when aggregating active/unassigned queue pages for local filter/sort (phase 16I fallback).
+/// Safety limits when aggregating active/unassigned queue pages for local filter/sort fallback.
 /// </summary>
 public static class TicketQueueFetchPolicy
 {

@@ -42,6 +42,7 @@ public partial class DashboardViewModel
     {
         OnPropertyChanged(nameof(CanUseOnlineActions));
         OnPropertyChanged(nameof(CanRequestAccount));
+        AdminPanel.NotifyCanRegisterUserChanged();
     }
 
     private Task LoadTicketsAsync(bool silentRefresh = false) =>

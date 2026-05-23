@@ -15,6 +15,8 @@ public sealed class AdminPanelCallbacks
 
     public required Func<bool> GetIsStaffRole { get; init; }
 
+    public required Func<bool> GetCanUseOnlineActions { get; init; }
+
     public required Func<ApiException, string> GetApiErrorMessage { get; init; }
 
     public required Func<string, int?, string?, object?[]?, Task> LogAuditAsync { get; init; }

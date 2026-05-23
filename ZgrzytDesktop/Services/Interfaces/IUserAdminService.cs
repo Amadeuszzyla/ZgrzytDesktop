@@ -20,4 +20,6 @@ public interface IUserAdminService
     Task ActivateUserAsync(int userId);
 
     Task UnbanUserAsync(int userId, string password);
+
+    Task<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request);
 }

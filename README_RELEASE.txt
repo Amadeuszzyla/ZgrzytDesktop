@@ -1,45 +1,33 @@
 ZGRZYT Desktop — instrukcja uruchomienia (Windows x64)
 =====================================================
 
-1. Rozpakuj CAŁE archiwum ZIP do folderu, np.:
-   C:\ZgrzytDesktop\
+1. Rozpakuj CAŁE archiwum ZIP do folderu, np. C:\ZgrzytDesktop\
+   W folderze muszą być ZgrzytDesktop.exe, pliki DLL i podfolder runtime.
+   Nie przenoś samego pliku EXE — aplikacja nie wystartuje.
 
-   W folderze muszą być m.in. ZgrzytDesktop.exe, pliki DLL i podfolder runtime.
-   Nie przenoś samego pliku EXE do innego katalogu — aplikacja nie wystartuje.
+2. Uruchom: ZgrzytDesktop.exe
 
-2. Uruchom program:
-   ZgrzytDesktop.exe
+3. Połączenie z API
+   Domyślnie: https://zgrzyt-api.onrender.com/api/
+   Po dłuższej bezczynności serwer (Render) może odpowiadać wolno — odczekaj ok. 30–60 s i spróbuj ponownie.
 
-3. Wersja self-contained
-   Ta paczka zawiera .NET runtime — nie musisz instalować .NET Desktop Runtime na tym komputerze.
-
-4. API
-   Aplikacja łączy się z:
-   https://zgrzyt-api.onrender.com/api/
-
-   Przy pierwszym uruchomieniu po bezczynności serwer na Render może odpowiadać wolno (cold start).
-   Odczekaj ok. 30–60 sekund i spróbuj ponownie.
+4. Kto może korzystać z aplikacji
+   Tylko konta z rolą IT lub administrator (admin).
+   Zwykły użytkownik (user) nie uzyska dostępu do panelu po logowaniu.
 
 5. Logowanie
-   Użyj konta utworzonego w systemie ZGRZYT (login i hasło z backendu).
+   Użyj loginu i hasła z systemu ZGRZYT (konto IT lub admin).
 
-6. Język i wygląd
-   W sekcji Ustawienia możesz wybrać język interfejsu: polski lub angielski.
-   Aplikacja używa wyłącznie jasnego motywu (light).
+6. Dane na tym komputerze
+   Token, cache i ustawienia: %AppData%\ZgrzytDesktop\
+   Nie wymaga uprawnień administratora Windows.
 
-7. Dane lokalne (Windows)
-   Token, cache i ustawienia są zapisywane per użytkownik Windows w:
-   %AppData%\ZgrzytDesktop\
+7. Język
+   W Ustawieniach: polski lub angielski. Interfejs jest tylko w jasnym motywie.
 
-   Nie wymaga uprawnień administratora.
-
-8. Offline
-   Przy braku połączenia z API aplikacja może pokazać dane z lokalnego cache (jeśli były wcześniej pobrane).
-
-9. Problemy
+8. Problemy
    - Antywirus blokuje EXE: dodaj cały folder publish do wyjątków.
-   - Brak połączenia: sprawdź internet i firewall.
-   - Stary adres API w settings.json: aplikacja migruje localhost na produkcyjny URL przy starcie.
+   - Brak internetu: możliwy podgląd wcześniej zapisanych zgłoszeń z cache.
+   - Błąd połączenia: sprawdź firewall i dostęp do internetu.
 
-Wersja: Release, win-x64, self-contained (folder publish)
-Paczka: ZgrzytDesktop-win-x64-release.zip (skrypt scripts/publish-release.ps1)
+Wersja: Release, win-x64, self-contained

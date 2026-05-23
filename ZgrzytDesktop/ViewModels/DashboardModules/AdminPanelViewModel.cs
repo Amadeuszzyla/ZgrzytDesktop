@@ -24,7 +24,7 @@ namespace ZgrzytDesktop.ViewModels.DashboardModules;
 
 
 
-public sealed class AdminPanelViewModel : ViewModelBase
+public sealed partial class AdminPanelViewModel : ViewModelBase
 
 {
 
@@ -74,6 +74,7 @@ public sealed class AdminPanelViewModel : ViewModelBase
 
         UnbanAdminUserCommand = new AsyncRelayCommand(UnbanUserAsync, () => CanUnbanAdminUser);
 
+        InitializeRegisterUser();
     }
 
 
@@ -320,6 +321,7 @@ public sealed class AdminPanelViewModel : ViewModelBase
 
             AdminStatusMessage = BuildAdminStatusMessage(AdminUsers.Count);
 
+        NotifyRegisterUserLocalization();
     }
 
 

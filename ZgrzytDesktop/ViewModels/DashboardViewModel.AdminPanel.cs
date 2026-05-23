@@ -20,6 +20,7 @@ public partial class DashboardViewModel
                 GetIsOffline = () => IsOffline,
                 GetIsAdminRole = () => IsAdminRole,
                 GetIsStaffRole = () => IsStaffRole,
+                GetCanUseOnlineActions = () => CanUseOnlineActions,
                 GetApiErrorMessage = GetApiErrorMessage,
                 LogAuditAsync = LogAuditAsync,
                 ExecuteApiAsyncCore = ExecuteApiAsync
@@ -80,4 +81,46 @@ public partial class DashboardViewModel
     public bool CanUnbanAdminUser => AdminPanel.CanUnbanAdminUser;
 
     public bool ShowAdminUnbanPassword => AdminPanel.ShowAdminUnbanPassword;
+
+    public ObservableCollection<RegisterUserRoleOption> NewUserRoles => AdminPanel.NewUserRoles;
+
+    public string NewUserName
+    {
+        get => AdminPanel.NewUserName;
+        set => AdminPanel.NewUserName = value;
+    }
+
+    public string NewUserLogin
+    {
+        get => AdminPanel.NewUserLogin;
+        set => AdminPanel.NewUserLogin = value;
+    }
+
+    public string NewUserEmail
+    {
+        get => AdminPanel.NewUserEmail;
+        set => AdminPanel.NewUserEmail = value;
+    }
+
+    public string NewUserPassword
+    {
+        get => AdminPanel.NewUserPassword;
+        set => AdminPanel.NewUserPassword = value;
+    }
+
+    public string NewUserPasswordConfirmation
+    {
+        get => AdminPanel.NewUserPasswordConfirmation;
+        set => AdminPanel.NewUserPasswordConfirmation = value;
+    }
+
+    public RegisterUserRoleOption? SelectedNewUserRole
+    {
+        get => AdminPanel.SelectedNewUserRole;
+        set => AdminPanel.SelectedNewUserRole = value;
+    }
+
+    public string RegisterUserStatusMessage => AdminPanel.RegisterUserStatusMessage;
+
+    public bool CanRegisterUser => AdminPanel.CanRegisterUser;
 }

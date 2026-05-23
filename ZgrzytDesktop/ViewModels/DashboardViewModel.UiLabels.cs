@@ -134,9 +134,27 @@ public partial class DashboardViewModel
 
     public string LblRequestAccountSubmit => AppStrings.Get("RequestAccount_Submit");
 
-    public string LblAdminRegisterTitle => AppStrings.Get("Admin_RegisterTitle");
+    public string LblAdminRegisterTitle => AppStrings.Get("RegisterUser_Title");
 
-    public string LblAdminRegisterSubtitle => AppStrings.Get("Admin_RegisterSubtitle");
+    public string LblAdminRegisterSubtitle => AppStrings.Get("RegisterUser_Subtitle");
+
+    public string LblRegisterUserTitle => AppStrings.Get("RegisterUser_Title");
+
+    public string LblRegisterUserSubtitle => AppStrings.Get("RegisterUser_Subtitle");
+
+    public string LblRegisterUserFullName => AppStrings.Get("RequestAccount_FullName");
+
+    public string LblRegisterUserLogin => AppStrings.Get("RequestAccount_Login");
+
+    public string LblRegisterUserEmail => AppStrings.Get("RequestAccount_Email");
+
+    public string LblRegisterUserPassword => AppStrings.Get("RequestAccount_Password");
+
+    public string LblRegisterUserPasswordConfirm => AppStrings.Get("RequestAccount_PasswordConfirm");
+
+    public string LblRegisterUserRole => AppStrings.Get("RegisterUser_Role");
+
+    public string LblRegisterUserSubmit => AppStrings.Get("RegisterUser_Submit");
 
     public string LblAuditTitle => AppStrings.Get("Audit_Title");
 
@@ -227,6 +245,15 @@ public partial class DashboardViewModel
         OnPropertyChanged(nameof(LblRequestAccountSubmit));
         OnPropertyChanged(nameof(LblAdminRegisterTitle));
         OnPropertyChanged(nameof(LblAdminRegisterSubtitle));
+        OnPropertyChanged(nameof(LblRegisterUserTitle));
+        OnPropertyChanged(nameof(LblRegisterUserSubtitle));
+        OnPropertyChanged(nameof(LblRegisterUserFullName));
+        OnPropertyChanged(nameof(LblRegisterUserLogin));
+        OnPropertyChanged(nameof(LblRegisterUserEmail));
+        OnPropertyChanged(nameof(LblRegisterUserPassword));
+        OnPropertyChanged(nameof(LblRegisterUserPasswordConfirm));
+        OnPropertyChanged(nameof(LblRegisterUserRole));
+        OnPropertyChanged(nameof(LblRegisterUserSubmit));
         OnPropertyChanged(nameof(LblAuditTitle));
         OnPropertyChanged(nameof(LblAuditSubtitle));
         OnPropertyChanged(nameof(LblAuditRefresh));

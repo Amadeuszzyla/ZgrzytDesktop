@@ -1,16 +1,56 @@
 # ZGRZYT Desktop
 
-Desktopowy klient systemu ZGRZYT — Zintegrowanego Systemu Zgłoszeń i Rejestru Zdarzeń Technicznych.
+Desktopowy klient systemu **ZGRZYT** (Zintegrowany System Zgłoszeń i Rejestru Zdarzeń Technicznych) dla personelu **IT** i **administratorów**.
 
-Aplikacja (Avalonia, MVVM) komunikuje się z backendem Laravel przez REST API (Bearer / Laravel Sanctum). Szczegóły zgodności z API, role i ograniczenia: [README_DESKTOP_STATUS.md](README_DESKTOP_STATUS.md).
+Aplikacja (Avalonia, .NET 10, MVVM) komunikuje się z backendem Laravel przez REST API (`Bearer`, Laravel Sanctum). Konto z rolą zwykłego użytkownika (`user`) **nie ma dostępu** do panelu desktopowego — po logowaniu wyświetlany jest komunikat o braku uprawnień i następuje wylogowanie.
+
+## Funkcje
+
+| Obszar | Opis |
+|--------|------|
+| **Logowanie** | `POST /api/login`, token JWT w pamięci i w pliku chronionym DPAPI, `GET /api/user`, wylogowanie; przy **401** jedna próba `POST /api/refresh` |
+| **Zgłoszenia** | Listy: wszystkie / aktywne / nieprzypisane (`tickets`, `active-tickets`, `unassigned-tickets`); filtry statusu i priorytetu, wyszukiwanie, sortowanie, paginacja |
+| **Szczegóły** | Podgląd zgłoszenia, wątek wiadomości (`GET`/`POST .../messages`), edycja statusu i priorytetu, przypisanie do siebie, zamknięcie, usunięcie (wg uprawnień API) |
+| **Administracja** | (**admin**) listy użytkowników, ban, aktywacja, odbanowanie; (**it** i **admin**) zakładka **Nowe konto** → `POST /api/register` z wyborem roli `user` / `it` / `admin` |
+| **Statystyki** | KPI i wykresy z bieżącej strony lub agregacja wielu stron listy |
+| **Lokalny audyt** | Historia działań w aplikacji (ustawienia + szczegóły zgłoszenia), plik szyfrowany DPAPI — **bez** `GET /api/logs` z backendu |
+| **i18n** | Polski / angielski (`AppStrings`) |
+| **Motyw** | Wyłącznie **jasny** (light-only) |
+| **Offline** | Cache zgłoszeń przy niedostępności API |
+| **Bezpieczeństwo lokalne** | Token, cache, audyt i ustawienia w `%AppData%\ZgrzytDesktop\` — szyfrowanie **DPAPI** (Windows) |
+
+## API
+
+Domyślny adres produkcyjny (kod / `settings.json`, bez edycji w UI):
+
+```text
+https://zgrzyt-api.onrender.com/api/
+```
+
+Lokalny development (opcjonalnie): `http://127.0.0.1:9000/api/`
+
+### Tworzenie kont vs prośba o konto
+
+| Endpoint | Zastosowanie |
+|----------|----------------|
+| `POST /api/register` | **Admin/IT** tworzą konto w **Administracja → Nowe konto** (body: `name`, `login`, `email`, `password`, `password_confirmation`, `role`) |
+| `POST /api/request-account` | Osobny flow prośby o konto (`AuthService`) — **nie** służy do tworzenia kont przez panel administracyjny |
+
+### Uwagi techniczne
+
+- **`GET /api/tickets`:** OpenAPI czasem opisuje tablicę; runtime API zwraca **paginację Laravel** (`current_page`, `data`, `last_page`, …) — desktop jest zgodny z API produkcyjnym.
+- **`first_response_at`:** opcjonalne w modelu; gdy API go nie zwraca, statystyki czasu reakcji pokazują **N/A** (brak fałszywego SLA).
+- **Kolejki active/unassigned:** do API idą `page`, `per_page`, `search`; przy filtrach status/priorytet/sort — pobranie wielu stron i przetwarzanie lokalne (`TicketQueueListProcessor`).
 
 ## Wymagania
 
 - Windows 10/11
-- [.NET SDK 10](https://dotnet.microsoft.com/download) (projekt: `net10.0-windows`)
-- Działające API ZGRZYT (domyślnie `https://zgrzyt-api.onrender.com/api/` — adres w kodzie / `settings.json`, **bez edycji w UI**)
+- [.NET SDK 10](https://dotnet.microsoft.com/download) do budowy ze źródeł
+- Konto **IT** lub **admin** w systemie ZGRZYT
 
-## Uruchomienie
+Szczegóły środowiska: [REQUIREMENTS.md](REQUIREMENTS.md).
+
+## Uruchomienie (developerskie)
 
 ```powershell
 cd C:\ścieżka\do\ZgrzytDesktop
@@ -20,16 +60,7 @@ dotnet test
 dotnet run --project .\ZgrzytDesktop\ZgrzytDesktop.csproj
 ```
 
-**Uwaga:** przed `dotnet build` zamknij uruchomioną aplikację — inaczej pliki w `bin\` mogą być zablokowane.
-
-### Cursor / VS Code
-
-W repozytorium jest folder `.vscode/`:
-
-- **Terminal → Run Task → `build`** — kompilacja
-- **Run and Debug → `ZgrzytDesktop`** — uruchomienie (profil `coreclr`)
-
-W Riderze: projekt startowy `ZgrzytDesktop`, profil uruchomienia.
+Przed `dotnet build` zamknij uruchomioną aplikację, aby uniknąć blokady plików w `bin\`.
 
 ## Testy
 
@@ -37,154 +68,65 @@ W Riderze: projekt startowy `ZgrzytDesktop`, profil uruchomienia.
 dotnet test -c Release
 ```
 
-**Stan weryfikacji (po Fazach 14–16, Release):**
+| Projekt | Typowe wyniki |
+|---------|----------------|
+| `ZgrzytDesktop.Tests` | testy jednostkowe i integracyjne (integracja live **skipped** bez env) |
+| `ZgrzytDesktop.Headless.Tests` | testy UI headless (Avalonia) |
 
-| Projekt | Powodzenie | Pominięte | Łącznie |
-|---------|------------|-----------|---------|
-| `ZgrzytDesktop.Tests` | **289** | **5** (live API) | 294 |
-| `ZgrzytDesktop.Headless.Tests` | **22** | 0 | 22 |
-| **Razem** | **311** | **5** | **316** |
-
-| Krok | Wynik |
-|------|--------|
-| `dotnet build -c Release` | OK — 0 błędów, 0 ostrzeżeń (typowo) |
-| `dotnet test -c Release` | jak w tabeli powyżej |
-
-Większość testów używa mockowanego `HttpMessageHandler` i fake serwisów — nie wymaga żywego API. **5** testów integracyjnych (`Category=Integration`) jest **pomijanych** bez zmiennych `ZGRZYT_API_URL`, `ZGRZYT_LOGIN`, `ZGRZYT_PASSWORD` — szczegóły: [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md).
+Testy integracyjne na żywym API (opcjonalnie): zmienne `ZGRZYT_API_URL`, `ZGRZYT_LOGIN`, `ZGRZYT_PASSWORD` — patrz [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md).
 
 ```powershell
-# tylko integracja na żywo (opcjonalnie, po ustawieniu env)
-dotnet test --filter "Category=Integration"
+dotnet test -c Release --filter "Category=Integration"
 ```
 
-Pokrycie obejmuje m.in.: panele dashboardu, i18n (`AppStrings` PL/EN), kolejki zgłoszeń i filtry (Faza 16I), administracja użytkowników, audyt lokalny, offline/cache, polling, testy regresji Faz 16, testy headless UI (Avalonia: `ViewLocator`, `MainWindow`, layout dashboardu).
+## Publikacja (Windows x64)
 
-## Architektura (Fazy 14–16)
-
-### Shell i nawigacja
-
-- **Composition root:** `App.axaml.cs` — DI (`ConfigureServices`, `BuildServiceProvider`), `ServiceProvider.Dispose()` przy zamknięciu aplikacji.
-- **`MainWindowViewModel`** — `CurrentViewModel` (login / dashboard), autologowanie, wylogowanie; `MainWindow` + `ViewLocator` (`ContentControl`, bez ręcznego podmiany widoków w `App`).
-- **`DashboardViewModel`** — **shell / orchestrator**: nawigacja sekcji, toasty, etykiety UI, delegacja do panelowych ViewModeli; własne partiale (`Navigation`, `Panels`, `Localization`, `Toast`, …).
-
-### Panele (osobne ViewModele)
-
-| ViewModel | Odpowiedzialność |
-|-----------|------------------|
-| `TicketsPanelViewModel` | Lista zgłoszeń, filtry, sort, paginacja, tworzenie zgłoszenia (partiale: `List`, `Filters`, `Pagination`, `Create`) |
-| `TicketDetailsPanelViewModel` | Szczegóły, wiadomości, edycja statusu/priorytetu, przypisanie, zamknięcie, usunięcie (partiale: `Load`, `Messages`, `Mutations`, `Permissions`) |
-| `AdminPanelViewModel` | Listy użytkowników (filtry), ban / aktywacja / odbanowanie, nowe konto (staff) |
-| `SettingsPanelViewModel` | Język UI, zapis ustawień, odświeżenie sesji |
-| `StatisticsPanelViewModel` | KPI i wykresy (bieżąca strona / agregacja wielostronicowa) |
-| `AuditPanelViewModel` | Lokalna historia audytu (ustawienia) |
-
-### UI (layout)
-
-- **`DashboardView.axaml`** — **topbar** (`DashboardTopBarView`: logo ZGRZYT, nawigacja pozioma, wylogowanie) + obszar treści (jedna sekcja na raz).
-- **Zgłoszenia:** lista jako **karty** (`ticket-card`), nie DataGrid.
-- **Administracja → użytkownicy:** lista jako **karty** (`admin-user-card`), nie DataGrid.
-- **Motyw:** wyłącznie **jasny** (light-only); brak przełącznika dark/system w UI (`RequestedThemeVariant="Light"`).
-- Układ i kolorystyka zbliżone do referencyjnego panelu webowego ZGRZYT.
-
-Widoki: `Views/DashboardParts/` (`DashboardTopBarView`, `TicketsPanelView`, `TicketDetailsPanelView`, `StatisticsPanelView`, `AdminPanelView`, `SettingsPanelView`, `RequestAccountPanelView`). Bindingi w XAML wskazują na właściwości `DashboardViewModel` (fasada) lub bezpośrednio na panele tam, gdzie to uproszczono.
-
-### i18n i serwisy
-
-- **`AppStrings`** (`AppStrings.resx` + `AppStrings.en.resx`) — runtime PL/EN (`UiCulture` w ustawieniach).
-- **Interfejsy:** `IApiService`, `IAuthService`, `ITicketService`, `ISettingsService`, `IUserAdminService`, cache, audyt — implementacje w `Services/`.
-- **Cache / DPAPI:** `ILocalTicketCacheService`, `ILocalUserCacheService`, `LocalAuditLogService`.
-
-## Publikacja i oddanie (Windows x64)
-
-**Rekomendowany sposób przekazania programu:** cały folder `publish` spakowany do **ZIP** (self-contained). **Nie** wysyłaj samego pliku EXE — aplikacja wymaga wszystkich DLL i plików runtime w tym samym katalogu.
+**Rekomendacja:** cały folder `publish` w archiwum ZIP (self-contained), nie sam plik EXE.
 
 ```powershell
 .\scripts\publish-release.ps1
 ```
 
-Skrypt wykonuje: `clean` → `restore` → `build` → `test` (bez `Category=Integration`) → `publish` (self-contained) → kopiuje `README_RELEASE.txt` → tworzy `ZgrzytDesktop-win-x64-release.zip`.
+Skrypt: `clean` → `restore` → `build` → `test` (bez integracji live) → `publish` → kopiuje `README_RELEASE.txt` → tworzy `ZgrzytDesktop-win-x64-release.zip`.
 
-Ręcznie (ten sam wariant co skrypt):
+Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt).
 
-```powershell
-dotnet publish .\ZgrzytDesktop\ZgrzytDesktop.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false
-```
+## Architektura (skrót)
 
-Artefakty:
+- **Shell:** `MainWindowViewModel` (login ↔ dashboard), `DashboardViewModel` (nawigacja, toasty, fasada etykiet).
+- **Panele:** `TicketsPanelViewModel`, `TicketDetailsPanelViewModel`, `AdminPanelViewModel`, `SettingsPanelViewModel`, `StatisticsPanelViewModel`, `AuditPanelViewModel`.
+- **Serwisy:** `IApiService`, `IAuthService`, `ITicketService`, `IUserAdminService`, `ISettingsService`, `ILocalAuditLogService`, cache — rejestracja w `App.axaml.cs`.
+- **Widoki:** `Views/DashboardParts/` (topbar, listy kart zgłoszeń i użytkowników, formularze).
 
-```text
-ZgrzytDesktop\bin\Release\net10.0-windows\win-x64\publish\ZgrzytDesktop.exe
-ZgrzytDesktop-win-x64-release.zip   (w katalogu głównym repo — ignorowany przez git)
-```
+## Dane lokalne
 
-Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt) (kopiowana do folderu publish przez skrypt).
+Katalog: `%AppData%\ZgrzytDesktop\`
 
-**Self-contained** — na docelowym PC **nie** trzeba instalować .NET Desktop Runtime.
-
-### Instalator (opcjonalnie, po oddaniu)
-
-| Sposób | Kiedy |
-|--------|--------|
-| **ZIP folderu publish** | **Rekomendowane** — `scripts/publish-release.ps1` |
-| **Inno Setup** | Opcjonalnie po oddaniu |
-| **MSI / WiX / MSIX** | Opcjonalne, nie wymagane na tym etapie |
-
-## Funkcje (zgodność ze specyfikacją)
-
-| Obszar | Opis |
-|--------|------|
-| **Logowanie** | `POST /api/login`, Bearer (Sanctum), autologowanie z tokenu DPAPI, `GET /api/user`, wylogowanie; przy **401** jedna próba `POST /api/refresh` i ponowienie żądania |
-| **Prośba o konto** | `POST /api/request-account` — menu użytkownika lub Administracja (it/admin) |
-| **Zgłoszenia** | Kolejki: `tickets` / `active-tickets` / `unassigned-tickets` (staff); filtry status i priorytet, wyszukiwanie, sort (pole + kierunek), paginacja, auto-odświeżanie |
-| **Filtry kolejek** | **Wszystkie:** filtry i sort w query API. **Aktywne / Nieprzypisane:** `search` w API; przy filtrze status/priorytet lub niestandardowym sorcie — pobranie kolejki i **filtrowanie/sort/paginacja po stronie klienta** (Faza 16I) |
-| **Szczegóły i wiadomości** | Szczegóły zgłoszenia, wątek (`GET`/`POST .../messages`, pole `body`), edycja statusu/priorytetu, przypisanie, zamknięcie, usunięcie (wg roli) |
-| **Statusy / priorytety** | API: `nowe` / `w trakcie` / `zamknięte`; UI PL: Nowe / W toku / **Zamknięte** (EN: Closed) |
-| **Kategorie** | Hardware, Software, Sieć — prefiks `[Kategoria]` w tytule i `Kategoria: ...` w opisie (brak pola `category` w API) |
-| **Role** | `user` / `it` / `admin` — widoczność menu i akcji |
-| **Administracja** | (admin) listy: wszyscy / aktywni / nieaktywni / zbanowani; ban, aktywacja, odbanowanie (`POST .../unban` z hasłem); fallback lokalny przy **404** na wyspecjalizowanych endpointach |
-| **Statystyki** | KPI z bieżącej strony; opcjonalna agregacja ze wszystkich stron `GET tickets` |
-| **Lokalny audyt** | Historia działań w aplikacji (szczegóły + ustawienia), szyfrowany plik w AppData — **nie** logi backendu (`GET /api/logs` niedostępne) |
-| **Toasty** | Komunikaty w oknie aplikacji (bez powiadomień systemowych Windows) |
-| **i18n** | Polski / angielski — `AppStrings`, przełącznik w ustawieniach |
-| **Motyw** | **Tylko jasny** (light-only); zapis w `settings.json` normalizowany do `Light` |
-| **Offline** | Cache zgłoszeń przy niedostępności API |
-
-## Znane ograniczenia
-
-- Brak **`GET /api/logs`** — tylko lokalny audyt desktopowy.
-- **Kategoria** — brak pola w API (zapis w tytule/opisie).
-- **Zamknięcie przez usera** — przycisk dla autora; przy **403** komunikat z API.
-- **Czas pierwszej reakcji IT** — brak `first_response_at` w modelu API.
-- Adres API **nie jest edytowany** w ustawieniach (język i zapis ustawień tak).
-- Brak **powiadomień Windows** — tylko toasty w aplikacji.
-
-Pełna tabela: [README_DESKTOP_STATUS.md](README_DESKTOP_STATUS.md).
+| Plik | Zawartość |
+|------|-----------|
+| `token.txt` | Bearer JWT (DPAPI) |
+| `Cache/tickets-cache.json` | Cache zgłoszeń |
+| `Cache/user-cache.json` | Profil użytkownika |
+| `audit-log.json` | Lokalny audyt |
+| `Settings/settings.json` | Język UI, adres API (bez haseł) |
 
 ## Struktura repozytorium
 
 ```text
 ZgrzytDesktop/
-├── ZgrzytDesktop/
-│   ├── ViewModels/
-│   │   ├── DashboardViewModel*.cs      # shell + partiale
-│   │   └── DashboardModules/           # TicketsPanel, TicketDetailsPanel, Admin, …
-│   ├── Views/
-│   │   ├── DashboardView.axaml         # topbar + panele treści
-│   │   └── DashboardParts/
-│   ├── Resources/                      # AppStrings.resx, AppStrings.en.resx
-│   ├── Helpers/                        # display helpers, TicketQueueListProcessor, …
-│   ├── Constants/
-│   ├── Cache/
-│   └── Services/Interfaces/
+├── ZgrzytDesktop/           # aplikacja Avalonia
 ├── ZgrzytDesktop.Tests/
 ├── ZgrzytDesktop.Headless.Tests/
 ├── scripts/publish-release.ps1
 ├── INTEGRATION_TESTS.md
-├── README_DESKTOP_STATUS.md
+├── REQUIREMENTS.md
 ├── README_RELEASE.txt
+├── .env.example
 └── ZgrzytDesktop.sln
 ```
 
-## Dane lokalne
+## Powiązane dokumenty
 
-Katalog: `%AppData%\ZgrzytDesktop\` — token, cache, audyt, ustawienia (DPAPI). Szczegóły: [README_DESKTOP_STATUS.md](README_DESKTOP_STATUS.md).
+- [REQUIREMENTS.md](REQUIREMENTS.md) — wymagania środowiska i produktu
+- [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) — testy na żywym API
+- [README_RELEASE.txt](README_RELEASE.txt) — instrukcja z paczki ZIP

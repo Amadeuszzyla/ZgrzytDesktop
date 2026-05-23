@@ -9,9 +9,9 @@ using ZgrzytDesktop.Tests.ViewModels;
 
 namespace ZgrzytDesktop.Tests.Regression;
 
-public class Phase17EQueueFetchTests
+public class TicketQueueFetchLimitTests
 {
-    public Phase17EQueueFetchTests() => ViewModelTestSetup.EnsureAppStrings();
+    public TicketQueueFetchLimitTests() => ViewModelTestSetup.EnsureAppStrings();
 
     [Fact]
     public async Task GetTicketsAsync_ActiveWithStatusFilter_MarksTruncationWhenMaxPagesReached()

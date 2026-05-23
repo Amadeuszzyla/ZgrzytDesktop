@@ -150,4 +150,10 @@ public class UserAdminService : IUserAdminService
     internal static bool UsersExposeBanStatus(IReadOnlyList<User> users) =>
         users.Any(user => user.Ban || user.BannedAt.HasValue);
 
+    public async Task<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request)
+    {
+        var response = await _apiService.PostAsync<RegisterUserRequest, RegisterUserResponse>("register", request);
+
+        return response ?? new RegisterUserResponse();
+    }
 }

@@ -17,6 +17,7 @@ public static class AuditDisplayHelper
             "Login" => AppStrings.Get("Audit_Action_Login"),
             "Logout" => AppStrings.Get("Audit_Action_Logout"),
             "RequestAccount" => AppStrings.Get("Audit_Action_RequestAccount"),
+            "RegisterUser" => AppStrings.Get("Audit_Action_RegisterUser"),
             "SettingsSaved" or "Zapis ustawień" => AppStrings.Get("Audit_Action_SettingsSaved"),
             "CreateTicket" => AppStrings.Get("Audit_Action_TicketCreated"),
             "UpdateTicket" => AppStrings.Get("Audit_Action_TicketUpdated"),

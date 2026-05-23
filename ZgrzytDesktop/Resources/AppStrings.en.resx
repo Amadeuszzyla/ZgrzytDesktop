@@ -173,7 +173,17 @@
   <data name="RequestAccount_PlaceholderPasswordConfirm" xml:space="preserve"><value>Repeat password</value></data>
   <data name="RequestAccount_Submit" xml:space="preserve"><value>Submit request</value></data>
   <data name="Admin_RegisterTitle" xml:space="preserve"><value>User registration</value></data>
-  <data name="Admin_RegisterSubtitle" xml:space="preserve"><value>Create a new account request in the system (POST /api/request-account).</value></data>
+  <data name="Admin_RegisterSubtitle" xml:space="preserve"><value>Create a user account in the system (POST /api/register).</value></data>
+  <data name="RegisterUser_Title" xml:space="preserve"><value>New account</value></data>
+  <data name="RegisterUser_Subtitle" xml:space="preserve"><value>Create a user account in the system (admin/IT).</value></data>
+  <data name="RegisterUser_Role" xml:space="preserve"><value>Role</value></data>
+  <data name="RegisterUser_RoleUser" xml:space="preserve"><value>User</value></data>
+  <data name="RegisterUser_RoleIt" xml:space="preserve"><value>IT</value></data>
+  <data name="RegisterUser_RoleAdmin" xml:space="preserve"><value>Administrator</value></data>
+  <data name="RegisterUser_Submit" xml:space="preserve"><value>Create account</value></data>
+  <data name="RegisterUser_Success" xml:space="preserve"><value>Account has been created.</value></data>
+  <data name="RegisterUser_Failed" xml:space="preserve"><value>Could not create account.</value></data>
+  <data name="RegisterUser_ValidationRole" xml:space="preserve"><value>Select a role (user, IT, or administrator).</value></data>
   <data name="Admin_StatusInactive" xml:space="preserve"><value>Inactive</value></data>
   <data name="Stats_LoadingAllPages" xml:space="preserve"><value>Aggregating multiple list pages...</value></data>
   <data name="Stats_ChartByStatus" xml:space="preserve"><value>By status</value></data>
@@ -318,6 +328,8 @@
   <data name="Audit_Action_Login" xml:space="preserve"><value>Login</value></data>
   <data name="Audit_Action_Logout" xml:space="preserve"><value>Logout</value></data>
   <data name="Audit_Action_RequestAccount" xml:space="preserve"><value>Account request</value></data>
+  <data name="Audit_Action_RegisterUser" xml:space="preserve"><value>Account created</value></data>
+  <data name="Audit_Desc_RegisterUser" xml:space="preserve"><value>Created account: {0} (role: {1}).</value></data>
   <data name="Audit_Action_SettingsSaved" xml:space="preserve"><value>Settings saved</value></data>
   <data name="Audit_Action_TicketCreated" xml:space="preserve"><value>Ticket created</value></data>
   <data name="Audit_Action_TicketUpdated" xml:space="preserve"><value>Ticket updated</value></data>

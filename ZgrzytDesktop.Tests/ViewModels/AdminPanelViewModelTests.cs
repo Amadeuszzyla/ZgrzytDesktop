@@ -339,6 +339,7 @@ public class AdminPanelViewModelTests
                 GetIsOffline = () => context.IsOffline,
                 GetIsAdminRole = () => isAdminRole,
                 GetIsStaffRole = () => isStaffRole,
+                GetCanUseOnlineActions = () => !context.IsOffline,
                 GetApiErrorMessage = ex => ApiErrorSanitizer.SanitizeApiErrorMessage(
                     ex.ResponseContent ?? ex.Message,
                     ex.StatusCode),

@@ -4,9 +4,9 @@ using ZgrzytDesktop.Tests.ViewModels;
 
 namespace ZgrzytDesktop.Tests.Regression;
 
-public class Phase16HStragglersTests
+public class FinalLocalizationRegressionTests
 {
-    public Phase16HStragglersTests() => ViewModelTestSetup.EnsureAppStrings();
+    public FinalLocalizationRegressionTests() => ViewModelTestSetup.EnsureAppStrings();
 
     [Fact]
     public void CultureEn_TicketsPaginationLabels_UseAppStrings()

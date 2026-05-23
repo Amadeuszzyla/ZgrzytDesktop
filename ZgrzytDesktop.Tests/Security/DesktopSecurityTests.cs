@@ -12,9 +12,9 @@ using ZgrzytDesktop.Tests.Infrastructure.Fakes;
 using ZgrzytDesktop.Tests.ViewModels;
 namespace ZgrzytDesktop.Tests.Security;
 
-public class Phase17FSecurityTests
+public class DesktopSecurityTests
 {
-    public Phase17FSecurityTests() => ViewModelTestSetup.EnsureAppStrings();
+    public DesktopSecurityTests() => ViewModelTestSetup.EnsureAppStrings();
 
     [Fact]
     public async Task TokenStorage_DoesNotPersistPlaintextJwt()

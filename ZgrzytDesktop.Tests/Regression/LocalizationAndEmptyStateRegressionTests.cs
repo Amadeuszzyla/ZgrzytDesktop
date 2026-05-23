@@ -14,11 +14,11 @@ using ZgrzytDesktop.ViewModels.DashboardModules;
 namespace ZgrzytDesktop.Tests.Regression;
 
 /// <summary>
-/// Regression suite for specification fixes in phases 16B–16E (i18n, tickets empty state, admin, light-only settings).
+/// Regression suite for localization, tickets empty state, admin panel, and light-only settings.
 /// </summary>
-public class Phase16RegressionTests
+public class LocalizationAndEmptyStateRegressionTests
 {
-    public Phase16RegressionTests() => ViewModelTestSetup.EnsureAppStrings();
+    public LocalizationAndEmptyStateRegressionTests() => ViewModelTestSetup.EnsureAppStrings();
 
     #region 16B — i18n EN
 
@@ -390,6 +390,7 @@ public class Phase16RegressionTests
                 GetIsOffline = () => false,
                 GetIsAdminRole = () => true,
                 GetIsStaffRole = () => true,
+                GetCanUseOnlineActions = () => true,
                 GetApiErrorMessage = ex => ApiErrorSanitizer.SanitizeApiErrorMessage(
                     ex.ResponseContent ?? ex.Message,
                     ex.StatusCode),

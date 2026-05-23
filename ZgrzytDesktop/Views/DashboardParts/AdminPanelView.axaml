@@ -174,17 +174,17 @@
                         <StackPanel Spacing="6" HorizontalAlignment="Center">
                             <TextBlock
                                 Classes="account-form-title"
-                                Text="{Binding LblAdminRegisterTitle}"
+                                Text="{Binding LblRegisterUserTitle}"
                                 HorizontalAlignment="Center"
                                 TextAlignment="Center" />
                             <TextBlock
                                 Classes="account-form-subtitle"
-                                Text="{Binding LblAdminRegisterSubtitle}"
+                                Text="{Binding LblRegisterUserSubtitle}"
                                 HorizontalAlignment="Center"
                                 TextAlignment="Center" />
                         </StackPanel>
 
-                        <parts:RequestAccountFormView />
+                        <parts:RegisterUserFormView />
                     </StackPanel>
                 </Border>
             </Panel>
