@@ -29,6 +29,8 @@ public sealed class FakeUserAdminService : IUserAdminService
 
     public List<User> NextUsers { get; set; } = [];
 
+    public List<User>? NextActiveUsers { get; set; }
+
     public string? NextInformationalMessage { get; set; }
 
     public UserAdminListInfoKind NextInfoKind { get; set; }
@@ -36,6 +38,8 @@ public sealed class FakeUserAdminService : IUserAdminService
     public bool NextUsedLocalFilterFallback { get; set; }
 
     public ApiException? GetUsersApiException { get; set; }
+
+    public ApiException? GetActiveUsersApiException { get; set; }
 
     public ApiException? BanApiException { get; set; }
 
@@ -68,7 +72,25 @@ public sealed class FakeUserAdminService : IUserAdminService
         });
     }
 
-    public Task<UserAdminListResult> GetActiveUsersAsync() => GetUsersAsync(UserAdminListFilter.Active);
+    public Task<UserAdminListResult> GetActiveUsersAsync()
+    {
+        GetUsersCallCount++;
+        LastFilter = UserAdminListFilter.Active;
+
+        if (GetActiveUsersApiException is not null)
+            throw GetActiveUsersApiException;
+
+        if (GetUsersApiException is not null)
+            throw GetUsersApiException;
+
+        return Task.FromResult(new UserAdminListResult
+        {
+            Users = (NextActiveUsers ?? NextUsers).ToList(),
+            InformationalMessage = NextInformationalMessage,
+            UsedLocalFilterFallback = NextUsedLocalFilterFallback,
+            InfoKind = NextInfoKind
+        });
+    }
 
     public Task<UserAdminListResult> GetInactiveUsersAsync() => GetUsersAsync(UserAdminListFilter.Inactive);
 

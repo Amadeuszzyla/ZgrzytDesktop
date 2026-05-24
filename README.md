@@ -10,7 +10,7 @@ Aplikacja (Avalonia, .NET 10, MVVM) komunikuje się z backendem Laravel przez RE
 |--------|------|
 | **Logowanie** | `POST /api/login`, token JWT w pamięci i w pliku chronionym DPAPI, `GET /api/user`, wylogowanie; przy **401** jedna próba `POST /api/refresh` |
 | **Zgłoszenia** | Listy: wszystkie / aktywne / nieprzypisane (`tickets`, `active-tickets`, `unassigned-tickets`); filtry statusu i priorytetu, wyszukiwanie, sortowanie, paginacja |
-| **Szczegóły** | Podgląd zgłoszenia, wątek wiadomości (`GET`/`POST .../messages`), edycja statusu i priorytetu, przypisanie do siebie, zamknięcie, usunięcie (wg uprawnień API) |
+| **Szczegóły** | Podgląd zgłoszenia, wątek wiadomości (`GET`/`POST .../messages` — odczyt i dodawanie), edycja statusu i priorytetu, przypisanie (`assigned_it_id`: admin wybiera IT/admin, IT — „Przypisz do mnie”), zamknięcie, usunięcie (wg uprawnień API) |
 | **Administracja** | (**admin**) listy użytkowników, ban, aktywacja, odbanowanie; (**it** i **admin**) zakładka **Nowe konto** → `POST /api/register` z wyborem roli `user` / `it` / `admin` |
 | **Statystyki** | Liczba zgłoszeń, statusy, priorytety, przypisania/nieprzypisane; zakres: bieżąca strona lub wszystkie strony listy. Czas pierwszej reakcji **nie** jest prezentowany — API nie dostarcza stabilnych danych do jego obliczenia. |
 | **Lokalny audyt** | Historia działań w aplikacji (ustawienia + szczegóły zgłoszenia), plik szyfrowany DPAPI — **bez** `GET /api/logs` z backendu |
@@ -19,9 +19,33 @@ Aplikacja (Avalonia, .NET 10, MVVM) komunikuje się z backendem Laravel przez RE
 | **Offline** | Cache zgłoszeń przy niedostępności API |
 | **Bezpieczeństwo lokalne** | Token, cache, audyt i ustawienia w `%AppData%\ZgrzytDesktop\` — szyfrowanie **DPAPI** (Windows) |
 
+## Zabezpieczenia po stronie aplikacji desktopowej
+
+- **Uwierzytelnianie tokenowe** — logowanie przez `POST /api/login`, Bearer JWT w pliku chronionym DPAPI, odświeżanie sesji (`POST /api/refresh`), wylogowanie lokalne i przez API
+- **Kontrola dostępu na podstawie roli** — dashboard tylko dla ról **IT** i **admin**; konto `user` po logowaniu otrzymuje komunikat i jest wylogowywane
+- **Role-based UI w administracji** — admin: lista użytkowników, ban/aktywacja/odbanowanie; IT: tylko zakładka **Nowe konto**; niedostępne sekcje i akcje są ukryte, nie wyłączone
+- **Szyfrowanie lokalnych danych (Windows DPAPI)** — token, cache zgłoszeń, cache użytkownika, lokalny audyt i ustawienia w `%AppData%\ZgrzytDesktop\`
+- **Oczyszczanie HTML przed wyświetleniem** — tytuł/opis zgłoszenia i treść wiadomości (`HtmlTextSanitizer`); odrzucanie odpowiedzi HTML z API jako błędów (`ApiErrorSanitizer`)
+- **Brak logowania haseł i tokenów** — maskowanie wrażliwych pól w lokalnym audycie i komunikatach błędów API (`SensitiveDataMasker`, `SensitiveDataRedactor`)
+- **Obsługa błędów bez stack trace** — przyjazne, zlokalizowane komunikaty (PL/EN); stack trace i HTML z odpowiedzi API nie trafiają do UI
+- **Lokalizowana obsługa błędów logowania** — `LoginErrorMapper` mapuje wyjątki API na komunikaty `AppStrings`
+- **Komunikacja z API przez HTTPS** — domyślny adres produkcyjny używa `https://`; zdalne `http://` jest automatycznie podnoszone do HTTPS (`ApiUrlSecurityHelper`); lokalny dev może używać `http://127.0.0.1`
+- **Wylogowanie czyści sesję lokalną** — token, cache zgłoszeń, cache użytkownika; język UI pozostaje w ustawieniach
+- **Brak fałszywej edycji/usuwania wiadomości** — desktop obsługuje tylko odczyt i dodawanie wiadomości; brak symulacji `PUT`/`DELETE` na wątku czatu
+
+### Znane ograniczenia
+
+- **Auto-wylogowanie po bezczynności** — nie jest jeszcze wdrożone jako stabilna funkcja produktowa (brak oficjalnego wymagania w release)
+- **Pełny audyt serwerowy** — wymaga endpointów backendowych (np. `GET /api/logs`); obecnie audyt jest **lokalny** (plik DPAPI)
+- **Edycja/usuwanie wiadomości** — wymaga dedykowanych endpointów backendowych; desktop ich nie symuluje
+- **Autoryzacja po stronie API** — UI ukrywa niedostępne akcje, ale ostateczna kontrola uprawnień musi być w backendzie
+- **Rate limiting, rotacja tokenów po stronie serwera** — poza zakresem aplikacji desktopowej
+
+**Nie da się wymusić wyłącznie z desktopu:** TLS/HTTPS po stronie serwera, timeout sesji API, autoryzacja endpointów, serwerowa walidacja danych.
+
 ## API
 
-Domyślny adres produkcyjny (kod / `settings.json`, bez edycji w UI):
+Domyślny adres produkcyjny (kod / `settings.json`, bez edycji URL w UI ustawień):
 
 ```text
 https://zgrzyt-api.onrender.com/api/
@@ -40,6 +64,7 @@ Lokalny development (opcjonalnie): `http://127.0.0.1:9000/api/`
 
 - **`GET /api/tickets`:** OpenAPI czasem opisuje tablicę; runtime API zwraca **paginację Laravel** (`current_page`, `data`, `last_page`, …) — desktop jest zgodny z API produkcyjnym.
 - **Kolejki active/unassigned:** do API idą `page`, `per_page`, `search`; przy filtrach status/priorytet/sort — pobranie wielu stron i przetwarzanie lokalne (`TicketQueueListProcessor`).
+- **Wiadomości w czacie:** brak w desktopie edycji/usuwania pojedynczych wiadomości — API nie udostępnia stabilnych endpointów `PUT`/`PATCH`/`DELETE` na `.../messages/{id}`; aplikacja nie ukrywa ani nie fałszuje treści lokalnie.
 
 ## Wymagania
 

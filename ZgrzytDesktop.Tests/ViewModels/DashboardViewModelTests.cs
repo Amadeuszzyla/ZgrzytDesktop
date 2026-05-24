@@ -46,13 +46,14 @@ public class DashboardViewModelTests
     [InlineData("user", false, false)]
     [InlineData("it", true, true)]
     [InlineData("admin", true, true)]
+    [InlineData("administrator", true, true)]
     public void Role_SetsManageAndStaffFlags(string role, bool canManage, bool isStaff)
     {
         var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard(role);
 
         Assert.Equal(canManage, vm.CanManageTickets);
         Assert.Equal(isStaff, vm.IsStaffRole);
-        Assert.Equal(role.Equals("admin", StringComparison.OrdinalIgnoreCase), vm.IsAdminRole);
+        Assert.Equal(ZgrzytDesktop.Helpers.AppRoleHelper.IsAdmin(role), vm.IsAdminRole);
     }
 
     [Fact]
@@ -138,15 +139,16 @@ public class DashboardViewModelTests
     }
 
     [Fact]
-    public async Task LoadAdminUsers_WhenNotAdmin_ShowsForbiddenWithoutCallingApi()
+    public async Task IT_OpenAdminPage_DoesNotLoadUsers_FromDashboard()
     {
         var userAdmin = new FakeUserAdminService();
-        var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard("user", userAdmin: userAdmin);
+        var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard("it", userAdmin: userAdmin);
 
+        vm.AdminPanel.PrepareAdminPage(vm.IsAdminRole);
         await vm.LoadAdminUsersCommand.ExecuteAsync(null);
 
-        Assert.Equal(AppStrings.Get("Api_Forbidden"), vm.AdminStatusMessage);
         Assert.Equal(0, userAdmin.GetUsersCallCount);
+        Assert.Equal(string.Empty, vm.AdminStatusMessage);
     }
 
     [Fact]

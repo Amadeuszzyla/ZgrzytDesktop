@@ -140,6 +140,35 @@ public class UserAdminServiceTests
     }
 
     [Fact]
+    public async Task GetUsersAsync_All_WhenApiReturnsPaginatedEnvelope_ShouldDeserializeData()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.EnqueueJson(HttpStatusCode.OK, """
+                {
+                  "current_page": 1,
+                  "data": [
+                    { "id": 1, "login": "it1", "role": "it", "active": true, "ban": false },
+                    { "id": 2, "login": "admin1", "role": "admin", "active": true, "ban": false }
+                  ],
+                  "total": 2
+                }
+                """);
+            var service = TestApiFactory.CreateUserAdmin(api);
+
+            var result = await service.GetUsersAsync(UserAdminListFilter.All);
+
+            Assert.Equal(2, result.Users.Count);
+            Assert.Contains(result.Users, user => user.Login == "it1");
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
     public async Task GetUsersAsync_WhenActiveUsersReturns404_ShouldFallbackToUsersAndFilterLocally()
     {
         var (api, handler, tempDir) = TestApiFactory.CreateApi();
@@ -272,6 +301,7 @@ public class UserAdminServiceTests
     [Theory]
     [InlineData(UserAdminListFilter.Active, true, false, true)]
     [InlineData(UserAdminListFilter.Inactive, false, false, true)]
+    [InlineData(UserAdminListFilter.Inactive, false, true, false)]
     [InlineData(UserAdminListFilter.Banned, true, true, true)]
     public void FilterUsersLocally_ShouldApplyExpectedRules(
         UserAdminListFilter filter,

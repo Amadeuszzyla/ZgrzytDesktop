@@ -29,6 +29,34 @@ $env:ZGRZYT_PASSWORD = "twoje_haslo"
 
 Wzorzec w repozytorium: [.env.example](.env.example)
 
+## Smoke test (PowerShell, ręcznie)
+
+Skrypt [`scripts/smoke-live-api.ps1`](scripts/smoke-live-api.ps1) sprawdza produkcyjne API bez crasha przy braku `WebException.Response` (timeout, DNS, TLS, cold start Render).
+
+Domyślny URL: `https://zgrzyt-api.onrender.com/api/` — nadpisanie przez `ZGRZYT_API_URL`.
+
+```powershell
+cd C:\ścieżka\do\ZgrzytDesktop
+
+# opcjonalnie (sesja bieżąca)
+$env:ZGRZYT_API_URL = "https://zgrzyt-api.onrender.com/api/"
+$env:ZGRZYT_LOGIN = "twoj_login"
+$env:ZGRZYT_PASSWORD = "twoje_haslo"
+
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-live-api.ps1
+```
+
+| Test | Zachowanie |
+|------|------------|
+| **GET `/api/user`** (bez tokena) | **401 → PASS** — API żyje i wymaga auth; **brak odpowiedzi HTTP → INFO/FAIL** (połączenie, cold start); **500+ → FAIL** backend |
+| **POST `/api/login`** | Wykonywany tylko gdy ustawione **`ZGRZYT_LOGIN`** i **`ZGRZYT_PASSWORD`**; w przeciwnym razie: *Login smoke skipped because ZGRZYT_LOGIN/ZGRZYT_PASSWORD are not set.* |
+
+Login smoke (gdy env ustawione): **200 → PASS**; **401 → FAIL** (invalid credentials); **403 → FAIL** (brak dostępu); **422 → FAIL** (validation); **500+ → FAIL** (backend); brak HTTP → FAIL (connection).
+
+Skrypt **nie loguje** hasła ani tokena (`access_token` w podglądzie body jest redagowany).
+
+Kod wyjścia: **0** gdy wszystkie wykonane testy przeszły; **1** przy co najmniej jednym FAIL.
+
 ## Uruchomienie
 
 Tylko testy integracyjne:
@@ -97,6 +125,7 @@ run: dotnet test -c Release --filter "Category=Integration"
 
 ## Powiązane pliki
 
+- `scripts/smoke-live-api.ps1`
 - `ZgrzytDesktop/Services/AuthService.cs`
 - `ZgrzytDesktop/Services/TicketService.cs`
 - `ZgrzytDesktop/Services/UserAdminService.cs`

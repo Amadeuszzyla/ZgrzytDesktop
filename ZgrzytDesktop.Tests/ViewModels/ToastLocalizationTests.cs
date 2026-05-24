@@ -66,6 +66,8 @@ public class ToastLocalizationTests
     public async Task AdminBan_Toast_IsEnglish_WhenCultureEn()
     {
         using var _ = new TestCultureScope("en");
+        var previousConfirmation = ConfirmationServiceHolder.Instance;
+        ConfirmationServiceHolder.Instance = new FakeUserConfirmationService { NextResult = true };
         var userAdmin = new FakeUserAdminService
         {
             NextUsers =
@@ -88,6 +90,7 @@ public class ToastLocalizationTests
         }
         finally
         {
+            ConfirmationServiceHolder.Instance = previousConfirmation;
             TestApiFactory.Cleanup(tempDir);
         }
     }
@@ -108,6 +111,7 @@ public class ToastLocalizationTests
 
         var panel = new TicketDetailsPanelViewModel(
             tickets,
+            new FakeUserAdminService(),
             new FakeAuditLogService(),
             new TicketDetailsPanelCallbacks
             {
@@ -121,6 +125,7 @@ public class ToastLocalizationTests
                 NotifyDetailsLoadingChanged = () => { },
                 GetCurrentUser = () => new User { Id = 99, Login = "it", Name = "IT", Role = AppRoles.It },
                 GetCanManageTickets = () => true,
+                GetIsAdminRole = () => false,
                 GetIsRegularUser = () => false,
                 LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
                 RefreshTicketsAsync = () => Task.CompletedTask,

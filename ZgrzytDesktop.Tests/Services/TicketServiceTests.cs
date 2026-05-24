@@ -18,7 +18,7 @@ public class TicketServiceTests
             handler.EnqueueJson(HttpStatusCode.OK, """
                 {
                   "current_page": 1,
-                  "data": [{ "id": 1, "title": "A", "status": "nowe", "priority": "niski", "user_id": 1 }],
+                  "data": [{ "id": 1, "title": "A", "status": "nowe", "priority": "wysoki", "user_id": 1 }],
                   "last_page": 1,
                   "per_page": 15,
                   "total": 1
@@ -80,6 +80,58 @@ public class TicketServiceTests
             Assert.Equal(2, doc.RootElement.GetProperty("assigned_it_id").GetInt32());
             Assert.False(body.Contains("category", StringComparison.OrdinalIgnoreCase));
             Assert.False(body.Contains("closed_at", StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateTicketAsync_AssignSelectedUser_SerializesAssignedItId()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.EnqueueJson(HttpStatusCode.OK, """
+                { "id": 12, "title": "T", "status": "nowe", "priority": "niski", "user_id": 1, "assigned_it_id": 2 }
+                """);
+            var service = TestApiFactory.CreateTickets(api);
+
+            await service.UpdateTicketAsync(12, new UpdateTicketRequest { AssignedItId = 2 });
+
+            var body = TestApiFactory.LastRequestBody(handler)!;
+            using var doc = JsonDocument.Parse(body);
+            Assert.Equal(2, doc.RootElement.GetProperty("assigned_it_id").GetInt32());
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateTicketAsync_ShouldPutAssignedItId() =>
+        await UpdateTicketAsync_ShouldPutAssignedItIdOnly_WhenAssigning();
+
+    [Fact]
+    public async Task UpdateTicketAsync_ShouldPutAssignedItIdOnly_WhenAssigning()
+    {
+        var (api, handler, tempDir) = TestApiFactory.CreateApi();
+        try
+        {
+            handler.EnqueueJson(HttpStatusCode.OK, """
+                { "id": 6, "title": "T", "status": "nowe", "priority": "niski", "user_id": 1, "assigned_it_id": 9 }
+                """);
+            var service = TestApiFactory.CreateTickets(api);
+
+            await service.UpdateTicketAsync(6, new UpdateTicketRequest { AssignedItId = 9 });
+
+            var body = TestApiFactory.LastRequestBody(handler)!;
+            using var doc = JsonDocument.Parse(body);
+            Assert.Equal(9, doc.RootElement.GetProperty("assigned_it_id").GetInt32());
+            Assert.False(doc.RootElement.TryGetProperty("status", out _));
+            Assert.False(doc.RootElement.TryGetProperty("priority", out _));
         }
         finally
         {

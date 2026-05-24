@@ -39,7 +39,7 @@ public class MainWindowDesktopAccessTests
     }
 
     [Fact]
-    public async Task Login_UserRole_DeniesAccess_ClearsSession_StaysOnLogin()
+    public async Task User_Login_IsDeniedBeforeDashboard()
     {
         var auth = new FakeAuthService
         {

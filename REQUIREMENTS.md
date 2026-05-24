@@ -32,7 +32,9 @@ Lokalny development: `http://127.0.0.1:9000/api/`
 ### Zgłoszenia i audyt
 
 - Listy zgłoszeń z paginacją Laravel (`GET /api/tickets` i kolejki staff)
-- Wiadomości: pole JSON `body`
+- Przypisanie zgłoszenia: `PUT /api/tickets/{id}` z polem `assigned_it_id` (admin: wybór IT/admin; IT: „Przypisz do mnie”)
+- Wiadomości: `GET` / `POST .../messages`, pole JSON `body` — **odczyt i dodawanie**
+- **Edycja i usuwanie pojedynczych wiadomości** wymagają dedykowanych endpointów backendowych (`PUT`/`PATCH`/`DELETE` na `.../messages/{id}`); desktop **nie symuluje** tych operacji lokalnie
 - **Brak `GET /api/logs`** w API — desktop prowadzi **lokalny audyt** (plik w AppData, **DPAPI**); historia zmian w szczegółach zgłoszenia jest lokalna
 - **Statystyki:** liczba zgłoszeń, statusy, priorytety, przypisania; bez czasu pierwszej reakcji w UI (API nie dostarcza stabilnych danych)
 
@@ -52,3 +54,28 @@ Użytkownik uruchamia `ZgrzytDesktop.exe` z **całego** rozpakowanego folderu pu
 `%AppData%\ZgrzytDesktop\` — token, cache, audyt, ustawienia; ochrona **DPAPI** (CurrentUser). Aplikacja nie wymaga uprawnień administratora Windows.
 
 Szczegóły: [README.md](README.md).
+
+## 6. Zabezpieczenia po stronie aplikacji desktopowej
+
+### Obecnie (zaimplementowane)
+
+- **Uwierzytelnianie tokenem** — `POST /api/login`, Bearer w DPAPI (`token.txt`), `GET /api/user`, `POST /api/logout`, `POST /api/refresh`
+- **Dostęp do desktopa** — tylko role **IT** i **admin**; rola **`user`** nie wchodzi do dashboardu (`DesktopAccessHelper`)
+- **Role-based UI** — admin: zarządzanie użytkownikami; IT: rejestracja kont (**Nowe konto**); ukrywanie niedostępnych sekcji
+- **DPAPI** — token, cache zgłoszeń, cache użytkownika, lokalny audyt, ustawienia w `%AppData%\ZgrzytDesktop\`
+- **Sanityzacja HTML** — plain text w tytule/opisie zgłoszenia i wiadomościach; filtrowanie odpowiedzi HTML z API
+- **Brak haseł/tokenów w logach lokalnych** — maskowanie wrażliwych danych w audycie i błędach API
+- **Błędy bez stack trace** — zlokalizowane komunikaty (`ApiErrorSanitizer`, `LoginErrorMapper`)
+- **HTTPS dla API produkcyjnego** — domyślny URL `https://…`; `ApiUrlSecurityHelper` podnosi zdalne `http://` do HTTPS
+- **Wylogowanie** — usuwa token i cache sesji; nie usuwa preferencji języka z ustawień
+- **Wiadomości** — tylko odczyt i dodawanie; **bez** lokalnej edycji/usuwania
+
+### Przyszłe rozszerzenia (poza obecnym zakresem)
+
+- Auto-wylogowanie po bezczynności
+- Edycja/usuwanie pojedynczych wiadomości (wymaga endpointów backendowych)
+- Pełny audyt serwerowy (`GET /api/logs` lub równoważny)
+- Rate limiting po stronie backendu
+- Rotacja tokenów po stronie backendu
+
+**Ograniczenia wymagające backendu:** wymuszenie TLS, timeout sesji API, autoryzacja endpointów, walidacja po stronie serwera.

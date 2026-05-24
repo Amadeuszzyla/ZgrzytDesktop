@@ -1,4 +1,5 @@
 using System.Net;
+using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
@@ -25,6 +26,12 @@ public sealed class FakeTicketService : ITicketService
     public string? LastSortBy { get; private set; }
 
     public string? LastSortDirection { get; private set; }
+
+    public string? LastCategoryFilter { get; private set; }
+
+    public string? LastAssignmentFilter { get; private set; }
+
+    public int LastCurrentUserId { get; private set; }
 
     public Exception? GetTicketsException { get; set; }
 
@@ -59,7 +66,10 @@ public sealed class FakeTicketService : ITicketService
         string? priority = null,
         string sortBy = "created_at",
         string sortDirection = "desc",
-        TicketQueueView queueView = TicketQueueView.All)
+        TicketQueueView queueView = TicketQueueView.All,
+        string? categoryFilter = null,
+        string? assignmentFilter = null,
+        int currentUserId = 0)
     {
         GetTicketsCallCount++;
         LastQueueView = queueView;
@@ -70,6 +80,9 @@ public sealed class FakeTicketService : ITicketService
         LastPriority = priority;
         LastSortBy = sortBy;
         LastSortDirection = sortDirection;
+        LastCategoryFilter = categoryFilter;
+        LastAssignmentFilter = assignmentFilter;
+        LastCurrentUserId = currentUserId;
 
         if (GetTicketsException is not null)
             throw GetTicketsException;
@@ -81,23 +94,53 @@ public sealed class FakeTicketService : ITicketService
         {
             var source = NextTicketsResponse?.Data ?? [];
 
-            if (!TicketQueueListProcessor.RequiresLocalProcessing(status, priority, sortBy, sortDirection))
+            if (!TicketQueueListProcessor.RequiresLocalProcessing(
+                    status, priority, assignmentFilter, categoryFilter, sortBy, sortDirection))
             {
-                var serverFiltered = TicketQueueListProcessor.Filter(source, status: null, priority: null, search);
+                var serverFiltered = TicketQueueListProcessor.Filter(
+                    source,
+                    status: null,
+                    priority: null,
+                    search,
+                    categoryFilter,
+                    assignmentFilter,
+                    currentUserId);
                 return Task.FromResult<PaginatedResponse<Ticket>?>(
                     TicketQueueListProcessor.Paginate(serverFiltered, page, perPage));
             }
 
-            var filtered = TicketQueueListProcessor.Filter(source, status, priority, search);
+            var filtered = TicketQueueListProcessor.Filter(
+                source, status, priority, search, categoryFilter, assignmentFilter, currentUserId);
             var sorted = TicketQueueListProcessor.Sort(filtered, sortBy, sortDirection);
             return Task.FromResult<PaginatedResponse<Ticket>?>(
                 TicketQueueListProcessor.Paginate(sorted, page, perPage));
         }
 
         if (PagedResponses.TryGetValue(page, out var paged))
-            return Task.FromResult<PaginatedResponse<Ticket>?>(paged);
+            return Task.FromResult(ApplyCategoryFilter(paged, categoryFilter));
 
-        return Task.FromResult(NextTicketsResponse);
+        return Task.FromResult(ApplyCategoryFilter(NextTicketsResponse, categoryFilter));
+    }
+
+    private static PaginatedResponse<Ticket>? ApplyCategoryFilter(
+        PaginatedResponse<Ticket>? response,
+        string? categoryFilter)
+    {
+        if (response?.Data is null || TicketCategoryFilterKeys.IsAll(categoryFilter))
+            return response;
+
+        var filtered = response.Data
+            .Where(ticket => TicketCategoryFilter.Matches(ticket, categoryFilter))
+            .ToList();
+
+        return new PaginatedResponse<Ticket>
+        {
+            Data = filtered,
+            Total = filtered.Count,
+            CurrentPage = response.CurrentPage,
+            LastPage = Math.Max(1, (int)Math.Ceiling(filtered.Count / (double)Math.Max(1, response.PerPage))),
+            PerPage = response.PerPage
+        };
     }
 
     public Task<PaginatedResponse<Ticket>?> GetActiveTicketsAsync(
@@ -189,14 +232,14 @@ public sealed class FakeTicketService : ITicketService
 
         if (TicketsById.TryGetValue(id, out var existing))
         {
+            if (request.AssignedItId.HasValue)
+                existing.AssignedItId = request.AssignedItId;
+
             if (request.Status is not null)
                 existing.Status = request.Status;
 
             if (request.Priority is not null)
                 existing.Priority = request.Priority;
-
-            if (request.AssignedItId is not null)
-                existing.AssignedItId = request.AssignedItId;
 
             return Task.FromResult<Ticket?>(existing);
         }

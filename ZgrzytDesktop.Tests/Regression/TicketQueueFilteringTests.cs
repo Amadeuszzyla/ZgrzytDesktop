@@ -327,6 +327,7 @@ public class TicketQueueFilteringTests
                 NotifyTicketsLoadingChanged = () => { },
                 NotifyOnlineActionsChanged = () => { },
                 GetApiErrorMessage = ex => ex.Message,
+                GetCurrentUserId = () => 1,
                 TicketSelected = _ => { },
                 RefreshPaginationSideEffects = () => { },
                 LogAuditAsync = (_, _, _, _) => Task.CompletedTask,

@@ -84,6 +84,7 @@ public class TicketDisplayLocalizationTests
 
         var panel = new TicketDetailsPanelViewModel(
             tickets,
+            new FakeUserAdminService(),
             new FakeAuditLogService(),
             CreateDetailsCallbacks());
 
@@ -110,6 +111,7 @@ public class TicketDisplayLocalizationTests
             NotifyTicketsLoadingChanged = () => { },
             NotifyOnlineActionsChanged = () => { },
             GetApiErrorMessage = ex => ex.Message,
+            GetCurrentUserId = () => 1,
             TicketSelected = _ => { },
             RefreshPaginationSideEffects = () => { },
             LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
@@ -133,6 +135,7 @@ public class TicketDisplayLocalizationTests
             NotifyDetailsLoadingChanged = () => { },
             GetCurrentUser = () => new User { Id = 1, Login = "it", Role = AppRoles.It },
             GetCanManageTickets = () => true,
+            GetIsAdminRole = () => false,
             GetIsRegularUser = () => false,
             LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
             RefreshTicketsAsync = () => Task.CompletedTask,

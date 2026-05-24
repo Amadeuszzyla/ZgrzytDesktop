@@ -8,7 +8,7 @@ public sealed class FakeSettingsService : ISettingsService
 {
     public AppSettings Settings { get; } = new()
     {
-        ApiBaseUrl = "http://127.0.0.1:9000/api/",
+        ApiBaseUrl = "https://127.0.0.1:9000/api/",
         ThemeMode = "Light",
         UiCulture = "pl"
     };
@@ -24,6 +24,8 @@ public sealed class FakeSettingsService : ISettingsService
         Settings.ApiBaseUrl = settings.ApiBaseUrl;
         Settings.ThemeMode = settings.ThemeMode;
         Settings.UiCulture = settings.UiCulture;
+        Settings.AutoLogoutEnabled = settings.AutoLogoutEnabled;
+        Settings.AutoLogoutTimeoutMinutes = settings.AutoLogoutTimeoutMinutes;
     }
 
     public Task SaveAsync(AppSettings settings)

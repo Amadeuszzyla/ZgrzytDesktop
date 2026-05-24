@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Xunit;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Services;
 
@@ -76,6 +77,31 @@ public class ModelJsonSerializationTests
         Assert.NotNull(ticket);
         Assert.Equal(2, ticket!.AssignedTo?.Id);
         Assert.Equal("it.user", ticket.AssignedTo?.Login);
+    }
+
+    [Fact]
+    public void UpdateTicketRequest_ShouldOmitAssignedItIdNull_OnStatusUpdate()
+    {
+        var request = new UpdateTicketRequest
+        {
+            Status = "w trakcie",
+            Priority = "wysoki"
+        };
+
+        var json = JsonSerializer.Serialize(request, _options);
+
+        Assert.DoesNotContain("assigned_it_id", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void UpdateTicketRequest_ShouldSerializeAssignedItIdNull_OnlyIfSupportedByContract()
+    {
+        var json = JsonSerializer.Serialize(new UpdateTicketRequest { AssignedItId = null }, _options);
+
+        if (TicketAssignmentContract.SupportsClearAssignment)
+            Assert.Contains("\"assigned_it_id\":null", json, StringComparison.Ordinal);
+        else
+            Assert.DoesNotContain("assigned_it_id", json, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

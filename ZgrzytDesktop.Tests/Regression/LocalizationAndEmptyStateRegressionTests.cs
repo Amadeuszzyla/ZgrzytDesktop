@@ -257,8 +257,6 @@ public class LocalizationAndEmptyStateRegressionTests
         };
 
         var panel = CreateAdminPanel(userAdmin);
-        panel.SelectedAdminUserListFilterOption = panel.AdminUserListFilterOptions
-            .First(option => option.Filter == UserAdminListFilter.Active);
 
         await panel.LoadAdminUsersCommand.ExecuteAsync(null);
 
@@ -432,6 +430,7 @@ public class LocalizationAndEmptyStateRegressionTests
                 NotifyTicketsLoadingChanged = () => { },
                 NotifyOnlineActionsChanged = () => { },
                 GetApiErrorMessage = ex => ex.Message,
+                GetCurrentUserId = () => 1,
                 TicketSelected = _ => { },
                 RefreshPaginationSideEffects = () => { },
                 LogAuditAsync = (_, _, _, _) => Task.CompletedTask,

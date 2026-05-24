@@ -30,7 +30,7 @@ public class TicketDetailsPanelViewModelTests
             UserId = 10
         };
 
-        var (panel, _) = CreatePanel(tickets);
+        var (panel, _, _) = CreatePanel(tickets);
 
         await panel.LoadTicketDetailsAsync(1);
 
@@ -52,7 +52,7 @@ public class TicketDetailsPanelViewModelTests
             new TicketMessage { Id = 2, Content = "World", TicketId = 2 }
         ];
 
-        var (panel, _) = CreatePanel(tickets);
+        var (panel, _, _) = CreatePanel(tickets);
 
         await panel.LoadTicketDetailsAsync(2);
 
@@ -77,7 +77,7 @@ public class TicketDetailsPanelViewModelTests
             Description = "Utworzono"
         });
 
-        var (panel, _) = CreatePanel(tickets, audit);
+        var (panel, _, _) = CreatePanel(tickets, audit);
 
         await panel.LoadTicketDetailsAsync(3);
 
@@ -99,7 +99,7 @@ public class TicketDetailsPanelViewModelTests
         };
 
         var previous = new Ticket { Id = 4, Title = "Safe", Description = "ok", Status = TicketStatuses.Nowe };
-        var (panel, _) = CreatePanel(tickets);
+        var (panel, _, _) = CreatePanel(tickets);
         panel.TicketDetails = previous;
 
         await panel.LoadTicketDetailsAsync(4);
@@ -116,7 +116,7 @@ public class TicketDetailsPanelViewModelTests
             GetTicketApiException = new ApiException(HttpStatusCode.Forbidden, "forbidden")
         };
 
-        var (panel, _) = CreatePanel(tickets);
+        var (panel, _, _) = CreatePanel(tickets);
 
         await panel.LoadTicketDetailsAsync(9);
 
@@ -141,7 +141,7 @@ public class TicketDetailsPanelViewModelTests
             Messages = [new TicketMessage { Id = 1, Content = "Cached msg", TicketId = 7 }]
         };
 
-        var (panel, _) = CreatePanel(
+        var (panel, _, _) = CreatePanel(
             tickets,
             findCached: _ => cached);
 
@@ -159,7 +159,7 @@ public class TicketDetailsPanelViewModelTests
         var tickets = new FakeTicketService();
         tickets.TicketsById[5] = new Ticket { Id = 5, Title = "No msgs", Status = TicketStatuses.Nowe };
 
-        var (panel, _) = CreatePanel(tickets);
+        var (panel, _, _) = CreatePanel(tickets);
 
         await panel.LoadTicketDetailsAsync(5);
 
@@ -173,7 +173,7 @@ public class TicketDetailsPanelViewModelTests
         var tickets = new FakeTicketService();
         tickets.TicketsById[6] = new Ticket { Id = 6, Title = "No audit", Status = TicketStatuses.Nowe };
 
-        var (panel, _) = CreatePanel(tickets, new FakeAuditLogService());
+        var (panel, _, _) = CreatePanel(tickets, new FakeAuditLogService());
 
         await panel.LoadTicketDetailsAsync(6);
 
@@ -187,7 +187,7 @@ public class TicketDetailsPanelViewModelTests
         var tickets = new FakeTicketService();
         tickets.TicketsById[10] = new Ticket { Id = 10, Title = "Msg", Status = TicketStatuses.Nowe };
 
-        var (panel, _) = CreatePanel(tickets);
+        var (panel, _, _) = CreatePanel(tickets);
 
         await panel.LoadTicketDetailsAsync(10);
         panel.NewMessageText = "Nowa wiadomość";
@@ -218,7 +218,7 @@ public class TicketDetailsPanelViewModelTests
             }
         ];
 
-        var (panel, _) = CreatePanel(tickets);
+        var (panel, _, _) = CreatePanel(tickets);
 
         await panel.LoadTicketDetailsAsync(20);
 
@@ -232,7 +232,7 @@ public class TicketDetailsPanelViewModelTests
         var tickets = new FakeTicketService();
         tickets.TicketsById[11] = new Ticket { Id = 11, Title = "X", Status = TicketStatuses.Nowe };
 
-        var (panel, _) = CreatePanel(tickets);
+        var (panel, _, _) = CreatePanel(tickets);
 
         await panel.LoadTicketDetailsAsync(11);
         panel.NewMessageText = "   ";
@@ -255,7 +255,7 @@ public class TicketDetailsPanelViewModelTests
             Priority = TicketPriorities.Low
         };
 
-        var (panel, _) = CreatePanel(tickets, canManageTickets: true);
+        var (panel, _, _) = CreatePanel(tickets, canManageTickets: true);
 
         await panel.LoadTicketDetailsAsync(12);
         panel.SelectedStatus = StatusDisplayHelper.ToDisplayStatus(TicketStatuses.WTrakcie);
@@ -277,7 +277,7 @@ public class TicketDetailsPanelViewModelTests
         var tickets = new FakeTicketService();
         tickets.TicketsById[13] = new Ticket { Id = 13, Title = "Assign", Status = TicketStatuses.Nowe };
 
-        var (panel, _) = CreatePanel(tickets, canManageTickets: true, currentUser: user);
+        var (panel, _, _) = CreatePanel(tickets, canManageTickets: true, currentUser: user);
 
         await panel.LoadTicketDetailsAsync(13);
 
@@ -303,7 +303,7 @@ public class TicketDetailsPanelViewModelTests
         };
         tickets.UpdateTicketApiException = new ApiException(HttpStatusCode.Forbidden, "forbidden");
 
-        var (panel, _) = CreatePanel(tickets, canManageTickets: true);
+        var (panel, _, _) = CreatePanel(tickets, canManageTickets: true);
 
         await panel.LoadTicketDetailsAsync(14);
         var titleBefore = panel.TicketDetails!.Title;
@@ -338,7 +338,7 @@ public class TicketDetailsPanelViewModelTests
             Status = TicketStatuses.Zamkniete
         };
 
-        var (panel, _) = CreatePanel(tickets, canManageTickets: true);
+        var (panel, _, _) = CreatePanel(tickets, canManageTickets: true);
 
         await panel.LoadTicketDetailsAsync(15);
 
@@ -358,7 +358,7 @@ public class TicketDetailsPanelViewModelTests
         tickets.TicketsById[16] = new Ticket { Id = 16, Title = "Del", Status = TicketStatuses.Nowe };
 
         var ctx = new DetailsTestContext();
-        var (panel, _) = CreatePanel(tickets, canManageTickets: true, context: ctx);
+        var (panel, _, _) = CreatePanel(tickets, canManageTickets: true, context: ctx);
 
         await panel.LoadTicketDetailsAsync(16);
 
@@ -382,7 +382,7 @@ public class TicketDetailsPanelViewModelTests
         };
         tickets.TicketsById[17] = new Ticket { Id = 17, Title = "Keep", Status = TicketStatuses.Nowe };
 
-        var (panel, _) = CreatePanel(tickets, canManageTickets: true);
+        var (panel, _, _) = CreatePanel(tickets, canManageTickets: true);
 
         await panel.LoadTicketDetailsAsync(17);
 
@@ -402,7 +402,7 @@ public class TicketDetailsPanelViewModelTests
         tickets.TicketsById[18] = new Ticket { Id = 18, Title = "R", Status = TicketStatuses.Nowe };
 
         var ctx = new DetailsTestContext();
-        var (panel, _) = CreatePanel(tickets, canManageTickets: true, context: ctx);
+        var (panel, _, _) = CreatePanel(tickets, canManageTickets: true, context: ctx);
 
         await panel.LoadTicketDetailsAsync(18);
         panel.SelectedStatus = StatusDisplayHelper.ToDisplayStatus(TicketStatuses.WTrakcie);
@@ -423,7 +423,7 @@ public class TicketDetailsPanelViewModelTests
         tickets.TicketsById[19] = new Ticket { Id = 19, Title = "A", Status = TicketStatuses.Nowe };
 
         var ctx = new DetailsTestContext();
-        var (panel, _) = CreatePanel(tickets, context: ctx);
+        var (panel, _, _) = CreatePanel(tickets, context: ctx);
 
         await panel.LoadTicketDetailsAsync(19);
         panel.NewMessageText = "audit test";
@@ -436,7 +436,7 @@ public class TicketDetailsPanelViewModelTests
         Assert.Contains(ctx.AuditCalls, c => c.action == "SendMessage" && c.ticketId == 19);
     }
 
-    private sealed class DetailsTestContext
+    internal sealed class DetailsTestContext
     {
         public int RefreshTicketsCount;
 
@@ -447,29 +447,34 @@ public class TicketDetailsPanelViewModelTests
         public List<(string action, int? ticketId)> AuditCalls { get; } = new();
     }
 
-    private static (TicketDetailsPanelViewModel Panel, FakeTicketService Tickets) CreatePanel(
+    internal static (TicketDetailsPanelViewModel Panel, FakeTicketService Tickets, FakeUserAdminService Users) CreatePanel(
         FakeTicketService tickets,
         FakeAuditLogService? audit = null,
+        FakeUserAdminService? users = null,
         Func<int, Ticket?>? findCached = null,
         bool canManageTickets = false,
+        bool isAdminRole = false,
         bool isRegularUser = true,
         User? currentUser = null,
         DetailsTestContext? context = null)
     {
         audit ??= new FakeAuditLogService();
+        users ??= new FakeUserAdminService();
         currentUser ??= new User { Id = 1, Login = "user", Name = "User", Role = AppRoles.User };
 
         var panel = new TicketDetailsPanelViewModel(
             tickets,
+            users,
             audit,
-            CreateCallbacks(findCached, canManageTickets, isRegularUser, currentUser, context));
+            CreateCallbacks(findCached, canManageTickets, isAdminRole, isRegularUser, currentUser, context));
 
-        return (panel, tickets);
+        return (panel, tickets, users);
     }
 
     private static TicketDetailsPanelCallbacks CreateCallbacks(
         Func<int, Ticket?>? findCached = null,
         bool canManageTickets = false,
+        bool isAdminRole = false,
         bool isRegularUser = true,
         User? currentUser = null,
         DetailsTestContext? context = null)
@@ -491,6 +496,7 @@ public class TicketDetailsPanelViewModelTests
             NotifyDetailsLoadingChanged = () => { },
             GetCurrentUser = () => currentUser,
             GetCanManageTickets = () => canManageTickets,
+            GetIsAdminRole = () => isAdminRole,
             GetIsRegularUser = () => isRegularUser,
             LogAuditAsync = (action, ticketId, _, _) =>
             {

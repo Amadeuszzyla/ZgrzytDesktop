@@ -1,10 +1,13 @@
 using System;
+using System.Linq;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Headless.Tests.Headless;
 using ZgrzytDesktop.Tests.Infrastructure;
+using ZgrzytDesktop.Tests.Infrastructure.Fakes;
 using ZgrzytDesktop.Tests.ViewModels;
 using ZgrzytDesktop.ViewModels;
 using ZgrzytDesktop.ViewModels.DashboardModules;
@@ -113,6 +116,8 @@ public class HeadlessViewsTests
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblSettingsLanguage));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblSettingsSave));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblSettingsRefreshSession));
+                Assert.False(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_ResetApiUrl")));
+                Assert.False(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_AutoLogout")));
                 Assert.Equal(1, HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(settingsPanel!));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, "Lokalny audyt aplikacji"));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, "Odśwież audyt"));
@@ -146,8 +151,8 @@ public class HeadlessViewsTests
                     .FirstOrDefault();
 
                 Assert.NotNull(ticketsPanel);
-                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblTicketsFiltersTitle));
-                Assert.True(HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(window) >= 2);
+                Assert.False(HeadlessViewTestHelper.ContainsText(ticketsPanel, vm.LblTicketsFiltersTitle));
+                Assert.True(HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(ticketsPanel) >= 7);
                 Assert.Equal(0, HeadlessViewTestHelper.CountDescendantsByTypeName(ticketsPanel, "DataGrid"));
                 Assert.True(HeadlessViewTestHelper.CountDescendantsByTypeName(ticketsPanel, "ListBox") >= 1);
             }
@@ -272,6 +277,244 @@ public class HeadlessViewsTests
                 Assert.NotNull(detailsPanel);
                 Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, "In progress"));
                 Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, "Medium"));
+            }
+            finally
+            {
+                TestApiFactory.Cleanup(tempDir);
+            }
+        });
+    }
+
+    [Fact]
+    public void TicketsPanel_DoesNotShowAdminTabs_PL() =>
+        RunTicketsPanelToolbarTest(
+            culture: "pl",
+            forbiddenButtonLabels: ["Nowe konto", "Użytkownicy"],
+            expectedSearchPlaceholder: "Szukaj po tytule lub opisie...",
+            expectedStatusFilterLabel: "Wszystkie statusy");
+
+    [Fact]
+    public void TicketsPanel_DoesNotShowAdminTabs_EN() =>
+        RunTicketsPanelToolbarTest(
+            culture: "en",
+            forbiddenButtonLabels: ["New account", "Users"],
+            expectedSearchPlaceholder: "Search by title or description...",
+            expectedStatusFilterLabel: "All statuses");
+
+    [Fact]
+    public void TicketsPanel_ShowsSearchAndTicketFilters_PL() =>
+        RunTicketsPanelToolbarTest(
+            culture: "pl",
+            forbiddenButtonLabels: ["Nowe konto", "Użytkownicy"],
+            expectedSearchPlaceholder: "Szukaj po tytule lub opisie...",
+            expectedStatusFilterLabel: "Wszystkie statusy");
+
+    [Fact]
+    public void TicketsPanel_ShowsSearchAndTicketFilters_EN() =>
+        RunTicketsPanelToolbarTest(
+            culture: "en",
+            forbiddenButtonLabels: ["New account", "Users"],
+            expectedSearchPlaceholder: "Search by title or description...",
+            expectedStatusFilterLabel: "All statuses");
+
+    [Fact]
+    public void TicketsPanel_ShowsCategoryFilter_PL() =>
+        RunTicketsPanelToolbarTest(
+            culture: "pl",
+            forbiddenButtonLabels: ["Nowe konto", "Użytkownicy"],
+            expectedSearchPlaceholder: "Szukaj po tytule lub opisie...",
+            expectedStatusFilterLabel: "Wszystkie statusy",
+            expectedCategoryFilterLabel: "Sieć",
+            categoryFilterKey: TicketCategoryFilterKeys.Network);
+
+    [Fact]
+    public void TicketsPanel_ShowsCategoryFilter_EN() =>
+        RunTicketsPanelToolbarTest(
+            culture: "en",
+            forbiddenButtonLabels: ["New account", "Users"],
+            expectedSearchPlaceholder: "Search by title or description...",
+            expectedStatusFilterLabel: "All statuses",
+            expectedCategoryFilterLabel: "Network",
+            categoryFilterKey: TicketCategoryFilterKeys.Network);
+
+    [Fact]
+    public void TicketDetails_Admin_ShowsAssignToComboBox_PL()
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var settings = new FakeSettingsService();
+            settings.Settings.UiCulture = "pl";
+            var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("admin", settings: settings);
+
+            try
+            {
+                vm.CurrentSection = AppSections.Details;
+                vm.TicketDetailsPanel.TicketDetails = new Ticket
+                {
+                    Id = 20,
+                    Title = "Assign admin",
+                    Status = TicketStatuses.Nowe,
+                    Priority = TicketPriorities.Low,
+                    UserId = 1
+                };
+                vm.TicketDetailsPanel.AssignableUsers.Clear();
+                vm.TicketDetailsPanel.AssignableUsers.Add(
+                    AssignableUserOption.FromUser(new User { Id = 2, Name = "IT", Login = "it1", Role = AppRoles.It, Active = true }));
+                vm.TicketDetailsPanel.SelectedAssignedUser = vm.TicketDetailsPanel.AssignableUsers[0];
+                vm.TicketDetailsPanel.NotifyLocalization();
+
+                var view = HeadlessViewTestHelper.CreateDashboardView(vm);
+                HeadlessViewTestHelper.ShowInWindow(view);
+                var detailsPanel = HeadlessViewTestHelper
+                    .FindDescendants<TicketDetailsPanelView>(view)
+                    .FirstOrDefault();
+
+                Assert.NotNull(detailsPanel);
+                Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, vm.LblTicketAssignTo));
+                Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, vm.LblTicketSaveAssignment));
+                Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, vm.LblTicketAssignToMe));
+                Assert.True(HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(detailsPanel!) >= 3);
+            }
+            finally
+            {
+                TestApiFactory.Cleanup(tempDir);
+            }
+        });
+    }
+
+    [Fact]
+    public void TicketDetails_IT_ShowsAssignToMeOnly_EN()
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var settings = new FakeSettingsService();
+            settings.Settings.UiCulture = "en";
+            var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("it", settings: settings);
+
+            try
+            {
+                vm.CurrentSection = AppSections.Details;
+                vm.TicketDetailsPanel.TicketDetails = new Ticket
+                {
+                    Id = 21,
+                    Title = "Assign IT",
+                    Status = TicketStatuses.Nowe,
+                    Priority = TicketPriorities.Low,
+                    UserId = 1
+                };
+                vm.TicketDetailsPanel.NotifyLocalization();
+
+                var view = HeadlessViewTestHelper.CreateDashboardView(vm);
+                HeadlessViewTestHelper.ShowInWindow(view);
+                var detailsPanel = HeadlessViewTestHelper
+                    .FindDescendants<TicketDetailsPanelView>(view)
+                    .FirstOrDefault();
+
+                Assert.NotNull(detailsPanel);
+                Assert.False(vm.IsAdminRole);
+                Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, vm.LblTicketAssignToMe));
+                Assert.Empty(vm.TicketDetailsPanel.AssignableUsers);
+            }
+            finally
+            {
+                TestApiFactory.Cleanup(tempDir);
+            }
+        });
+    }
+
+    [Fact]
+    public void TicketDetails_DoesNotShowMessageEditDeleteButtons()
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("admin");
+
+            try
+            {
+                vm.CurrentSection = AppSections.Details;
+                vm.TicketDetailsPanel.TicketDetails = new Ticket { Id = 22, Title = "Msg", Status = TicketStatuses.Nowe };
+                vm.TicketDetailsPanel.Messages.Add(new Models.Message
+                {
+                    Id = 1,
+                    Content = "Hello",
+                    Sender = new User { Id = 1, Name = "U", Login = "u" }
+                });
+
+                var view = HeadlessViewTestHelper.CreateDashboardView(vm);
+                HeadlessViewTestHelper.ShowInWindow(view);
+                var detailsPanel = HeadlessViewTestHelper
+                    .FindDescendants<TicketDetailsPanelView>(view)
+                    .FirstOrDefault();
+
+                Assert.NotNull(detailsPanel);
+                Assert.False(HeadlessViewTestHelper.ContainsText(detailsPanel!, "Edytuj wiadomość"));
+                Assert.False(HeadlessViewTestHelper.ContainsText(detailsPanel!, "Usuń wiadomość"));
+                Assert.False(HeadlessViewTestHelper.ContainsText(detailsPanel!, "Edit message"));
+                Assert.False(HeadlessViewTestHelper.ContainsText(detailsPanel!, "Delete message"));
+            }
+            finally
+            {
+                TestApiFactory.Cleanup(tempDir);
+            }
+        });
+    }
+
+    [Fact]
+    public void AdminPanel_StillShowsUsersAndNewAccount_ForAdmin()
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("admin");
+
+            try
+            {
+                vm.CurrentSection = AppSections.Admin;
+                vm.AdminPanel.PrepareAdminPage(isAdminRole: true);
+
+                var view = HeadlessViewTestHelper.CreateDashboardView(vm);
+                HeadlessViewTestHelper.ShowInWindow(view);
+
+                var adminPanel = HeadlessViewTestHelper
+                    .FindDescendants<AdminPanelView>(view)
+                    .FirstOrDefault();
+
+                Assert.NotNull(adminPanel);
+                Assert.True(HeadlessViewTestHelper.ContainsText(adminPanel!, vm.LblAdminTabUsers));
+                Assert.True(HeadlessViewTestHelper.ContainsText(adminPanel!, vm.LblAdminTabNewAccount));
+            }
+            finally
+            {
+                TestApiFactory.Cleanup(tempDir);
+            }
+        });
+    }
+
+    [Fact]
+    public void AdminPanel_NewAccountStillWorks()
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("it");
+
+            try
+            {
+                vm.CurrentSection = AppSections.Admin;
+                vm.AdminPanel.PrepareAdminPage(isAdminRole: false);
+
+                var view = HeadlessViewTestHelper.CreateDashboardView(vm);
+                HeadlessViewTestHelper.ShowInWindow(view);
+
+                var adminPanel = HeadlessViewTestHelper
+                    .FindDescendants<AdminPanelView>(view)
+                    .FirstOrDefault();
+
+                Assert.NotNull(adminPanel);
+                Assert.True(HeadlessViewTestHelper.FindDescendants<RegisterUserFormView>(adminPanel!).Any());
+                Assert.Equal(vm.RegisterUserCommand,
+                    HeadlessViewTestHelper
+                        .FindDescendants<Avalonia.Controls.Button>(adminPanel!)
+                        .FirstOrDefault(b => b.Content as string == vm.LblRegisterUserSubmit)
+                        ?.Command);
             }
             finally
             {
@@ -621,7 +864,7 @@ public class HeadlessViewsTests
     }
 
     [Fact]
-    public void DashboardView_AdminPage_ContainsUsersListAndActions()
+    public void DashboardView_AdminPage_AdminRole_ShowsUsersListAndFilters()
     {
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>
         {
@@ -644,7 +887,14 @@ public class HeadlessViewsTests
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblAdminUsersSubtitle));
                 Assert.Equal(0, HeadlessViewTestHelper.CountDescendantsByTypeName(adminPanel!, "DataGrid"));
                 Assert.True(HeadlessViewTestHelper.CountDescendantsByTypeName(adminPanel!, "ListBox") >= 1);
-                Assert.True(HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(adminPanel!) >= 1);
+
+                var refreshButton = HeadlessViewTestHelper
+                    .FindDescendants<Avalonia.Controls.Button>(adminPanel!)
+                    .FirstOrDefault(b => b.Content as string == vm.LblAdminRefreshList);
+
+                Assert.NotNull(refreshButton);
+                Assert.Equal(1, HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(adminPanel!));
+                Assert.True(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Admin_Filter_All")));
             }
             finally
             {
@@ -654,7 +904,38 @@ public class HeadlessViewsTests
     }
 
     [Fact]
-    public void DashboardView_AdminPage_NewAccountTab_ContainsRegistrationForm()
+    public void DashboardView_AdminPage_EmptyUsers_ShowsEmptyStateInListCenterOnly()
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("admin");
+
+            try
+            {
+                vm.CurrentSection = AppSections.Admin;
+                vm.AdminPanel.PrepareAdminPage(isAdminRole: true);
+                vm.AdminPanel.AdminUsers.Clear();
+                vm.AdminPanel.NotifyLocalization();
+
+                var panelView = new AdminPanelView { DataContext = vm };
+                HeadlessViewTestHelper.ShowInWindow(panelView);
+
+                Assert.True(vm.HasNoAdminUsers);
+                Assert.True(HeadlessViewTestHelper.ContainsText(panelView, vm.LblAdminNoUsersFound));
+                Assert.DoesNotContain(
+                    vm.LblAdminNoUsersFound,
+                    vm.AdminStatusMessage,
+                    StringComparison.Ordinal);
+            }
+            finally
+            {
+                TestApiFactory.Cleanup(tempDir);
+            }
+        });
+    }
+
+    [Fact]
+    public void DashboardView_AdminPage_ItRole_ShowsRegisterForm_HidesUserListAndFilters()
     {
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>
         {
@@ -676,8 +957,10 @@ public class HeadlessViewsTests
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblRegisterUserTitle));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblRegisterUserSubtitle));
                 Assert.True(HeadlessViewTestHelper.FindDescendants<RegisterUserFormView>(adminPanel!).Any());
-                Assert.True(HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.TextBox>(adminPanel!) >= 5);
-                Assert.True(HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(adminPanel!) >= 1);
+                Assert.False(vm.IsAdminUsersPanelVisible);
+                Assert.True(vm.IsAdminNewAccountPanelVisible);
+                Assert.False(vm.IsAdminRole);
+                Assert.Equal(AdminTabs.NewAccount, vm.AdminTab);
 
                 var submitButton = HeadlessViewTestHelper
                     .FindDescendants<Avalonia.Controls.Button>(adminPanel!)
@@ -827,6 +1110,79 @@ public class HeadlessViewsTests
 
                 Assert.NotNull(submitButton);
                 Assert.NotNull(submitButton!.Command);
+            }
+            finally
+            {
+                TestApiFactory.Cleanup(tempDir);
+            }
+        });
+    }
+
+    private static void RunTicketsPanelToolbarTest(
+        string culture,
+        string[] forbiddenButtonLabels,
+        string expectedSearchPlaceholder,
+        string expectedStatusFilterLabel,
+        string? expectedCategoryFilterLabel = null,
+        string? categoryFilterKey = null)
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var settings = new FakeSettingsService();
+            settings.Settings.UiCulture = culture;
+
+            var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("admin", settings: settings);
+
+            try
+            {
+                vm.TicketsPanel.NotifyLocalization();
+                vm.CurrentSection = AppSections.Tickets;
+                vm.TicketsPanel.StatusMessage = AppStrings.GetFormat("Tickets_Loaded", 0, 0);
+
+                var panelView = new TicketsPanelView { DataContext = vm };
+                HeadlessViewTestHelper.ShowInWindow(panelView);
+
+                foreach (var label in forbiddenButtonLabels)
+                {
+                    Assert.False(
+                        HeadlessViewTestHelper.ContainsText(panelView, label),
+                        $"Tickets panel must not show admin toolbar label: {label}");
+                }
+
+                Assert.Equal(expectedSearchPlaceholder, AppStrings.Get("Tickets_SearchPlaceholder"));
+                Assert.True(
+                    HeadlessViewTestHelper.FindDescendants<Avalonia.Controls.TextBox>(panelView).Any(),
+                    "Tickets search field should be present.");
+
+                Assert.True(
+                    HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(panelView) >= 7,
+                    "Expected status, priority, assignment, queue, category, sort field and sort direction filters.");
+
+                Assert.Equal(expectedStatusFilterLabel, vm.TicketsPanel.SelectedFilterStatusOption?.Label);
+                Assert.NotNull(vm.TicketsPanel.SelectedFilterPriorityOption);
+                Assert.NotNull(vm.TicketsPanel.SelectedFilterAssignmentOption);
+                Assert.NotNull(vm.TicketsPanel.SelectedTicketSortField);
+                Assert.NotNull(vm.TicketsPanel.SelectedTicketSortDirection);
+                Assert.Contains(
+                    vm.TicketsPanel.FilterCategoryOptions,
+                    option => option.Key == TicketCategoryFilterKeys.Software);
+
+                if (categoryFilterKey is not null)
+                {
+                    vm.TicketsPanel.SelectedCategoryFilterOption = vm.TicketsPanel.FilterCategoryOptions
+                        .First(option => option.Key == categoryFilterKey);
+                }
+
+                if (expectedCategoryFilterLabel is not null)
+                {
+                    Assert.Equal(expectedCategoryFilterLabel, vm.TicketsPanel.SelectedCategoryFilterOption?.Label);
+                    Assert.True(
+                        HeadlessViewTestHelper.ContainsText(panelView, expectedCategoryFilterLabel),
+                        "Category filter label should be visible in the tickets toolbar.");
+                }
+
+                Assert.True(HeadlessViewTestHelper.ContainsText(panelView, vm.TicketsPanel.StatusMessage));
+                Assert.False(HeadlessViewTestHelper.ContainsText(panelView, AppStrings.Get("Tickets_FiltersTitle")));
             }
             finally
             {

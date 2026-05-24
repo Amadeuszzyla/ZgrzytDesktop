@@ -82,6 +82,44 @@ public class TicketsPanelViewModelTests
     }
 
     [Fact]
+    public async Task LoadTicketsAsync_PassesCategoryFilterAndFiltersResults()
+    {
+        var tickets = new FakeTicketService
+        {
+            NextTicketsResponse = new PaginatedResponse<Ticket>
+            {
+                Data =
+                [
+                    new Ticket { Id = 1, Title = "CRM issue", Category = "Software" },
+                    new Ticket { Id = 2, Title = "VPN offline" },
+                    new Ticket { Id = 3, Title = "Printer jam", Description = "drukarka" }
+                ],
+                Total = 3,
+                LastPage = 1,
+                CurrentPage = 1
+            }
+        };
+
+        var (panel, _, tempDir) = CreatePanel(tickets);
+
+        try
+        {
+            panel.SelectedCategoryFilterOption = panel.FilterCategoryOptions
+                .First(option => option.Key == TicketCategoryFilterKeys.Network);
+
+            await panel.LoadTicketsAsync();
+
+            Assert.Equal(TicketCategoryFilterKeys.Network, tickets.LastCategoryFilter);
+            Assert.Single(panel.Tickets);
+            Assert.Equal(2, panel.Tickets[0].Id);
+        }
+        finally
+        {
+            TestApiFactory.Cleanup(tempDir);
+        }
+    }
+
+    [Fact]
     public async Task Pagination_UpdatesPagePositionAndNavigationFlags()
     {
         var tickets = new FakeTicketService
@@ -569,7 +607,7 @@ public class TicketsPanelViewModelTests
         }
     }
 
-    private static (TicketsPanelViewModel Panel, FakeTicketService Tickets, string TempDir) CreatePanel(
+    internal static (TicketsPanelViewModel Panel, FakeTicketService Tickets, string TempDir) CreatePanel(
         FakeTicketService tickets,
         ILocalTicketCacheService? cache = null,
         string? tempDir = null,
@@ -612,6 +650,7 @@ public class TicketsPanelViewModelTests
             GetApiErrorMessage = ex => ApiErrorSanitizer.SanitizeApiErrorMessage(
                 ex.ResponseContent ?? ex.Message,
                 ex.StatusCode),
+            GetCurrentUserId = () => 1,
             TicketSelected = ticketSelected ?? (_ => { }),
             RefreshPaginationSideEffects = () => { },
             LogAuditAsync = logAudit ?? ((_, _, _, _) => Task.CompletedTask),
