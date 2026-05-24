@@ -1019,8 +1019,18 @@
         <Setter Property="Foreground" Value="{DynamicResource AppMutedTextBrush}" />
     </Style>
 
-    <Style Selector="WrapPanel.tickets-toolbar-wrap">
-        <Setter Property="Orientation" Value="Horizontal" />
+    <Style Selector="Grid.tickets-toolbar-grid">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+    <Style Selector="Grid.tickets-toolbar-grid > ComboBox">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="Grid.tickets-toolbar-grid > TextBox">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
     <Style Selector="Button.btn-primary:focus, Button.btn-primary:focus-within">

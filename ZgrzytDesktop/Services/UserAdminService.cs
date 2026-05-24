@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Exceptions;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services.Interfaces;
@@ -31,7 +33,7 @@ public class UserAdminService : IUserAdminService
     {
         if (filter == UserAdminListFilter.All)
         {
-            var users = await _apiService.GetAsync<List<User>>("users") ?? [];
+            var users = await FetchUsersAsync("users");
             return new UserAdminListResult { Users = users };
         }
 
@@ -39,7 +41,7 @@ public class UserAdminService : IUserAdminService
 
         try
         {
-            var users = await _apiService.GetAsync<List<User>>(endpoint) ?? [];
+            var users = await FetchUsersAsync(endpoint);
             return new UserAdminListResult { Users = users };
         }
         catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -116,7 +118,7 @@ public class UserAdminService : IUserAdminService
 
     private async Task<UserAdminListResult> FetchWithLocalFilterFallbackAsync(UserAdminListFilter filter)
     {
-        var allUsers = await _apiService.GetAsync<List<User>>("users") ?? [];
+        var allUsers = await FetchUsersAsync("users");
 
         if (filter == UserAdminListFilter.Banned && !UsersExposeBanStatus(allUsers))
         {
@@ -142,8 +144,8 @@ public class UserAdminService : IUserAdminService
         filter switch
         {
             UserAdminListFilter.Active => users.Where(user => user.Active && !user.Ban).ToList(),
-            UserAdminListFilter.Inactive => users.Where(user => !user.Active).ToList(),
-            UserAdminListFilter.Banned => users.Where(user => user.Ban).ToList(),
+            UserAdminListFilter.Inactive => users.Where(user => !user.Active && !user.Ban).ToList(),
+            UserAdminListFilter.Banned => users.Where(user => user.Ban || user.BannedAt.HasValue).ToList(),
             _ => users.ToList()
         };
 
@@ -155,5 +157,17 @@ public class UserAdminService : IUserAdminService
         var response = await _apiService.PostAsync<RegisterUserRequest, RegisterUserResponse>("register", request);
 
         return response ?? new RegisterUserResponse();
+    }
+
+    private async Task<List<User>> FetchUsersAsync(string endpoint)
+    {
+        var json = await _apiService.GetAsync<JsonElement?>(endpoint);
+        if (json is not JsonElement root ||
+            root.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+        {
+            return [];
+        }
+
+        return ApiUserListParser.ParseUsers(root);
     }
 }

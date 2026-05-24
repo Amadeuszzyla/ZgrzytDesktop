@@ -35,13 +35,16 @@ public class TicketService : ITicketService
         string? priority = null,
         string sortBy = "created_at",
         string sortDirection = "desc",
-        TicketQueueView queueView = TicketQueueView.All)
+        TicketQueueView queueView = TicketQueueView.All,
+        string? categoryFilter = null,
+        string? assignmentFilter = null,
+        int currentUserId = 0)
     {
         var endpointName = ResolveEndpointName(queueView);
 
         if (queueView == TicketQueueView.All)
         {
-            return await FetchTicketsPageAsync(
+            var response = await FetchTicketsPageAsync(
                 endpointName,
                 page,
                 perPage,
@@ -51,11 +54,20 @@ public class TicketService : ITicketService
                 sortBy,
                 sortDirection,
                 includeFilterAndSortParams: true);
+
+            return ApplyClientSideFilters(
+                response,
+                status,
+                priority,
+                categoryFilter,
+                assignmentFilter,
+                currentUserId);
         }
 
-        if (!TicketQueueListProcessor.RequiresLocalProcessing(status, priority, sortBy, sortDirection))
+        if (!TicketQueueListProcessor.RequiresLocalProcessing(
+                status, priority, assignmentFilter, categoryFilter, sortBy, sortDirection))
         {
-            return await FetchTicketsPageAsync(
+            var response = await FetchTicketsPageAsync(
                 endpointName,
                 page,
                 perPage,
@@ -65,10 +77,25 @@ public class TicketService : ITicketService
                 sortBy,
                 sortDirection,
                 includeFilterAndSortParams: false);
+
+            return ApplyClientSideFilters(
+                response,
+                status,
+                priority,
+                categoryFilter,
+                assignmentFilter,
+                currentUserId);
         }
 
         var aggregation = await FetchAllQueuePagesAsync(endpointName, search);
-        var filtered = TicketQueueListProcessor.Filter(aggregation.Tickets, status, priority, search);
+        var filtered = TicketQueueListProcessor.Filter(
+            aggregation.Tickets,
+            status,
+            priority,
+            search,
+            categoryFilter,
+            assignmentFilter,
+            currentUserId);
         var sorted = TicketQueueListProcessor.Sort(filtered, sortBy, sortDirection);
         var paginated = TicketQueueListProcessor.Paginate(sorted, page, perPage);
         paginated.IsQueueFetchTruncated = aggregation.Truncated;
@@ -205,6 +232,47 @@ public class TicketService : ITicketService
 
         parameters.Add($"{name}={Uri.EscapeDataString(value.Trim())}");
     }
+
+    private static PaginatedResponse<Ticket>? ApplyClientSideFilters(
+        PaginatedResponse<Ticket>? response,
+        string? status,
+        string? priority,
+        string? categoryFilter,
+        string? assignmentFilter,
+        int currentUserId)
+    {
+        if (response?.Data is null)
+            return response;
+
+        if (string.IsNullOrWhiteSpace(status) &&
+            string.IsNullOrWhiteSpace(priority) &&
+            TicketCategoryFilterKeys.IsAll(categoryFilter) &&
+            TicketAssignmentFilterKeys.IsAll(assignmentFilter))
+        {
+            return response;
+        }
+
+        var filtered = TicketQueueListProcessor.Filter(
+            response.Data,
+            status,
+            priority,
+            search: null,
+            categoryFilter,
+            assignmentFilter,
+            currentUserId);
+
+        return new PaginatedResponse<Ticket>
+        {
+            Data = filtered,
+            Total = filtered.Count,
+            CurrentPage = response.CurrentPage,
+            LastPage = Math.Max(1, (int)Math.Ceiling(filtered.Count / (double)Math.Max(1, response.PerPage))),
+            PerPage = response.PerPage,
+            IsQueueFetchTruncated = response.IsQueueFetchTruncated,
+            QueuePagesFetched = response.QueuePagesFetched,
+            QueueApiReportedTotal = response.QueueApiReportedTotal
+        };
+    }
 }
 
 public class CreateTicketRequest
@@ -222,12 +290,15 @@ public class CreateTicketRequest
 public class UpdateTicketRequest
 {
     [JsonPropertyName("status")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Status { get; set; }
 
     [JsonPropertyName("priority")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Priority { get; set; }
 
     [JsonPropertyName("assigned_it_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? AssignedItId { get; set; }
 }
 

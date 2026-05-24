@@ -63,6 +63,8 @@ public class SettingsService : ISettingsService
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
             settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
             settings.UiCulture = NormalizeUiCulture(settings.UiCulture);
+            settings.AutoLogoutEnabled = settings.AutoLogoutEnabled;
+            settings.AutoLogoutTimeoutMinutes = SessionInactivityMonitor.NormalizeTimeout(settings.AutoLogoutTimeoutMinutes);
 
             return settings;
         }
@@ -102,6 +104,8 @@ public class SettingsService : ISettingsService
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
             settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
             settings.UiCulture = NormalizeUiCulture(settings.UiCulture);
+            settings.AutoLogoutEnabled = settings.AutoLogoutEnabled;
+            settings.AutoLogoutTimeoutMinutes = SessionInactivityMonitor.NormalizeTimeout(settings.AutoLogoutTimeoutMinutes);
 
             return settings;
         }
@@ -122,6 +126,7 @@ public class SettingsService : ISettingsService
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
             settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
             settings.UiCulture = NormalizeUiCulture(settings.UiCulture);
+            settings.AutoLogoutTimeoutMinutes = SessionInactivityMonitor.NormalizeTimeout(settings.AutoLogoutTimeoutMinutes);
 
             var json = JsonSerializer.Serialize(settings, _jsonOptions);
             File.WriteAllText(_filePath, json);
@@ -139,6 +144,7 @@ public class SettingsService : ISettingsService
             settings.ApiBaseUrl = NormalizeApiBaseUrl(settings.ApiBaseUrl);
             settings.ThemeMode = NormalizeThemeMode(settings.ThemeMode);
             settings.UiCulture = NormalizeUiCulture(settings.UiCulture);
+            settings.AutoLogoutTimeoutMinutes = SessionInactivityMonitor.NormalizeTimeout(settings.AutoLogoutTimeoutMinutes);
 
             var json = JsonSerializer.Serialize(settings, _jsonOptions);
             await File.WriteAllTextAsync(_filePath, json);

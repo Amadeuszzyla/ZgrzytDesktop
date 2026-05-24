@@ -1,5 +1,6 @@
 using System;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Resources;
 
 namespace ZgrzytDesktop.ViewModels;
@@ -67,12 +68,9 @@ public partial class DashboardViewModel
 
     public bool IsAdminPageVisible => CurrentSection == AppSections.Admin;
 
-    public bool IsAdminRole =>
-        string.Equals(CurrentUser.Role, AppRoles.Admin, StringComparison.OrdinalIgnoreCase);
+    public bool IsAdminRole => AppRoleHelper.IsAdmin(CurrentUser.Role);
 
-    public bool IsStaffRole =>
-        IsAdminRole ||
-        string.Equals(CurrentUser.Role, AppRoles.It, StringComparison.OrdinalIgnoreCase);
+    public bool IsStaffRole => AppRoleHelper.IsDesktopStaff(CurrentUser.Role);
 
     public bool ShowAdministrationNav => IsStaffRole;
 

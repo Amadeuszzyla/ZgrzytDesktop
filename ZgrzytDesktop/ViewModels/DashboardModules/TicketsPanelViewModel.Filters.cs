@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 
 namespace ZgrzytDesktop.ViewModels.DashboardModules;
@@ -17,7 +19,9 @@ public sealed partial class TicketsPanelViewModel
 
     private string _selectedFilterStatus = FilterLabels.All;
     private string _selectedFilterPriority = FilterLabels.All;
+    private string _selectedAssignmentFilterKey = TicketAssignmentFilterKeys.All;
     private string _selectedTicketQueueView = FilterLabels.All;
+    private string _selectedCategoryFilterKey = TicketCategoryFilterKeys.All;
 
     public string SearchText
     {
@@ -62,10 +66,12 @@ public sealed partial class TicketsPanelViewModel
         get => FilterStatusOptions.FirstOrDefault(option => option.Value == _selectedFilterStatus);
         set
         {
-            if (value is null)
+            if (value is null || _selectedFilterStatus == value.Value)
                 return;
 
             SelectedFilterStatus = value.Value;
+            SetCurrentPageSilently(1);
+            _ = LoadTicketsAsync();
         }
     }
 
@@ -80,10 +86,34 @@ public sealed partial class TicketsPanelViewModel
         get => FilterPriorityOptions.FirstOrDefault(option => option.Value == _selectedFilterPriority);
         set
         {
-            if (value is null)
+            if (value is null || _selectedFilterPriority == value.Value)
                 return;
 
             SelectedFilterPriority = value.Value;
+            SetCurrentPageSilently(1);
+            _ = LoadTicketsAsync();
+        }
+    }
+
+    public string SelectedAssignmentFilterKey
+    {
+        get => _selectedAssignmentFilterKey;
+        set => SetProperty(ref _selectedAssignmentFilterKey, value);
+    }
+
+    public TicketFilterOption? SelectedFilterAssignmentOption
+    {
+        get => FilterAssignmentOptions.FirstOrDefault(option => option.Value == _selectedAssignmentFilterKey);
+        set
+        {
+            if (value is null || _selectedAssignmentFilterKey == value.Value)
+                return;
+
+            _selectedAssignmentFilterKey = value.Value;
+            OnPropertyChanged(nameof(SelectedAssignmentFilterKey));
+            OnPropertyChanged(nameof(SelectedFilterAssignmentOption));
+            SetCurrentPageSilently(1);
+            _ = LoadTicketsAsync();
         }
     }
 
@@ -114,6 +144,50 @@ public sealed partial class TicketsPanelViewModel
         }
     }
 
+    public string LblFilterCategory => AppStrings.Get("Tickets_FilterCategory");
+
+    public string SelectedCategory
+    {
+        get => SelectedCategoryFilterKey;
+        set
+        {
+            var option = FilterCategoryOptions.FirstOrDefault(o =>
+                string.Equals(o.Key, value, StringComparison.OrdinalIgnoreCase));
+
+            if (option is not null)
+                SelectedCategoryFilterOption = option;
+        }
+    }
+
+    public string SelectedCategoryFilterKey
+    {
+        get => _selectedCategoryFilterKey;
+        set => SetProperty(ref _selectedCategoryFilterKey, value);
+    }
+
+    public TicketCategoryFilterOption? SelectedCategoryFilterOption
+    {
+        get => FilterCategoryOptions.FirstOrDefault(option =>
+            string.Equals(option.Key, _selectedCategoryFilterKey, StringComparison.OrdinalIgnoreCase));
+        set
+        {
+            if (value is null)
+                return;
+
+            if (_selectedCategoryFilterKey == value.Key)
+                return;
+
+            _selectedCategoryFilterKey = value.Key;
+            OnPropertyChanged(nameof(SelectedCategoryFilterKey));
+            OnPropertyChanged(nameof(SelectedCategory));
+            OnPropertyChanged(nameof(SelectedCategoryFilterOption));
+            SetCurrentPageSilently(1);
+            _ = LoadTicketsAsync();
+        }
+    }
+
+    public IReadOnlyList<string> AvailableCategories => TicketCategoryFilterKeys.AllKeys;
+
     private async Task SearchTicketsAsync()
     {
         SetCurrentPageSilently(1);
@@ -125,7 +199,14 @@ public sealed partial class TicketsPanelViewModel
         SearchText = string.Empty;
         SelectedFilterStatus = FilterLabels.All;
         SelectedFilterPriority = FilterLabels.All;
+        _selectedAssignmentFilterKey = TicketAssignmentFilterKeys.All;
+        OnPropertyChanged(nameof(SelectedAssignmentFilterKey));
+        OnPropertyChanged(nameof(SelectedFilterAssignmentOption));
         SetSelectedTicketQueueViewSilently(FilterLabels.All);
+        _selectedCategoryFilterKey = TicketCategoryFilterKeys.All;
+        OnPropertyChanged(nameof(SelectedCategoryFilterKey));
+        OnPropertyChanged(nameof(SelectedCategory));
+        OnPropertyChanged(nameof(SelectedCategoryFilterOption));
         SetCurrentPageSilently(1);
 
         _ = LoadTicketsAsync();
@@ -137,6 +218,7 @@ public sealed partial class TicketsPanelViewModel
             PageSizeOptions.Add(size);
 
         RefreshFilterCollections();
+        RefreshFilterCategoryOptions();
 
         foreach (var field in TicketSortHelper.Fields)
             TicketSortFields.Add(field);
@@ -151,6 +233,7 @@ public sealed partial class TicketsPanelViewModel
     {
         var filterStatus = _selectedFilterStatus;
         var filterPriority = _selectedFilterPriority;
+        var filterAssignment = _selectedAssignmentFilterKey;
 
         FilterStatusOptions.Clear();
         foreach (var value in new[]
@@ -172,13 +255,40 @@ public sealed partial class TicketsPanelViewModel
                  })
             FilterPriorityOptions.Add(new TicketFilterOption(value, TicketFilterOptionKind.Priority));
 
+        FilterAssignmentOptions.Clear();
+        foreach (var key in TicketAssignmentFilterKeys.AllKeys)
+            FilterAssignmentOptions.Add(new TicketFilterOption(key, TicketFilterOptionKind.Assignment));
+
         _selectedFilterStatus = filterStatus;
         _selectedFilterPriority = filterPriority;
+        _selectedAssignmentFilterKey = filterAssignment;
 
         OnPropertyChanged(nameof(SelectedFilterStatus));
         OnPropertyChanged(nameof(SelectedFilterStatusOption));
         OnPropertyChanged(nameof(SelectedFilterPriority));
         OnPropertyChanged(nameof(SelectedFilterPriorityOption));
+        OnPropertyChanged(nameof(SelectedAssignmentFilterKey));
+        OnPropertyChanged(nameof(SelectedFilterAssignmentOption));
+    }
+
+    internal void RefreshFilterCategoryOptions()
+    {
+        var selectedKey = _selectedCategoryFilterKey;
+
+        FilterCategoryOptions.Clear();
+
+        foreach (var key in TicketCategoryFilterKeys.AllKeys)
+            FilterCategoryOptions.Add(new TicketCategoryFilterOption(key));
+
+        _selectedCategoryFilterKey = FilterCategoryOptions
+            .FirstOrDefault(option => string.Equals(option.Key, selectedKey, StringComparison.OrdinalIgnoreCase))
+            ?.Key ?? TicketCategoryFilterKeys.All;
+
+        OnPropertyChanged(nameof(FilterCategoryOptions));
+        OnPropertyChanged(nameof(SelectedCategoryFilterKey));
+        OnPropertyChanged(nameof(SelectedCategory));
+        OnPropertyChanged(nameof(SelectedCategoryFilterOption));
+        OnPropertyChanged(nameof(LblFilterCategory));
     }
 
     internal void RefreshCategoryOptions()

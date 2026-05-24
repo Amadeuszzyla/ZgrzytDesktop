@@ -25,6 +25,8 @@ public sealed class TicketsPanelCallbacks
 
     public required Func<ApiException, string> GetApiErrorMessage { get; init; }
 
+    public required Func<int> GetCurrentUserId { get; init; }
+
     public required Action<int> TicketSelected { get; init; }
 
     public required Action RefreshPaginationSideEffects { get; init; }

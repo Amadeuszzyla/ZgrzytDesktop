@@ -42,23 +42,22 @@
 
                 <Border Classes="app-card admin-toolbar-card">
                     <StackPanel Spacing="12">
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <Grid ColumnDefinitions="200,*,Auto" ColumnSpacing="12">
                             <ComboBox
                                 Grid.Column="0"
-                                MinWidth="180"
                                 MinHeight="38"
                                 VerticalAlignment="Center"
-                                ItemsSource="{Binding AdminUserListFilterOptions}"
-                                SelectedItem="{Binding SelectedAdminUserListFilterOption}">
+                                ItemsSource="{Binding AdminUserFilterOptions}"
+                                SelectedItem="{Binding SelectedAdminUserFilter}"
+                                IsEnabled="{Binding IsLoadingAdminUsers, Converter={StaticResource InvertBoolConverter}}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Label}" />
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-
                             <StackPanel
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Orientation="Horizontal"
                                 Spacing="8"
                                 HorizontalAlignment="Right">
@@ -126,7 +125,8 @@
                                             Grid.Column="2"
                                             Spacing="6"
                                             VerticalAlignment="Center"
-                                            MinWidth="120">
+                                            MinWidth="120"
+                                            IsVisible="{Binding IsAdminRole}">
                                             <Button
                                                 Classes="btn-primary"
                                                 Content="{Binding DataContext.LblAdminActivate, RelativeSource={RelativeSource AncestorType=UserControl}}"

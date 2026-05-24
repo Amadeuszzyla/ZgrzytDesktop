@@ -32,7 +32,8 @@ public enum TicketFilterOptionKind
 {
     Queue,
     Status,
-    Priority
+    Priority,
+    Assignment
 }
 
 public static class TicketFilterDisplayHelper
@@ -45,6 +46,14 @@ public static class TicketFilterDisplayHelper
                 FilterLabels.All => AppStrings.Get("Filter_All"),
                 FilterLabels.Active => AppStrings.Get("Filter_Active"),
                 FilterLabels.Unassigned => AppStrings.Get("Filter_Unassigned"),
+                _ => value
+            },
+            TicketFilterOptionKind.Assignment => value switch
+            {
+                TicketAssignmentFilterKeys.All => AppStrings.Get("Tickets_Filter_AssignmentAll"),
+                TicketAssignmentFilterKeys.Assigned => AppStrings.Get("Tickets_Filter_Assigned"),
+                TicketAssignmentFilterKeys.Unassigned => AppStrings.Get("Tickets_Filter_Unassigned"),
+                TicketAssignmentFilterKeys.AssignedToMe => AppStrings.Get("Tickets_Filter_AssignedToMe"),
                 _ => value
             },
             TicketFilterOptionKind.Status => FilterLabels.IsAll(value)

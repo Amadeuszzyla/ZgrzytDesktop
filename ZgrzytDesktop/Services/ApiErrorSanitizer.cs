@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Text.Json;
 using ZgrzytDesktop.Resources;
+using ZgrzytDesktop.Security;
 
 namespace ZgrzytDesktop.Services;
 
@@ -50,11 +51,11 @@ public static class ApiErrorSanitizer
         if (statusCode == HttpStatusCode.UnprocessableEntity &&
             TryExtractValidationMessage(content, out var validationMessage))
         {
-            return validationMessage;
+            return SensitiveDataMasker.Mask(validationMessage);
         }
 
         if (TryUsePlainFriendlyMessage(content, statusCode, out var friendlyMessage))
-            return friendlyMessage;
+            return SensitiveDataMasker.Mask(friendlyMessage);
 
         return statusCode switch
         {
@@ -64,7 +65,7 @@ public static class ApiErrorSanitizer
             HttpStatusCode.Conflict => AppStrings.Get("Api_Conflict"),
             HttpStatusCode.ServiceUnavailable => AppStrings.Get("Api_ServiceUnavailable"),
             HttpStatusCode.InternalServerError => AppStrings.Get("Api_InternalServerError"),
-            _ => TruncatePlainText(content, 240)
+            _ => SensitiveDataMasker.Mask(TruncatePlainText(content, 240))
         };
     }
 

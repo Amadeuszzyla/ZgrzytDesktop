@@ -24,7 +24,8 @@ public partial class DashboardViewModel
                 GetCanUseOnlineActions = () => CanUseOnlineActions,
                 GetApiErrorMessage = GetApiErrorMessage,
                 LogAuditAsync = LogAuditAsync,
-                ExecuteApiAsyncCore = ExecuteApiAsync
+                ExecuteApiAsyncCore = ExecuteApiAsync,
+                ConfirmAsync = ConfirmRiskyActionAsync
             });
 
         AdminPanel.PropertyChanged += (_, e) =>
@@ -38,8 +39,14 @@ public partial class DashboardViewModel
 
     public ObservableCollection<User> AdminUsers => AdminPanel.AdminUsers;
 
-    public ObservableCollection<AdminListFilterOption> AdminUserListFilterOptions =>
-        AdminPanel.AdminUserListFilterOptions;
+    public ObservableCollection<AdminListFilterOption> AdminUserFilterOptions =>
+        AdminPanel.AdminUserFilterOptions;
+
+    public AdminListFilterOption? SelectedAdminUserFilter
+    {
+        get => AdminPanel.SelectedAdminUserFilter;
+        set => AdminPanel.SelectedAdminUserFilter = value;
+    }
 
     public string AdminTab
     {
@@ -54,12 +61,6 @@ public partial class DashboardViewModel
     public bool IsAdminUsersPanelVisible => AdminPanel.IsAdminUsersPanelVisible;
 
     public bool IsAdminNewAccountPanelVisible => AdminPanel.IsAdminNewAccountPanelVisible;
-
-    public AdminListFilterOption? SelectedAdminUserListFilterOption
-    {
-        get => AdminPanel.SelectedAdminUserListFilterOption;
-        set => AdminPanel.SelectedAdminUserListFilterOption = value;
-    }
 
     public string AdminUnbanPassword
     {

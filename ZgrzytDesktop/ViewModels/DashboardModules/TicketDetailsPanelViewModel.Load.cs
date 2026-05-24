@@ -43,6 +43,8 @@ public sealed partial class TicketDetailsPanelViewModel
 
             ApplyDetailsFormFromTicket(ticket);
 
+            await LoadAssignableUsersIfNeededAsync();
+
             DetailsStatusMessage = ticket is null
                 ? AppStrings.Get("Details_LoadFailed")
                 : AppStrings.GetFormat("Details_Selected", ticket.Id);

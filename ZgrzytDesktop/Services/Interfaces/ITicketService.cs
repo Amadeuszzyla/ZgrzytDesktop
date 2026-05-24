@@ -15,7 +15,10 @@ public interface ITicketService
         string? priority = null,
         string sortBy = "created_at",
         string sortDirection = "desc",
-        TicketQueueView queueView = TicketQueueView.All);
+        TicketQueueView queueView = TicketQueueView.All,
+        string? categoryFilter = null,
+        string? assignmentFilter = null,
+        int currentUserId = 0);
 
     Task<PaginatedResponse<Ticket>?> GetActiveTicketsAsync(
         int page = 1,

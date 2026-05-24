@@ -52,6 +52,37 @@
                                     HorizontalAlignment="Stretch" />
                             </StackPanel>
 
+                            <StackPanel
+                                Spacing="6"
+                                Margin="0,4,0,0"
+                                IsVisible="{Binding TicketDetailsPanel.CanSelectAssignee}">
+                                <TextBlock Classes="field-label" Text="{Binding LblTicketAssignTo}" Margin="0" />
+                                <ComboBox
+                                    MinHeight="38"
+                                    ItemsSource="{Binding TicketDetailsPanel.AssignableUsers}"
+                                    SelectedItem="{Binding TicketDetailsPanel.SelectedAssignableUser, Mode=TwoWay}"
+                                    IsEnabled="{Binding TicketDetailsPanel.CanShowAdminAssignmentControls}"
+                                    HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Label}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBlock
+                                    Text="{Binding LblTicketNoAssignableUsers}"
+                                    IsVisible="{Binding TicketDetailsPanel.ShowAssignableUsersEmptyMessage}"
+                                    TextWrapping="Wrap"
+                                    Foreground="{DynamicResource AppMutedTextBrush}"
+                                    FontSize="12" />
+                                <Button
+                                    Classes="btn-secondary"
+                                    Content="{Binding LblTicketSaveAssignment}"
+                                    Command="{Binding TicketDetailsPanel.AssignSelectedUserCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    MinHeight="40" />
+                            </StackPanel>
+
                             <StackPanel Spacing="8" Margin="0,4,0,0">
                                 <Button
                                     Classes="btn-primary"
@@ -62,7 +93,7 @@
                                     MinHeight="40" />
                                 <Button
                                     Classes="btn-secondary"
-                                    Content="{Binding LblDetailsAssignToMe}"
+                                    Content="{Binding LblTicketAssignToMe}"
                                     Command="{Binding TicketDetailsPanel.AssignToMeCommand}"
                                     IsEnabled="{Binding TicketDetailsPanel.CanAssignTicket}"
                                     HorizontalAlignment="Stretch"

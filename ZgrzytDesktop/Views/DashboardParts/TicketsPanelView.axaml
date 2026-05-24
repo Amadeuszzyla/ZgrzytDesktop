@@ -18,56 +18,97 @@
         <StackPanel Classes="page-content">
             <Border Classes="app-card tickets-toolbar-card" Margin="0,0,0,16">
                 <StackPanel Spacing="12">
-                    <WrapPanel Classes="tickets-toolbar-wrap" Orientation="Horizontal">
-                        <StackPanel
-                            Orientation="Horizontal"
-                            Spacing="8"
-                            Margin="0,0,12,8"
-                            IsVisible="{Binding ShowAdministrationNav}">
-                            <Button
-                                Classes="btn-primary"
-                                Content="{Binding LblAdminTabNewAccount}"
-                                Click="OnCreateUserToolbarClick"
-                                MinHeight="38" />
-                            <Button
-                                Classes="btn-primary"
-                                Content="{Binding LblAdminTabUsers}"
-                                Click="OnManageUsersToolbarClick"
-                                MinHeight="38" />
-                        </StackPanel>
+                    <Grid
+                        Classes="tickets-toolbar-grid"
+                        ColumnDefinitions="130,130,150,150,2*,48,130,130,120"
+                        ColumnSpacing="8"
+                        RowSpacing="10">
+                        <ComboBox
+                            Grid.Column="0"
+                            MinHeight="38"
+                            VerticalAlignment="Center"
+                            ItemsSource="{Binding TicketsPanel.FilterStatusOptions}"
+                            SelectedItem="{Binding TicketsPanel.SelectedFilterStatusOption}"
+                            IsEnabled="{Binding TicketsPanel.IsNotLoading}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
                         <ComboBox
-                            MinWidth="140"
+                            Grid.Column="1"
                             MinHeight="38"
-                            Margin="0,0,8,8"
+                            VerticalAlignment="Center"
+                            ItemsSource="{Binding TicketsPanel.FilterPriorityOptions}"
+                            SelectedItem="{Binding TicketsPanel.SelectedFilterPriorityOption}"
+                            IsEnabled="{Binding TicketsPanel.IsNotLoading}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <ComboBox
+                            Grid.Column="2"
+                            MinHeight="38"
+                            VerticalAlignment="Center"
+                            ItemsSource="{Binding TicketsPanel.FilterAssignmentOptions}"
+                            SelectedItem="{Binding TicketsPanel.SelectedFilterAssignmentOption}"
+                            IsEnabled="{Binding TicketsPanel.IsNotLoading}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <ComboBox
+                            Grid.Column="3"
+                            MinHeight="38"
                             VerticalAlignment="Center"
                             ItemsSource="{Binding TicketsPanel.TicketQueueViewOptions}"
                             SelectedItem="{Binding TicketsPanel.SelectedTicketQueueViewOption}"
                             IsEnabled="{Binding TicketsPanel.IsNotLoading}" />
 
-                        <Grid ColumnDefinitions="*,Auto" MinWidth="200" MaxWidth="320" Margin="0,0,8,8">
-                            <TextBox
-                                Grid.Column="0"
-                                MinHeight="38"
-                                VerticalContentAlignment="Center"
-                                Text="{Binding TicketsPanel.SearchText}"
-                                PlaceholderText="{Binding LblTicketsSearchPlaceholder}"
-                                IsEnabled="{Binding TicketsPanel.IsNotLoading}" />
-                            <Button
-                                Grid.Column="1"
-                                Classes="btn-primary tickets-search-icon"
-                                Content="⌕"
-                                Command="{Binding TicketsPanel.SearchTicketsCommand}"
-                                IsEnabled="{Binding TicketsPanel.IsNotLoading}"
-                                MinWidth="44"
-                                MinHeight="38"
-                                Margin="8,0,0,0" />
-                        </Grid>
+                        <TextBox
+                            Grid.Column="4"
+                            MinHeight="38"
+                            VerticalContentAlignment="Center"
+                            Text="{Binding TicketsPanel.SearchText}"
+                            PlaceholderText="{Binding LblTicketsSearchPlaceholder}"
+                            IsEnabled="{Binding TicketsPanel.IsNotLoading}" />
+
+                        <Button
+                            Grid.Column="5"
+                            Classes="btn-primary tickets-search-icon"
+                            Content="⌕"
+                            Command="{Binding TicketsPanel.SearchTicketsCommand}"
+                            IsEnabled="{Binding TicketsPanel.IsNotLoading}"
+                            MinWidth="48"
+                            MinHeight="38"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch" />
 
                         <ComboBox
-                            MinWidth="120"
+                            Grid.Column="6"
                             MinHeight="38"
-                            Margin="0,0,8,8"
+                            VerticalAlignment="Center"
+                            ItemsSource="{Binding TicketsPanel.FilterCategoryOptions}"
+                            SelectedItem="{Binding TicketsPanel.SelectedCategoryFilterOption}"
+                            IsEnabled="{Binding TicketsPanel.IsNotLoading}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <ComboBox
+                            Grid.Column="7"
+                            MinHeight="38"
                             VerticalAlignment="Center"
                             ItemsSource="{Binding TicketsPanel.TicketSortFields}"
                             SelectedItem="{Binding TicketsPanel.SelectedTicketSortField}"
@@ -80,9 +121,8 @@
                         </ComboBox>
 
                         <ComboBox
-                            MinWidth="56"
+                            Grid.Column="8"
                             MinHeight="38"
-                            Margin="0,0,8,8"
                             VerticalAlignment="Center"
                             ItemsSource="{Binding TicketsPanel.TicketSortDirections}"
                             SelectedItem="{Binding TicketsPanel.SelectedTicketSortDirection}"
@@ -93,53 +133,42 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                    </WrapPanel>
+                    </Grid>
 
-                    <Expander Header="{Binding LblTicketsFiltersTitle}" IsExpanded="False">
-                        <StackPanel Spacing="10" Margin="0,8,0,0">
-                            <Grid ColumnDefinitions="*,*,Auto,Auto" ColumnSpacing="8">
-                                <ComboBox
-                                    Grid.Column="0"
-                                    MinHeight="36"
-                                    ItemsSource="{Binding TicketsPanel.FilterStatusOptions}"
-                                    SelectedItem="{Binding TicketsPanel.SelectedFilterStatusOption}"
-                                    IsEnabled="{Binding TicketsPanel.IsNotLoading}" />
-                                <ComboBox
-                                    Grid.Column="1"
-                                    MinHeight="36"
-                                    ItemsSource="{Binding TicketsPanel.FilterPriorityOptions}"
-                                    SelectedItem="{Binding TicketsPanel.SelectedFilterPriorityOption}"
-                                    IsEnabled="{Binding TicketsPanel.IsNotLoading}" />
-                                <Button
-                                    Grid.Column="2"
-                                    Classes="btn-secondary"
-                                    Content="{Binding LblTicketsClear}"
-                                    Command="{Binding TicketsPanel.ClearFiltersCommand}"
-                                    IsEnabled="{Binding TicketsPanel.IsNotLoading}"
-                                    MinHeight="36" />
-                                <Button
-                                    Grid.Column="3"
-                                    Classes="btn-secondary"
-                                    Content="{Binding LblTicketsRefreshNow}"
-                                    Command="{Binding TicketsPanel.RefreshTicketsNowCommand}"
-                                    IsEnabled="{Binding TicketsPanel.CanRefreshTicketsNow}"
-                                    MinHeight="36" />
-                            </Grid>
-                            <Grid ColumnDefinitions="Auto,88,Auto" ColumnSpacing="8">
-                                <TextBlock
-                                    Grid.Column="0"
-                                    Text="{Binding LblTicketsPageSizeLabel}"
-                                    VerticalAlignment="Center"
-                                    Foreground="{DynamicResource AppSecondaryTextBrush}" />
-                                <ComboBox
-                                    Grid.Column="1"
-                                    MinHeight="36"
-                                    ItemsSource="{Binding TicketsPanel.PageSizeOptions}"
-                                    SelectedItem="{Binding TicketsPanel.SelectedPageSize}"
-                                    IsEnabled="{Binding TicketsPanel.IsNotLoading}" />
-                            </Grid>
-                        </StackPanel>
-                    </Expander>
+                    <Grid ColumnDefinitions="Auto,88,*,Auto,Auto" ColumnSpacing="8">
+                        <TextBlock
+                            Grid.Column="0"
+                            Text="{Binding LblTicketsPageSizeLabel}"
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource AppSecondaryTextBrush}" />
+                        <ComboBox
+                            Grid.Column="1"
+                            MinHeight="38"
+                            VerticalAlignment="Center"
+                            ItemsSource="{Binding TicketsPanel.PageSizeOptions}"
+                            SelectedItem="{Binding TicketsPanel.SelectedPageSize}"
+                            IsEnabled="{Binding TicketsPanel.IsNotLoading}" />
+                        <Button
+                            Grid.Column="3"
+                            Classes="btn-secondary"
+                            Content="{Binding LblTicketsClear}"
+                            Command="{Binding TicketsPanel.ClearFiltersCommand}"
+                            IsEnabled="{Binding TicketsPanel.IsNotLoading}"
+                            MinHeight="38"
+                            MinWidth="120"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right" />
+                        <Button
+                            Grid.Column="4"
+                            Classes="btn-secondary"
+                            Content="{Binding LblTicketsRefreshNow}"
+                            Command="{Binding TicketsPanel.RefreshTicketsNowCommand}"
+                            IsEnabled="{Binding TicketsPanel.CanRefreshTicketsNow}"
+                            MinHeight="38"
+                            MinWidth="120"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right" />
+                    </Grid>
 
                     <StackPanel Spacing="4">
                         <TextBlock

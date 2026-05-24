@@ -84,6 +84,14 @@ public partial class DashboardViewModel
 
     public string LblDetailsAssignToMe => AppStrings.Get("Details_AssignToMe");
 
+    public string LblTicketAssignTo => AppStrings.Get("Ticket_AssignTo");
+
+    public string LblTicketNoAssignableUsers => AppStrings.Get("Ticket_NoAssignableUsers");
+
+    public string LblTicketAssignToMe => AppStrings.Get("Ticket_AssignToMe");
+
+    public string LblTicketSaveAssignment => AppStrings.Get("Ticket_SaveAssignment");
+
     public string LblDetailsCloseTicket => AppStrings.Get("Details_CloseTicket");
 
     public string LblDetailsDeleteTicket => AppStrings.Get("Details_DeleteTicket");
@@ -218,6 +226,10 @@ public partial class DashboardViewModel
         OnPropertyChanged(nameof(LblDetailsManageTitle));
         OnPropertyChanged(nameof(LblDetailsSaveChanges));
         OnPropertyChanged(nameof(LblDetailsAssignToMe));
+        OnPropertyChanged(nameof(LblTicketAssignTo));
+        OnPropertyChanged(nameof(LblTicketNoAssignableUsers));
+        OnPropertyChanged(nameof(LblTicketAssignToMe));
+        OnPropertyChanged(nameof(LblTicketSaveAssignment));
         OnPropertyChanged(nameof(LblDetailsCloseTicket));
         OnPropertyChanged(nameof(LblDetailsDeleteTicket));
         OnPropertyChanged(nameof(LblDetailsLocalAuditTitle));

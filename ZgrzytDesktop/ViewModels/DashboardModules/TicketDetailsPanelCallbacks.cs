@@ -28,6 +28,8 @@ public sealed class TicketDetailsPanelCallbacks
 
     public required Func<bool> GetCanManageTickets { get; init; }
 
+    public required Func<bool> GetIsAdminRole { get; init; }
+
     public required Func<bool> GetIsRegularUser { get; init; }
 
     public required Func<string, int?, string?, object?[]?, Task> LogAuditAsync { get; init; }
@@ -39,6 +41,9 @@ public sealed class TicketDetailsPanelCallbacks
     public required Action ClearSelectedTicket { get; init; }
 
     public required Func<Func<Task>, Action<string>?, string?, string?, string?, bool, bool, Func<ApiException, Task>?, Task<bool>> ExecuteApiAsyncCore { get; init; }
+
+    public Func<string, string?, Task<bool>> ConfirmAsync { get; init; } =
+        static (_, _) => Task.FromResult(true);
 
     public Task<bool> ExecuteApiAsync(
         Func<Task> action,

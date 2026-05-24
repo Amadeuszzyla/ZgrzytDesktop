@@ -291,6 +291,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         CurrentViewModel = CreateDashboard(cachedUser);
 
+        RestartInactivityMonitor();
+
     }
 
 
@@ -343,6 +345,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         CurrentViewModel = CreateDashboard(user);
 
+        RestartInactivityMonitor();
+
     }
 
 
@@ -374,6 +378,8 @@ public partial class MainWindowViewModel : ViewModelBase
         await _ticketCacheService.ClearAsync();
 
 
+
+        _sessionInactivityMonitor.Stop();
 
         CurrentViewModel = CreateLoginViewModel(AppStrings.Get("Login_DesktopAccessDenied"));
 
@@ -407,7 +413,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
             _userAdminService,
 
-            LogoutAsync
+            () => LogoutAsync(),
+
+            ApplyAutoLogoutSettings
 
         );
 
@@ -433,9 +441,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
 
 
-    private async Task LogoutAsync()
+    private async Task LogoutAsync(string? loginErrorMessage = null)
 
     {
+
+        if (CurrentViewModel is DashboardViewModel dashboard)
+            dashboard.ClearSessionData();
+
+        _sessionInactivityMonitor.Stop();
 
         var cachedUser = await _userCacheService.LoadUserAsync();
 
@@ -475,7 +488,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
 
 
-        CurrentViewModel = CreateLoginViewModel();
+        CurrentViewModel = CreateLoginViewModel(loginErrorMessage);
 
     }
 

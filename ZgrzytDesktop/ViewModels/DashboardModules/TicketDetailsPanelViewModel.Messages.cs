@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 
@@ -46,9 +47,10 @@ public sealed partial class TicketDetailsPanelViewModel
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(NewMessageText))
+        var messageError = TicketMessageValidator.ValidateBody(NewMessageText);
+        if (messageError is not null)
         {
-            DetailsStatusMessage = AppStrings.Get("Details_EmptyMessage");
+            DetailsStatusMessage = messageError;
             return;
         }
 

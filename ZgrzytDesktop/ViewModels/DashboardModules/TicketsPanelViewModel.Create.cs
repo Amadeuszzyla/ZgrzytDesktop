@@ -55,15 +55,17 @@ public sealed partial class TicketsPanelViewModel
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(NewTicketTitle))
+        var titleError = TicketFormValidator.ValidateTitle(NewTicketTitle);
+        if (titleError is not null)
         {
-            CreateTicketStatusMessage = AppStrings.Get("Tickets_ValidationTitle");
+            CreateTicketStatusMessage = titleError;
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(NewTicketDescription))
+        var descriptionError = TicketFormValidator.ValidateDescription(NewTicketDescription);
+        if (descriptionError is not null)
         {
-            CreateTicketStatusMessage = AppStrings.Get("Tickets_ValidationDescription");
+            CreateTicketStatusMessage = descriptionError;
             return;
         }
 

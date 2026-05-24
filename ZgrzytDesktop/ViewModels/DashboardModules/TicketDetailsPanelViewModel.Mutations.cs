@@ -45,6 +45,18 @@ public sealed partial class TicketDetailsPanelViewModel
             return;
         }
 
+        if (!StatusDisplayHelper.IsKnownDisplayStatus(SelectedStatus))
+        {
+            DetailsStatusMessage = AppStrings.Get("Validation_InvalidStatus");
+            return;
+        }
+
+        if (!PriorityDisplayHelper.IsKnownDisplayPriority(SelectedPriority))
+        {
+            DetailsStatusMessage = AppStrings.Get("Validation_InvalidPriority");
+            return;
+        }
+
         try
         {
             IsLoadingDetails = true;
@@ -113,6 +125,9 @@ public sealed partial class TicketDetailsPanelViewModel
             DetailsStatusMessage = AppStrings.Get("Details_OfflineClose");
             return;
         }
+
+        if (!await _callbacks.ConfirmAsync("Confirm_CloseTicket", "Confirm_Title"))
+            return;
 
         var ticketId = TicketDetails.Id;
         var previousDetails = TicketDetails;
@@ -187,6 +202,9 @@ public sealed partial class TicketDetailsPanelViewModel
             return;
         }
 
+        if (!await _callbacks.ConfirmAsync("Confirm_DeleteTicket", "Confirm_Title"))
+            return;
+
         try
         {
             IsLoadingDetails = true;
@@ -224,74 +242,18 @@ public sealed partial class TicketDetailsPanelViewModel
         }
     }
 
-    private async Task AssignToMeAsync()
+    private Task AssignToMeAsync()
     {
-        if (!_callbacks.GetCanManageTickets())
-        {
-            DetailsStatusMessage = AppStrings.Get("Details_NoAssignPermission");
-            _callbacks.ShowToastKey("Toast_DetailsAssignForbidden", ToastTypes.Warning);
-            return;
-        }
+        var user = _callbacks.GetCurrentUser();
 
-        if (_callbacks.GetIsOffline())
-        {
-            DetailsStatusMessage = AppStrings.Get("Details_OfflineAssign");
-            _callbacks.ShowToastKey("Toast_DetailsAssignOffline", ToastTypes.Warning);
-            return;
-        }
-
-        if (TicketDetails is null)
-        {
-            DetailsStatusMessage = AppStrings.Get("Details_SelectFirst");
-            return;
-        }
-
-        try
-        {
-            IsLoadingDetails = true;
-            DetailsStatusMessage = AppStrings.Get("Details_Assigning");
-
-            var ticketId = TicketDetails.Id;
-            var user = _callbacks.GetCurrentUser();
-
-            var request = new UpdateTicketRequest
-            {
-                AssignedItId = user.Id
-            };
-
-            await _callbacks.ExecuteApiAsync(
-                async () =>
-                {
-                    await _ticketService.UpdateTicketAsync(ticketId, request);
-
-                    _callbacks.SetIsOffline(false);
-
-                    await LoadTicketDetailsAsync(ticketId);
-                    await _callbacks.RefreshTicketsAsync();
-
-                    DetailsStatusMessage = AppStrings.Get("Details_Assigned");
-                    _callbacks.ShowToastKey("Toast_TicketAssigned", ToastTypes.Success);
-
-                    await _callbacks.LogAuditAsync(
-                        "AssignToMe",
-                        ticketId,
-                        "Details_AssignAuditDesc",
-                        [user.Login]);
-                },
-                setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessageKey: "Details_AssignUnexpectedError",
-                unexpectedToastMessageKey: "Details_AssignFailed",
-                onServiceUnavailableAsync: async _ =>
-                {
-                    _callbacks.SetIsOffline(true);
-                    DetailsStatusMessage = AppStrings.Get("Details_OfflineAssignFailed");
-                    _callbacks.ShowToastKey("Toast_TicketAssignOffline", ToastTypes.Error);
-                    await Task.CompletedTask;
-                });
-        }
-        finally
-        {
-            IsLoadingDetails = false;
-        }
+        return AssignTicketAsync(
+            user.Id,
+            auditAction: "AssignToMe",
+            auditDescriptionKey: "Details_AssignAuditDesc",
+            auditArgs: [user.Login],
+            successStatusKey: "Details_Assigned",
+            successToastKey: "Toast_TicketAssigned",
+            unexpectedStatusKey: "Details_AssignUnexpectedError",
+            unexpectedToastKey: "Details_AssignFailed");
     }
 }

@@ -10,8 +10,6 @@ public static class DesktopAccessHelper
         if (string.IsNullOrWhiteSpace(role))
             return false;
 
-        return string.Equals(role, AppRoles.Admin, StringComparison.OrdinalIgnoreCase)
-               || string.Equals(role, AppRoles.It, StringComparison.OrdinalIgnoreCase)
-               || string.Equals(role, "administrator", StringComparison.OrdinalIgnoreCase);
+        return AppRoleHelper.IsDesktopStaff(role);
     }
 }

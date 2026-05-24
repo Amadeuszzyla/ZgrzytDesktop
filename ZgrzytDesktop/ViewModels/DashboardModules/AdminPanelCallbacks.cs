@@ -26,6 +26,9 @@ public sealed class AdminPanelCallbacks
 
     public required Func<Func<Task>, Action<string>?, string?, string?, string?, bool, bool, Func<ApiException, Task>?, Task<bool>> ExecuteApiAsyncCore { get; init; }
 
+    public Func<string, string?, Task<bool>> ConfirmAsync { get; init; } =
+        static (_, _) => Task.FromResult(true);
+
     public Task<bool> ExecuteApiAsync(
         Func<Task> action,
         Action<string>? setStatusMessage = null,

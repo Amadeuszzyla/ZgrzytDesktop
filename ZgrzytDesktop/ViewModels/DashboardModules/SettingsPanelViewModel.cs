@@ -12,6 +12,8 @@ using ZgrzytDesktop.Models;
 
 using ZgrzytDesktop.Resources;
 
+using ZgrzytDesktop.Security;
+
 using ZgrzytDesktop.Services;
 
 using ZgrzytDesktop.Services.Interfaces;
@@ -38,6 +40,8 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
     private readonly Func<Task> _refreshAuditWhenOnSettingsPage;
 
+    private readonly Action<bool, int>? _applyAutoLogoutSettings;
+
 
 
     private string _settingsStatusMessage = AppStrings.Get("Settings_StatusReady");
@@ -54,7 +58,9 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
         DashboardVmBridge bridge,
 
-        Func<Task> refreshAuditWhenOnSettingsPage)
+        Func<Task> refreshAuditWhenOnSettingsPage,
+
+        Action<bool, int>? applyAutoLogoutSettings = null)
 
     {
 
@@ -65,6 +71,8 @@ public sealed class SettingsPanelViewModel : ViewModelBase
         _bridge = bridge;
 
         _refreshAuditWhenOnSettingsPage = refreshAuditWhenOnSettingsPage;
+
+        _applyAutoLogoutSettings = applyAutoLogoutSettings;
 
 
 
@@ -160,6 +168,12 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
         SettingsService.ApplyThemeMode(LightThemeMode);
 
+        _applyAutoLogoutSettings?.Invoke(
+
+            appSettings.AutoLogoutEnabled,
+
+            SessionInactivityMonitor.NormalizeTimeout(appSettings.AutoLogoutTimeoutMinutes));
+
     }
 
 
@@ -214,7 +228,13 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
                     ThemeMode = LightThemeMode,
 
-                    UiCulture = SettingsService.NormalizeUiCulture(SelectedUiCulture)
+                    UiCulture = SettingsService.NormalizeUiCulture(SelectedUiCulture),
+
+                    AutoLogoutEnabled = existing.AutoLogoutEnabled,
+
+                    AutoLogoutTimeoutMinutes = SessionInactivityMonitor.NormalizeTimeout(
+
+                        existing.AutoLogoutTimeoutMinutes)
 
                 };
 
@@ -239,9 +259,13 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
 
                 await _bridge.LogAuditAsync(
+
                     "SettingsSaved",
+
                     null,
+
                     "Audit_Desc_SettingsSaved",
+
                     null);
 
 
@@ -311,4 +335,5 @@ public sealed class SettingsPanelViewModel : ViewModelBase
     }
 
 }
+
 

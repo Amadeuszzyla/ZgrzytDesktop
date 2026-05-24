@@ -68,6 +68,10 @@ public sealed partial class TicketsPanelViewModel : ViewModelBase
 
     public ObservableCollection<TicketFilterOption> FilterPriorityOptions { get; } = new();
 
+    public ObservableCollection<TicketFilterOption> FilterAssignmentOptions { get; } = new();
+
+    public ObservableCollection<TicketCategoryFilterOption> FilterCategoryOptions { get; } = new();
+
     public ObservableCollection<TicketSortFieldOption> TicketSortFields { get; } = new();
 
     public ObservableCollection<TicketSortDirectionOption> TicketSortDirections { get; } = new();
@@ -146,7 +150,9 @@ public sealed partial class TicketsPanelViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(AutoRefreshStatusText));
         OnPropertyChanged(nameof(StatusMessage));
+        OnPropertyChanged(nameof(LblFilterCategory));
         RefreshFilterCollections();
+        RefreshFilterCategoryOptions();
         RefreshCategoryOptions();
         RefreshTicketDisplayLabels();
         OnPropertyChanged(nameof(TicketSortFields));

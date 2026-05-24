@@ -72,6 +72,18 @@ public static class PriorityDisplayHelper
             : TicketPriorities.Low;
     }
 
+    public static bool IsKnownDisplayPriority(string? displayOrApiPriority)
+    {
+        if (string.IsNullOrWhiteSpace(displayOrApiPriority))
+            return false;
+
+        var trimmed = displayOrApiPriority.Trim();
+        if (ApiToResourceKey.ContainsKey(NormalizeApiPriority(trimmed)))
+            return true;
+
+        return TryResolveApiFromDisplayLabel(trimmed, out _);
+    }
+
     public static string GetPriorityBadgeClasses(string? apiOrDisplayPriority)
     {
         var apiPriority = NormalizeApiPriority(apiOrDisplayPriority);

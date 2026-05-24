@@ -46,6 +46,8 @@ public partial class DashboardViewModel : ViewModelBase
 
     private readonly Func<Task> _onLogoutRequested;
 
+    private readonly Action<bool, int>? _onAutoLogoutSettingsChanged;
+
     private DispatcherTimer? _ticketPollingTimer;
 
     private bool _pollingTimersInitialized;
@@ -74,7 +76,9 @@ public partial class DashboardViewModel : ViewModelBase
 
         IUserAdminService userAdminService,
 
-        Func<Task> onLogoutRequested)
+        Func<Task> onLogoutRequested,
+
+        Action<bool, int>? onAutoLogoutSettingsChanged = null)
 
         : this(
 
@@ -94,7 +98,9 @@ public partial class DashboardViewModel : ViewModelBase
 
             onLogoutRequested,
 
-            BootstrapOptions.Production)
+            BootstrapOptions.Production,
+
+            onAutoLogoutSettingsChanged)
 
     {
 
@@ -120,7 +126,9 @@ public partial class DashboardViewModel : ViewModelBase
 
         Func<Task> onLogoutRequested,
 
-        BootstrapOptions bootstrap)
+        BootstrapOptions bootstrap,
+
+        Action<bool, int>? onAutoLogoutSettingsChanged = null)
 
     {
 
@@ -139,6 +147,8 @@ public partial class DashboardViewModel : ViewModelBase
         _userAdminService = userAdminService;
 
         _onLogoutRequested = onLogoutRequested;
+
+        _onAutoLogoutSettingsChanged = onAutoLogoutSettingsChanged;
 
 
 

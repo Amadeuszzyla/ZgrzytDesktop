@@ -64,6 +64,7 @@
   <data name="Admin_Filter_Active" xml:space="preserve"><value>Aktywni</value></data>
   <data name="Admin_Filter_Inactive" xml:space="preserve"><value>Nieaktywni</value></data>
   <data name="Admin_Filter_Banned" xml:space="preserve"><value>Zbanowani</value></data>
+  <data name="Admin_SearchPlaceholder" xml:space="preserve"><value>Szukaj po nazwie, loginie lub e-mailu...</value></data>
   <data name="Admin_UserLoginLine" xml:space="preserve"><value>Login: {0}</value></data>
   <data name="Admin_UserEmailLine" xml:space="preserve"><value>E-mail: {0}</value></data>
   <data name="Admin_UserRoleLine" xml:space="preserve"><value>Rola: {0}</value></data>
@@ -153,6 +154,14 @@
   <data name="Details_ManageTitle" xml:space="preserve"><value>Zarządzanie zgłoszeniem</value></data>
   <data name="Details_SaveChanges" xml:space="preserve"><value>Zapisz zmiany</value></data>
   <data name="Details_AssignToMe" xml:space="preserve"><value>Przypisz do mnie</value></data>
+  <data name="Ticket_AssignTo" xml:space="preserve"><value>Przypisz do</value></data>
+  <data name="Ticket_AssignToMe" xml:space="preserve"><value>Przypisz do mnie</value></data>
+  <data name="Ticket_SaveAssignment" xml:space="preserve"><value>Zapisz przypisanie</value></data>
+  <data name="Ticket_AssignmentSaved" xml:space="preserve"><value>Przypisanie zapisane.</value></data>
+  <data name="Ticket_AssignmentFailed" xml:space="preserve"><value>Nie udało się zapisać przypisania.</value></data>
+  <data name="Ticket_Unassigned" xml:space="preserve"><value>Nieprzypisane</value></data>
+  <data name="Ticket_AssignableUsersLoadFailed" xml:space="preserve"><value>Nie udało się pobrać listy pracowników.</value></data>
+  <data name="Ticket_NoAssignableUsers" xml:space="preserve"><value>Brak dostępnych pracowników do przypisania.</value></data>
   <data name="Details_CloseTicket" xml:space="preserve"><value>Zamknij zgłoszenie</value></data>
   <data name="Details_DeleteTicket" xml:space="preserve"><value>Usuń zgłoszenie</value></data>
   <data name="Details_LocalAuditTitle" xml:space="preserve"><value>Historia lokalnych zmian</value></data>
@@ -227,6 +236,15 @@
   <data name="Filter_Inactive" xml:space="preserve"><value>Nieaktywni</value></data>
   <data name="Tickets_Filter_StatusAll" xml:space="preserve"><value>Wszystkie statusy</value></data>
   <data name="Tickets_Filter_PriorityAll" xml:space="preserve"><value>Wszystkie priorytety</value></data>
+  <data name="Tickets_Filter_AssignmentAll" xml:space="preserve"><value>Wszystkie przypisania</value></data>
+  <data name="Tickets_Filter_Assigned" xml:space="preserve"><value>Przypisane</value></data>
+  <data name="Tickets_Filter_Unassigned" xml:space="preserve"><value>Nieprzypisane</value></data>
+  <data name="Tickets_Filter_AssignedToMe" xml:space="preserve"><value>Przypisane do mnie</value></data>
+  <data name="Tickets_FilterCategory" xml:space="preserve"><value>Kategoria</value></data>
+  <data name="Tickets_CategoryAll" xml:space="preserve"><value>Wszystkie</value></data>
+  <data name="Tickets_CategorySoftware" xml:space="preserve"><value>Software</value></data>
+  <data name="Tickets_CategoryNetwork" xml:space="preserve"><value>Sieć</value></data>
+  <data name="Tickets_CategoryHardware" xml:space="preserve"><value>Hardware</value></data>
   <data name="Category_Hardware" xml:space="preserve"><value>Sprzęt / Hardware</value></data>
   <data name="Category_Software" xml:space="preserve"><value>Oprogramowanie / Software</value></data>
   <data name="Category_Network" xml:space="preserve"><value>Sieć</value></data>
@@ -351,6 +369,7 @@
   <data name="Audit_Ticket" xml:space="preserve"><value>Zgłoszenie #{0}</value></data>
   <data name="Admin_StatusCount" xml:space="preserve"><value>Znaleziono: {0} użytkowników — {1}</value></data>
   <data name="Admin_ListForbidden" xml:space="preserve"><value>Brak uprawnień do wyświetlenia tej listy użytkowników.</value></data>
+  <data name="Admin_UsersLoadServerError" xml:space="preserve"><value>Serwer API zwrócił błąd podczas pobierania użytkowników.</value></data>
   <data name="Admin_BannedListNotSupported" xml:space="preserve"><value>Backend nie udostępnia listy zbanowanych użytkowników.</value></data>
   <data name="Admin_ActionNotSupported" xml:space="preserve"><value>Backend nie obsługuje tej akcji dla wybranego użytkownika.</value></data>
   <data name="Admin_StatusActive" xml:space="preserve"><value>Aktywny</value></data>
@@ -370,6 +389,8 @@
   <data name="Toast_TicketClosed" xml:space="preserve"><value>Zgłoszenie zostało zamknięte.</value></data>
   <data name="Toast_TicketDeleted" xml:space="preserve"><value>Zgłoszenie zostało usunięte.</value></data>
   <data name="Toast_TicketAssigned" xml:space="preserve"><value>Zgłoszenie zostało przypisane do Ciebie.</value></data>
+  <data name="Toast_TicketAssignmentSaved" xml:space="preserve"><value>Przypisanie zapisane.</value></data>
+  <data name="Toast_TicketAssignmentFailed" xml:space="preserve"><value>Nie udało się zapisać przypisania.</value></data>
   <data name="Toast_TicketAssignOffline" xml:space="preserve"><value>Brak połączenia z API. Zgłoszenie nie zostało przypisane.</value></data>
   <data name="Toast_MessageSent" xml:space="preserve"><value>Wiadomość została wysłana.</value></data>
   <data name="Toast_MessageSendOffline" xml:space="preserve"><value>Brak połączenia z API. Wiadomość nie została wysłana.</value></data>
@@ -382,4 +403,26 @@
   <data name="Toast_DetailsAssignOffline" xml:space="preserve"><value>Nie można przypisać zgłoszenia w trybie offline.</value></data>
   <data name="Toast_DetailsMessageOffline" xml:space="preserve"><value>Nie można wysłać wiadomości w trybie offline.</value></data>
   <data name="RequestAccount_ValidationEmail" xml:space="preserve"><value>Podaj adres e-mail.</value></data>
+  <data name="Security_SessionExpiredInactivity" xml:space="preserve"><value>Sesja wygasła z powodu bezczynności.</value></data>
+  <data name="Security_ApiUrlMustBeHttps" xml:space="preserve"><value>Adres API musi używać HTTPS.</value></data>
+  <data name="Settings_AutoLogout" xml:space="preserve"><value>Automatyczne wylogowanie po bezczynności</value></data>
+  <data name="Settings_AutoLogoutTimeout" xml:space="preserve"><value>Czas bezczynności (minuty)</value></data>
+  <data name="Settings_ResetApiUrl" xml:space="preserve"><value>Przywróć domyślny adres API</value></data>
+  <data name="Settings_ApiUrlResetDone" xml:space="preserve"><value>Przywrócono domyślny adres API produkcyjnego.</value></data>
+  <data name="Toast_ApiUrlReset" xml:space="preserve"><value>Adres API został zresetowany do domyślnego.</value></data>
+  <data name="Confirm_Title" xml:space="preserve"><value>Potwierdzenie</value></data>
+  <data name="Confirm_Yes" xml:space="preserve"><value>Tak</value></data>
+  <data name="Confirm_No" xml:space="preserve"><value>Anuluj</value></data>
+  <data name="Confirm_BanUser" xml:space="preserve"><value>Czy na pewno zablokować tego użytkownika?</value></data>
+  <data name="Confirm_UnbanUser" xml:space="preserve"><value>Czy na pewno odblokować tego użytkownika?</value></data>
+  <data name="Confirm_ActivateUser" xml:space="preserve"><value>Czy na pewno aktywować tego użytkownika?</value></data>
+  <data name="Confirm_DeleteTicket" xml:space="preserve"><value>Czy na pewno usunąć to zgłoszenie?</value></data>
+  <data name="Confirm_CloseTicket" xml:space="preserve"><value>Czy na pewno zamknąć to zgłoszenie?</value></data>
+  <data name="Confirm_AssignmentChange" xml:space="preserve"><value>Czy na pewno zmienić przypisanie zgłoszenia?</value></data>
+  <data name="Validation_InvalidEmail" xml:space="preserve"><value>Podaj poprawny adres e-mail.</value></data>
+  <data name="Validation_TicketTitleTooLong" xml:space="preserve"><value>Tytuł zgłoszenia jest zbyt długi.</value></data>
+  <data name="Validation_TicketDescriptionTooLong" xml:space="preserve"><value>Opis zgłoszenia jest zbyt długi.</value></data>
+  <data name="Validation_MessageBodyTooLong" xml:space="preserve"><value>Treść wiadomości jest zbyt długa.</value></data>
+  <data name="Validation_InvalidStatus" xml:space="preserve"><value>Wybierz prawidłowy status zgłoszenia.</value></data>
+  <data name="Validation_InvalidPriority" xml:space="preserve"><value>Wybierz prawidłowy priorytet zgłoszenia.</value></data>
 </root>

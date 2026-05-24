@@ -1,4 +1,5 @@
 using System;
+using System.Net.Mail;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 
@@ -23,6 +24,9 @@ public static class RegisterUserValidator
         if (string.IsNullOrWhiteSpace(email))
             return AppStrings.Get("RequestAccount_ValidationEmail");
 
+        if (!IsValidEmail(email))
+            return AppStrings.Get("Validation_InvalidEmail");
+
         if (string.IsNullOrWhiteSpace(password))
             return AppStrings.Get("RequestAccount_ValidationPassword");
 
@@ -36,6 +40,20 @@ public static class RegisterUserValidator
             return AppStrings.Get("RegisterUser_ValidationRole");
 
         return null;
+    }
+
+    private static bool IsValidEmail(string email)
+    {
+        try
+        {
+            var trimmed = email.Trim();
+            var address = new MailAddress(trimmed);
+            return address.Address.Equals(trimmed, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public static RegisterUserRequest BuildRequest(

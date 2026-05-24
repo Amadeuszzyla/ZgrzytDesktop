@@ -23,6 +23,7 @@ public partial class DashboardViewModel
                 NotifyTicketsLoadingChanged = () => StatisticsPanel.NotifyTicketsLoadingChanged(),
                 NotifyOnlineActionsChanged = NotifyOnlineActionsChanged,
                 GetApiErrorMessage = GetApiErrorMessage,
+                GetCurrentUserId = () => CurrentUser.Id,
                 TicketSelected = ticketId => _ = LoadTicketDetailsAndOpenAsync(ticketId),
                 RefreshPaginationSideEffects = () => TicketDetailsPanel.NotifyCapabilityProperties(),
                 LogAuditAsync = LogAuditAsync,

@@ -7,4 +7,8 @@ public class AppSettings
     public string ThemeMode { get; set; } = "Light";
 
     public string UiCulture { get; set; } = "pl";
+
+    public bool AutoLogoutEnabled { get; set; } = true;
+
+    public int AutoLogoutTimeoutMinutes { get; set; } = 30;
 }

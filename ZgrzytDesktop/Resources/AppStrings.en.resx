@@ -64,6 +64,7 @@
   <data name="Admin_Filter_Active" xml:space="preserve"><value>Active</value></data>
   <data name="Admin_Filter_Inactive" xml:space="preserve"><value>Inactive</value></data>
   <data name="Admin_Filter_Banned" xml:space="preserve"><value>Banned</value></data>
+  <data name="Admin_SearchPlaceholder" xml:space="preserve"><value>Search by name, login, or email...</value></data>
   <data name="Admin_UserLoginLine" xml:space="preserve"><value>Login: {0}</value></data>
   <data name="Admin_UserEmailLine" xml:space="preserve"><value>Email: {0}</value></data>
   <data name="Admin_UserRoleLine" xml:space="preserve"><value>Role: {0}</value></data>
@@ -153,6 +154,14 @@
   <data name="Details_ManageTitle" xml:space="preserve"><value>Ticket management</value></data>
   <data name="Details_SaveChanges" xml:space="preserve"><value>Save changes</value></data>
   <data name="Details_AssignToMe" xml:space="preserve"><value>Assign to me</value></data>
+  <data name="Ticket_AssignTo" xml:space="preserve"><value>Assign to</value></data>
+  <data name="Ticket_AssignToMe" xml:space="preserve"><value>Assign to me</value></data>
+  <data name="Ticket_SaveAssignment" xml:space="preserve"><value>Save assignment</value></data>
+  <data name="Ticket_AssignmentSaved" xml:space="preserve"><value>Assignment saved.</value></data>
+  <data name="Ticket_AssignmentFailed" xml:space="preserve"><value>Could not save assignment.</value></data>
+  <data name="Ticket_Unassigned" xml:space="preserve"><value>Unassigned</value></data>
+  <data name="Ticket_AssignableUsersLoadFailed" xml:space="preserve"><value>Could not load staff users.</value></data>
+  <data name="Ticket_NoAssignableUsers" xml:space="preserve"><value>No staff users available for assignment.</value></data>
   <data name="Details_CloseTicket" xml:space="preserve"><value>Close ticket</value></data>
   <data name="Details_DeleteTicket" xml:space="preserve"><value>Delete ticket</value></data>
   <data name="Details_LocalAuditTitle" xml:space="preserve"><value>Local change history</value></data>
@@ -227,6 +236,15 @@
   <data name="Filter_Inactive" xml:space="preserve"><value>Inactive</value></data>
   <data name="Tickets_Filter_StatusAll" xml:space="preserve"><value>All statuses</value></data>
   <data name="Tickets_Filter_PriorityAll" xml:space="preserve"><value>All priorities</value></data>
+  <data name="Tickets_Filter_AssignmentAll" xml:space="preserve"><value>All assignments</value></data>
+  <data name="Tickets_Filter_Assigned" xml:space="preserve"><value>Assigned</value></data>
+  <data name="Tickets_Filter_Unassigned" xml:space="preserve"><value>Unassigned</value></data>
+  <data name="Tickets_Filter_AssignedToMe" xml:space="preserve"><value>Assigned to me</value></data>
+  <data name="Tickets_FilterCategory" xml:space="preserve"><value>Category</value></data>
+  <data name="Tickets_CategoryAll" xml:space="preserve"><value>All</value></data>
+  <data name="Tickets_CategorySoftware" xml:space="preserve"><value>Software</value></data>
+  <data name="Tickets_CategoryNetwork" xml:space="preserve"><value>Network</value></data>
+  <data name="Tickets_CategoryHardware" xml:space="preserve"><value>Hardware</value></data>
   <data name="Category_Hardware" xml:space="preserve"><value>Hardware</value></data>
   <data name="Category_Software" xml:space="preserve"><value>Software</value></data>
   <data name="Category_Network" xml:space="preserve"><value>Network</value></data>
@@ -351,6 +369,7 @@
   <data name="Audit_Ticket" xml:space="preserve"><value>Ticket #{0}</value></data>
   <data name="Admin_StatusCount" xml:space="preserve"><value>Found: {0} users — {1}</value></data>
   <data name="Admin_ListForbidden" xml:space="preserve"><value>You do not have permission to view this user list.</value></data>
+  <data name="Admin_UsersLoadServerError" xml:space="preserve"><value>The API server returned an error while loading users.</value></data>
   <data name="Admin_BannedListNotSupported" xml:space="preserve"><value>The backend does not expose a banned users list.</value></data>
   <data name="Admin_ActionNotSupported" xml:space="preserve"><value>The backend does not support this action for the selected user.</value></data>
   <data name="Admin_StatusActive" xml:space="preserve"><value>Active</value></data>
@@ -370,6 +389,8 @@
   <data name="Toast_TicketClosed" xml:space="preserve"><value>Ticket closed.</value></data>
   <data name="Toast_TicketDeleted" xml:space="preserve"><value>Ticket deleted.</value></data>
   <data name="Toast_TicketAssigned" xml:space="preserve"><value>Ticket assigned to you.</value></data>
+  <data name="Toast_TicketAssignmentSaved" xml:space="preserve"><value>Assignment saved.</value></data>
+  <data name="Toast_TicketAssignmentFailed" xml:space="preserve"><value>Could not save assignment.</value></data>
   <data name="Toast_TicketAssignOffline" xml:space="preserve"><value>Cannot reach API. Ticket was not assigned.</value></data>
   <data name="Toast_MessageSent" xml:space="preserve"><value>Message sent.</value></data>
   <data name="Toast_MessageSendOffline" xml:space="preserve"><value>Cannot reach API. Message was not sent.</value></data>
@@ -382,4 +403,26 @@
   <data name="Toast_DetailsAssignOffline" xml:space="preserve"><value>Cannot assign ticket while offline.</value></data>
   <data name="Toast_DetailsMessageOffline" xml:space="preserve"><value>Cannot send messages while offline.</value></data>
   <data name="RequestAccount_ValidationEmail" xml:space="preserve"><value>Enter email address.</value></data>
+  <data name="Security_SessionExpiredInactivity" xml:space="preserve"><value>Session expired due to inactivity.</value></data>
+  <data name="Security_ApiUrlMustBeHttps" xml:space="preserve"><value>The API URL must use HTTPS.</value></data>
+  <data name="Settings_AutoLogout" xml:space="preserve"><value>Auto logout after inactivity</value></data>
+  <data name="Settings_AutoLogoutTimeout" xml:space="preserve"><value>Inactivity timeout (minutes)</value></data>
+  <data name="Settings_ResetApiUrl" xml:space="preserve"><value>Reset API URL to default</value></data>
+  <data name="Settings_ApiUrlResetDone" xml:space="preserve"><value>Production API URL has been restored to the default.</value></data>
+  <data name="Toast_ApiUrlReset" xml:space="preserve"><value>API URL has been reset to the default.</value></data>
+  <data name="Confirm_Title" xml:space="preserve"><value>Confirmation</value></data>
+  <data name="Confirm_Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Confirm_No" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Confirm_BanUser" xml:space="preserve"><value>Are you sure you want to ban this user?</value></data>
+  <data name="Confirm_UnbanUser" xml:space="preserve"><value>Are you sure you want to unban this user?</value></data>
+  <data name="Confirm_ActivateUser" xml:space="preserve"><value>Are you sure you want to activate this user?</value></data>
+  <data name="Confirm_DeleteTicket" xml:space="preserve"><value>Are you sure you want to delete this ticket?</value></data>
+  <data name="Confirm_CloseTicket" xml:space="preserve"><value>Are you sure you want to close this ticket?</value></data>
+  <data name="Confirm_AssignmentChange" xml:space="preserve"><value>Are you sure you want to change the ticket assignment?</value></data>
+  <data name="Validation_InvalidEmail" xml:space="preserve"><value>Enter a valid email address.</value></data>
+  <data name="Validation_TicketTitleTooLong" xml:space="preserve"><value>Ticket title is too long.</value></data>
+  <data name="Validation_TicketDescriptionTooLong" xml:space="preserve"><value>Ticket description is too long.</value></data>
+  <data name="Validation_MessageBodyTooLong" xml:space="preserve"><value>Message body is too long.</value></data>
+  <data name="Validation_InvalidStatus" xml:space="preserve"><value>Select a valid ticket status.</value></data>
+  <data name="Validation_InvalidPriority" xml:space="preserve"><value>Select a valid ticket priority.</value></data>
 </root>

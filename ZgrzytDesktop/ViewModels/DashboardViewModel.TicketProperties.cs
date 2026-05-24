@@ -23,9 +23,7 @@ public partial class DashboardViewModel
         set => SetProperty(ref _pollingStatusMessage, value);
     }
 
-    public bool CanManageTickets =>
-        string.Equals(CurrentUser.Role, AppRoles.Admin, StringComparison.OrdinalIgnoreCase) ||
-        string.Equals(CurrentUser.Role, AppRoles.It, StringComparison.OrdinalIgnoreCase);
+    public bool CanManageTickets => AppRoleHelper.IsDesktopStaff(CurrentUser.Role);
 
     public bool IsRegularUser =>
         string.Equals(CurrentUser.Role, AppRoles.User, StringComparison.OrdinalIgnoreCase);

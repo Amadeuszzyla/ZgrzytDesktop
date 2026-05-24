@@ -70,6 +70,18 @@ public static class StatusDisplayHelper
         return TicketStatuses.Nowe;
     }
 
+    public static bool IsKnownDisplayStatus(string? displayOrApiStatus)
+    {
+        if (string.IsNullOrWhiteSpace(displayOrApiStatus))
+            return false;
+
+        var trimmed = displayOrApiStatus.Trim();
+        if (ApiToResourceKey.ContainsKey(NormalizeApiStatus(trimmed)))
+            return true;
+
+        return TryResolveApiFromDisplayLabel(trimmed, out _);
+    }
+
     public static string GetStatusBadgeClasses(string? apiOrDisplayStatus)
     {
         var apiStatus = NormalizeApiStatus(apiOrDisplayStatus);

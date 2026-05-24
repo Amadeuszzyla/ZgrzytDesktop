@@ -39,8 +39,15 @@ public sealed partial class TicketDetailsPanelViewModel
         OnPropertyChanged(nameof(CanSendMessage));
         OnPropertyChanged(nameof(CanEditTicket));
         OnPropertyChanged(nameof(CanAssignTicket));
+        OnPropertyChanged(nameof(CanSelectAssignee));
+        OnPropertyChanged(nameof(CanShowAdminAssignmentControls));
+        OnPropertyChanged(nameof(CanAssignSelectedUser));
+        OnPropertyChanged(nameof(CanClearAssignment));
+        OnPropertyChanged(nameof(HasNoAssignableStaff));
+        OnPropertyChanged(nameof(ShowAssignableUsersEmptyMessage));
         OnPropertyChanged(nameof(CanCloseOwnTicket));
         OnPropertyChanged(nameof(CanCloseTicket));
         OnPropertyChanged(nameof(CanDeleteTicket));
+        AssignSelectedUserCommand.NotifyCanExecuteChanged();
     }
 }

@@ -76,6 +76,8 @@ public class LocalAuditLogService : ILocalAuditLogService
 
         {
 
+            entry = SanitizeEntry(entry);
+
             var entries = await LoadAsync();
 
             entries.Add(entry);
@@ -181,6 +183,20 @@ public class LocalAuditLogService : ILocalAuditLogService
     }
 
 
+
+    private static AuditLogEntry SanitizeEntry(AuditLogEntry entry) =>
+        new()
+        {
+            Timestamp = entry.Timestamp,
+            Action = SensitiveDataMasker.Mask(entry.Action),
+            UserLogin = SensitiveDataMasker.Mask(entry.UserLogin),
+            TicketId = entry.TicketId,
+            DetailsKey = entry.DetailsKey,
+            ParametersJson = entry.ParametersJson is null
+                ? null
+                : SensitiveDataMasker.Mask(entry.ParametersJson),
+            Description = SensitiveDataMasker.Mask(entry.Description)
+        };
 
     private async Task SaveAsync(List<AuditLogEntry> entries)
 

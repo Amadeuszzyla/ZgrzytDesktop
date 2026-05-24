@@ -14,6 +14,7 @@ public partial class DashboardViewModel
     public string LblTicketsFiltersTitle => AppStrings.Get("Tickets_FiltersTitle");
     public string LblTicketsFiltersSubtitle => AppStrings.Get("Tickets_FiltersSubtitle");
     public string LblTicketsSearchPlaceholder => AppStrings.Get("Tickets_SearchPlaceholder");
+    public string LblTicketsFilterCategory => AppStrings.Get("Tickets_FilterCategory");
     public string LblTicketsSearch => AppStrings.Get("Tickets_Search");
     public string LblTicketsClear => AppStrings.Get("Tickets_Clear");
     public string LblTicketsRefreshNow => AppStrings.Get("Tickets_RefreshNow");

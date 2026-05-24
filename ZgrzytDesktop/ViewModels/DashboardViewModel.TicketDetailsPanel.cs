@@ -11,6 +11,7 @@ public partial class DashboardViewModel
     {
         TicketDetailsPanel = new TicketDetailsPanelViewModel(
             _ticketService,
+            _userAdminService,
             _auditLogService,
             new TicketDetailsPanelCallbacks
             {
@@ -24,18 +25,32 @@ public partial class DashboardViewModel
                 NotifyDetailsLoadingChanged = () => TicketDetailsPanel.NotifyCapabilityProperties(),
                 GetCurrentUser = () => CurrentUser,
                 GetCanManageTickets = () => CanManageTickets,
+                GetIsAdminRole = () => IsAdminRole,
                 GetIsRegularUser = () => IsRegularUser,
                 LogAuditAsync = LogAuditAsync,
                 RefreshTicketsAsync = async () => await LoadTicketsAsync(),
                 NavigateToTickets = () => CurrentSection = AppSections.Tickets,
                 ClearSelectedTicket = () => TicketsPanel.SelectedTicket = null,
-                ExecuteApiAsyncCore = ExecuteApiAsync
+                ExecuteApiAsyncCore = ExecuteApiAsync,
+                ConfirmAsync = ConfirmRiskyActionAsync
             });
 
         TicketDetailsPanel.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(TicketDetailsPanelViewModel.TicketDetails))
-                OnPropertyChanged(nameof(CanOpenDetailsPage));
+            switch (e.PropertyName)
+            {
+                case nameof(TicketDetailsPanelViewModel.TicketDetails):
+                    OnPropertyChanged(nameof(CanOpenDetailsPage));
+                    break;
+                case nameof(TicketDetailsPanelViewModel.CanAssignSelectedUser):
+                case nameof(TicketDetailsPanelViewModel.CanSelectAssignee):
+                case nameof(TicketDetailsPanelViewModel.CanShowAdminAssignmentControls):
+                case nameof(TicketDetailsPanelViewModel.ShowAssignableUsersEmptyMessage):
+                case nameof(TicketDetailsPanelViewModel.SelectedAssignableUser):
+                case nameof(TicketDetailsPanelViewModel.SelectedAssignedUser):
+                    OnPropertyChanged($"TicketDetailsPanel.{e.PropertyName}");
+                    break;
+            }
         };
     }
 }

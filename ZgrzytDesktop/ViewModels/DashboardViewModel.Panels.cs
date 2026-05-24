@@ -104,7 +104,8 @@ public partial class DashboardViewModel
             _settingsService,
             _authService,
             bridge,
-            () => AuditPanel.RefreshAsync());
+            () => AuditPanel.RefreshAsync(),
+            _onAutoLogoutSettingsChanged);
         StatisticsPanel = new StatisticsPanelViewModel(
             _ticketService,
             bridge,

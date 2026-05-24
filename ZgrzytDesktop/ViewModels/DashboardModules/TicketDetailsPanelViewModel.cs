@@ -12,6 +12,7 @@ namespace ZgrzytDesktop.ViewModels.DashboardModules;
 public sealed partial class TicketDetailsPanelViewModel : ViewModelBase
 {
     private readonly ITicketService _ticketService;
+    private readonly IUserAdminService _userAdminService;
     private readonly ILocalAuditLogService _auditLogService;
     private readonly TicketDetailsPanelCallbacks _callbacks;
 
@@ -25,10 +26,12 @@ public sealed partial class TicketDetailsPanelViewModel : ViewModelBase
 
     public TicketDetailsPanelViewModel(
         ITicketService ticketService,
+        IUserAdminService userAdminService,
         ILocalAuditLogService auditLogService,
         TicketDetailsPanelCallbacks callbacks)
     {
         _ticketService = ticketService;
+        _userAdminService = userAdminService;
         _auditLogService = auditLogService;
         _callbacks = callbacks;
 
@@ -37,6 +40,7 @@ public sealed partial class TicketDetailsPanelViewModel : ViewModelBase
         AssignToMeCommand = new AsyncRelayCommand(AssignToMeAsync);
         CloseTicketCommand = new AsyncRelayCommand(CloseTicketAsync);
         DeleteTicketCommand = new AsyncRelayCommand(DeleteTicketAsync);
+        InitializeAssignmentCommands();
     }
 
     public ObservableCollection<Message> Messages { get; } = new();
@@ -122,6 +126,7 @@ public sealed partial class TicketDetailsPanelViewModel : ViewModelBase
         }
 
         RefreshTicketAuditDisplayBindings();
+        RefreshAssignmentLocalization();
     }
 
     private void RefreshTicketDetailsDisplayBindings()

@@ -16,16 +16,27 @@ public static class TicketQueueListProcessor
         string.Equals(sortBy, TicketSortHelper.DefaultField.SortBy, StringComparison.OrdinalIgnoreCase)
         && string.Equals(sortDirection, TicketSortHelper.DefaultDirection.Direction, StringComparison.OrdinalIgnoreCase);
 
-    public static bool RequiresLocalProcessing(string? status, string? priority, string sortBy, string sortDirection) =>
+    public static bool RequiresLocalProcessing(
+        string? status,
+        string? priority,
+        string? assignmentFilter,
+        string? categoryFilter,
+        string sortBy,
+        string sortDirection) =>
         !string.IsNullOrWhiteSpace(status)
         || !string.IsNullOrWhiteSpace(priority)
+        || !TicketAssignmentFilterKeys.IsAll(assignmentFilter)
+        || !TicketCategoryFilterKeys.IsAll(categoryFilter)
         || !IsDefaultSort(sortBy, sortDirection);
 
     public static List<Ticket> Filter(
         IReadOnlyList<Ticket> tickets,
         string? status,
         string? priority,
-        string? search)
+        string? search,
+        string? categoryFilter = null,
+        string? assignmentFilter = null,
+        int currentUserId = 0)
     {
         IEnumerable<Ticket> query = tickets;
 
@@ -45,9 +56,19 @@ public static class TicketQueueListProcessor
         {
             var term = search.Trim();
             query = query.Where(ticket =>
-                ticket.Title.Contains(term, StringComparison.OrdinalIgnoreCase)
-                || ticket.Description.Contains(term, StringComparison.OrdinalIgnoreCase)
+                (ticket.Title?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (ticket.Description?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
                 || ticket.Id.ToString().Contains(term, StringComparison.Ordinal));
+        }
+
+        if (!TicketCategoryFilterKeys.IsAll(categoryFilter))
+        {
+            query = query.Where(ticket => TicketCategoryFilter.Matches(ticket, categoryFilter));
+        }
+
+        if (!TicketAssignmentFilterKeys.IsAll(assignmentFilter))
+        {
+            query = query.Where(ticket => TicketAssignmentFilter.Matches(ticket, assignmentFilter, currentUserId));
         }
 
         return query.ToList();

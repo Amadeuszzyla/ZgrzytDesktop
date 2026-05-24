@@ -31,7 +31,10 @@ public sealed partial class TicketsPanelViewModel
                 priority: GetSelectedFilterValue(SelectedFilterPriority),
                 sortBy: SelectedTicketSortField?.SortBy ?? TicketSortHelper.DefaultField.SortBy,
                 sortDirection: SelectedTicketSortDirection?.Direction ?? TicketSortHelper.DefaultDirection.Direction,
-                queueView: GetSelectedTicketQueueView());
+                queueView: GetSelectedTicketQueueView(),
+                categoryFilter: SelectedCategoryFilterKey,
+                assignmentFilter: SelectedAssignmentFilterKey,
+                currentUserId: _callbacks.GetCurrentUserId());
 
             _callbacks.SetIsOffline(false);
 
@@ -108,11 +111,19 @@ public sealed partial class TicketsPanelViewModel
     public async Task LoadTicketsFromCacheAsync()
     {
         var cachedTickets = await _ticketCacheService.LoadTicketsAsync();
+        var filteredTickets = TicketQueueListProcessor.Filter(
+            cachedTickets,
+            GetSelectedFilterValue(SelectedFilterStatus),
+            GetSelectedFilterValue(SelectedFilterPriority),
+            search: string.IsNullOrWhiteSpace(SearchText) ? null : SearchText.Trim(),
+            SelectedCategoryFilterKey,
+            SelectedAssignmentFilterKey,
+            _callbacks.GetCurrentUserId());
 
         _allTickets.Clear();
-        _allTickets.AddRange(cachedTickets);
+        _allTickets.AddRange(filteredTickets);
 
-        TotalTickets = cachedTickets.Count;
+        TotalTickets = filteredTickets.Count;
         LastPage = Math.Max(1, (int)Math.Ceiling((double)TotalTickets / PageSize));
 
         if (CurrentPage > LastPage)
@@ -175,9 +186,18 @@ public sealed partial class TicketsPanelViewModel
 
     private void ApplyVisibleTickets()
     {
+        var filtered = TicketQueueListProcessor.Filter(
+            _allTickets,
+            GetSelectedFilterValue(SelectedFilterStatus),
+            GetSelectedFilterValue(SelectedFilterPriority),
+            search: null,
+            SelectedCategoryFilterKey,
+            SelectedAssignmentFilterKey,
+            _callbacks.GetCurrentUserId());
+
         Tickets.Clear();
 
-        foreach (var ticket in _allTickets)
+        foreach (var ticket in filtered)
             Tickets.Add(ticket);
 
         UpdatePageNumbers();
