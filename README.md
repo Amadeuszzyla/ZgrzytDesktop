@@ -112,6 +112,8 @@ dotnet test -c Release --filter "Category=Integration"
 
 Coverlet (`coverlet.collector` w projektach testowych), bez integracji live API. Szczegóły: [TEST_COVERAGE.md](TEST_COVERAGE.md).
 
+**CI (GitHub Actions):** workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) uploaduje artefakty **TestResults** (TRX) oraz **CoverageReports** (Cobertura XML) z katalogu `TestResults/`.
+
 ## Publikacja (Windows x64)
 
 **Rekomendacja:** cały folder `publish` w archiwum ZIP (self-contained), nie sam plik EXE.
@@ -128,6 +130,8 @@ Skrypt: `clean` → `restore` → `build` → `test` (bez integracji live) → `
 | SHA256 | `release/ZgrzytDesktop-win-x64-release.zip.sha256` |
 
 Katalog `release/` jest w `.gitignore` i **nie jest commitowany**.
+
+**CI (GitHub Actions):** ręczny workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) (`workflow_dispatch`) — restore, build, test (bez integracji live), publish `win-x64` self-contained, ZIP + SHA256; artefakty **ZgrzytDesktop-win-x64-release.zip** i **ZgrzytDesktop-win-x64-release.zip.sha256** do pobrania z runu workflow (bez automatycznego GitHub Release).
 
 Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt).
 

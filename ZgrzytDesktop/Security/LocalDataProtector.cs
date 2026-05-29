@@ -1,17 +1,28 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace ZgrzytDesktop.Security;
 
 public static class LocalDataProtector
 {
     private static readonly byte[] Entropy = Encoding.UTF8.GetBytes("ZgrzytDesktop.LocalData.v1");
+    private static readonly AsyncLocal<bool> SimulateProtectFailureScope = new();
+
+    internal static bool SimulateProtectFailureForTests
+    {
+        get => SimulateProtectFailureScope.Value;
+        set => SimulateProtectFailureScope.Value = value;
+    }
 
     public static string ProtectString(string plainText)
     {
         if (string.IsNullOrEmpty(plainText))
             return string.Empty;
+
+        if (SimulateProtectFailureForTests)
+            throw new LocalDataProtectionException("Simulated data protection failure for tests.");
 
         try
         {
@@ -23,9 +34,9 @@ public static class LocalDataProtector
 
             return Convert.ToBase64String(protectedBytes);
         }
-        catch
+        catch (Exception ex) when (ex is not LocalDataProtectionException)
         {
-            return string.Empty;
+            throw new LocalDataProtectionException("Failed to protect local data.", ex);
         }
     }
 

@@ -63,13 +63,16 @@ Instalacja globalna nie jest wymagana do samego zebrania coverage — wystarczy 
 
 ## CI
 
-Przykład (GitHub Actions):
+Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) uruchamia `dotnet test` z `--collect:"XPlat Code Coverage"` i zapisuje wyniki do katalogu **`TestResults/`** (gitignored).
 
-```yaml
-- run: dotnet test ZgrzytDesktop.sln -c Release --filter "Category!=Integration" --collect:"XPlat Code Coverage" --results-directory coverage/raw
-```
+| Artefakt GitHub Actions | Zawartość |
+|-------------------------|-----------|
+| **TestResults** | pliki `.trx` (`TestResults/**/*.trx`) |
+| **CoverageReports** | pliki Cobertura XML (`TestResults/**/coverage.cobertura.xml`) |
 
-Artefakt: `coverage/raw/**/coverage.cobertura.xml`.
+Testy `Category=Integration` są wykluczone filtrem `Category!=Integration`. ReportGenerator **nie** jest używany w CI — tylko surowe XML.
+
+Lokalnie skrypt [`scripts/test-coverage.ps1`](scripts/test-coverage.ps1) nadal zapisuje coverage do `coverage/raw/` (osobny katalog od CI).
 
 ## Powiązane dokumenty
 

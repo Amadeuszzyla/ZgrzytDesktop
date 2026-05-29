@@ -33,4 +33,27 @@ jobs:
         run: dotnet build ZgrzytDesktop.sln -c Release --no-restore
 
       - name: Test
-        run: dotnet test ZgrzytDesktop.sln -c Release --no-build --filter "Category!=Integration"
+        shell: pwsh
+        run: |
+          dotnet test ZgrzytDesktop.sln -c Release --no-build --filter "Category!=Integration" `
+            --logger "trx;LogFileName=test-results.trx" `
+            --results-directory TestResults `
+            --collect:"XPlat Code Coverage" `
+            -- `
+            DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+
+      - name: Upload test results (TRX)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: TestResults/**/*.trx
+          if-no-files-found: warn
+
+      - name: Upload coverage reports (Cobertura XML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoverageReports
+          path: TestResults/**/coverage.cobertura.xml
+          if-no-files-found: warn

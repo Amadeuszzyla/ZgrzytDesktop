@@ -69,11 +69,11 @@ Szczegóły: [README.md](README.md).
 - **Błędy bez stack trace** — zlokalizowane komunikaty (`ApiErrorSanitizer`, `LoginErrorMapper`)
 - **HTTPS dla API produkcyjnego** — domyślny URL `https://…`; `ApiUrlSecurityHelper` podnosi zdalne `http://` do HTTPS
 - **Wylogowanie** — usuwa token i cache sesji; nie usuwa preferencji języka z ustawień
+- **Auto-wylogowanie po bezczynności** — `SessionInactivityMonitor` w `MainWindowViewModel` śledzi aktywność użytkownika i po przekroczeniu limitu wywołuje `LogoutAsync` z komunikatem `Security_SessionExpiredInactivity`; włączenie/wyłączenie i timeout (15 / 30 / 60 min) przez `AppSettings.AutoLogoutEnabled` i `AppSettings.AutoLogoutTimeoutMinutes` w `Settings/settings.json` (domyślnie włączone, 30 min); zmiana ustawień jest stosowana przy starcie sesji dashboardu i po zapisie ustawień — panel **Ustawienia** w UI obecnie eksponuje język i odświeżenie sesji, bez osobnych kontrolek auto-wylogowania
 - **Wiadomości** — tylko odczyt i dodawanie; **bez** lokalnej edycji/usuwania
 
 ### Przyszłe rozszerzenia (poza obecnym zakresem)
 
-- Auto-wylogowanie po bezczynności
 - Edycja/usuwanie pojedynczych wiadomości (wymaga endpointów backendowych)
 - Pełny audyt serwerowy (`GET /api/logs` lub równoważny)
 - Rate limiting po stronie backendu

@@ -18,7 +18,8 @@ public sealed class UserConfirmationService : IUserConfirmationService
         var title = AppStrings.Get(titleResourceKey ?? "Confirm_Title");
 
         if (_owner is null)
-            return Task.FromResult(true);
+            // Fail closed: without a dialog owner we cannot show confirmation, so deny the action.
+            return Task.FromResult(false);
 
         return ConfirmDialog.ShowAsync(_owner, title, message);
     }

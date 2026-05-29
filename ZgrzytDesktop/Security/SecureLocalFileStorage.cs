@@ -8,8 +8,16 @@ public static class SecureLocalFileStorage
 {
     public static async Task WriteEncryptedAsync(string filePath, string plainText)
     {
+        if (string.IsNullOrEmpty(plainText))
+            throw new ArgumentException("Cannot encrypt empty plaintext.", nameof(plainText));
+
         AppDataPaths.EnsureDirectoryForFile(filePath);
+
         var protectedText = LocalDataProtector.ProtectString(plainText);
+
+        if (string.IsNullOrWhiteSpace(protectedText))
+            throw new LocalDataProtectionException("Data protection produced no output.");
+
         await File.WriteAllTextAsync(filePath, protectedText);
     }
 

@@ -85,13 +85,11 @@ public class TokenStorage : ITokenStorage
             try
             {
                 var protectedValue = LocalDataProtector.ProtectString(trimmed);
-
-                if (!string.IsNullOrWhiteSpace(protectedValue))
-                    File.WriteAllText(_filePath, protectedValue);
+                File.WriteAllText(_filePath, protectedValue);
             }
-            catch
+            catch (LocalDataProtectionException)
             {
-                // Migracja nie może zablokować logowania.
+                // Migracja nie może zablokować logowania ani nadpisać pliku pustą wartością.
             }
         }
 

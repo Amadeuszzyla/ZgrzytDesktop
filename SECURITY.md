@@ -79,10 +79,10 @@ Domyślny `dotnet test` w CI **pomija** testy `Category=Integration`, dopóki ni
 | Obszar | Zalecenie |
 |--------|-----------|
 | **HTTPS** | Produkcyjne API **musi** używać HTTPS. Domyślny URL w aplikacji wskazuje na endpoint HTTPS. |
-| **Podpisywanie aplikacji** | **Rekomendowane** dla wdrożeń organizacyjnych (Authenticode) — zmniejsza ryzyko fałszywych instalatorów. |
-| **Checksumy release** | **Rekomendowane** — publikuj SHA-256 archiwum ZIP obok paczki, aby użytkownicy mogli zweryfikować integralność pobranego pliku. |
+| **Podpisywanie aplikacji** | **Rekomendowane** dla wdrożeń organizacyjnych (Authenticode) — zmniejsza ryzyko fałszywych instalatorów. Workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) i [`scripts/publish-release.ps1`](scripts/publish-release.ps1) **nie podpisują** jeszcze `ZgrzytDesktop.exe` — Authenticode pozostaje **TODO** (komentarz w skrypcie/workflow). |
+| **Checksumy release** | **Rekomendowane** — publikuj SHA-256 archiwum ZIP obok paczki, aby użytkownicy mogli zweryfikować integralność pobranego pliku. Workflow release generuje plik `.sha256` jako artefakt GitHub Actions. |
 
-Skrypt publikacji: [`scripts/publish-release.ps1`](scripts/publish-release.ps1). Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt).
+Skrypt publikacji lokalnej: [`scripts/publish-release.ps1`](scripts/publish-release.ps1). Ręczny build w CI: [`.github/workflows/release.yml`](.github/workflows/release.yml). Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt).
 
 ## Powiązane dokumenty
 
