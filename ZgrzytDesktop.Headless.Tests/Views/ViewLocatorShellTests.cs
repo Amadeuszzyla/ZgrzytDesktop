@@ -12,9 +12,12 @@ using ZgrzytDesktop.Views;
 namespace ZgrzytDesktop.Headless.Tests.Views;
 
 [Collection(AvaloniaHeadlessCollection.Name)]
-public class ViewLocatorShellTests
+public class ViewLocatorShellTests : IDisposable
 {
     public ViewLocatorShellTests() => ViewModelTestSetup.EnsureAppStrings();
+
+    public void Dispose() =>
+        AvaloniaHeadlessTestHost.RunOnUiThread(HeadlessViewTestHelper.ResetSharedTestState);
 
     [Fact]
     public void ViewLocator_Build_ReturnsLoginView_ForLoginViewModel()

@@ -17,9 +17,12 @@ using ZgrzytDesktop.Views.DashboardParts;
 namespace ZgrzytDesktop.Headless.Tests.Views;
 
 [Collection(AvaloniaHeadlessCollection.Name)]
-public class HeadlessViewsTests
+public class HeadlessViewsTests : IDisposable
 {
     public HeadlessViewsTests() => ViewModelTestSetup.EnsureAppStrings();
+
+    public void Dispose() =>
+        AvaloniaHeadlessTestHost.RunOnUiThread(HeadlessViewTestHelper.ResetSharedTestState);
 
     [Fact]
     public void LoginView_CreatesWithoutException()
@@ -388,6 +391,7 @@ public class HeadlessViewsTests
     {
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>
         {
+            using var cultureScope = new TestCultureScope("en");
             var settings = new FakeSettingsService();
             settings.Settings.UiCulture = "en";
             var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("it", settings: settings);
@@ -403,6 +407,7 @@ public class HeadlessViewsTests
                     Priority = TicketPriorities.Low,
                     UserId = 1
                 };
+                HeadlessViewTestHelper.ApplyUiCulture("en");
                 vm.TicketDetailsPanel.NotifyLocalization();
 
                 var view = HeadlessViewTestHelper.CreateDashboardView(vm);
@@ -412,6 +417,9 @@ public class HeadlessViewsTests
                     .FirstOrDefault();
 
                 Assert.NotNull(detailsPanel);
+                HeadlessViewTestHelper.WaitForCondition(
+                    () => HeadlessViewTestHelper.ContainsText(detailsPanel!, vm.LblTicketAssignToMe),
+                    timeoutMs: 5000);
                 Assert.False(vm.IsAdminRole);
                 Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, vm.LblTicketAssignToMe));
                 Assert.Empty(vm.TicketDetailsPanel.AssignableUsers);
@@ -647,6 +655,7 @@ public class HeadlessViewsTests
     {
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>
         {
+            using var cultureScope = new TestCultureScope("pl");
             var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("it");
 
             try
@@ -662,7 +671,7 @@ public class HeadlessViewsTests
                     UserId = 1,
                     User = new User { Id = 1, Name = "User", Login = "user" }
                 };
-                AppStrings.ApplyCulture("pl");
+                HeadlessViewTestHelper.ApplyUiCulture("pl");
                 vm.TicketDetailsPanel.NotifyLocalization();
                 vm.TicketDetailsPanel.DetailsStatusMessage = "Status details headless";
                 vm.TicketDetailsPanel.Messages.Add(new Models.Message
@@ -682,6 +691,9 @@ public class HeadlessViewsTests
                     .FirstOrDefault();
 
                 Assert.NotNull(detailsPanel);
+                HeadlessViewTestHelper.WaitForCondition(
+                    () => HeadlessViewTestHelper.ContainsText(detailsPanel!, "Details binding smoke"),
+                    timeoutMs: 5000);
 
                 Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, "Details binding smoke"));
                 Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, "Opis headless"));

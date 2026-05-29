@@ -10,6 +10,8 @@ namespace ZgrzytDesktop.Headless.Tests.Headless;
 
 internal static class HeadlessViewTestHelper
 {
+    private static readonly List<Window> OpenWindows = [];
+
     public static Window ShowInWindow(AvaloniaControl content, double width = 1280, double height = 900)
     {
         var window = new Window
@@ -20,6 +22,7 @@ internal static class HeadlessViewTestHelper
         };
 
         window.Show();
+        OpenWindows.Add(window);
         WaitForUiIdle(content);
         return window;
     }
@@ -29,8 +32,21 @@ internal static class HeadlessViewTestHelper
         if (window is null)
             return;
 
+        OpenWindows.Remove(window);
         window.Close();
         WaitForUiIdle();
+    }
+
+    public static void CloseAllOpenWindows()
+    {
+        while (OpenWindows.Count > 0)
+            CloseWindow(OpenWindows[^1]);
+    }
+
+    public static void ResetSharedTestState()
+    {
+        CloseAllOpenWindows();
+        ApplyUiCulture("pl");
     }
 
     public static void ApplyUiCulture(string culture)
