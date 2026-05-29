@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Avalonia.Controls;
 using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
@@ -1128,19 +1129,25 @@ public class HeadlessViewsTests
     {
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>
         {
+            using var cultureScope = new TestCultureScope(culture);
+            HeadlessViewTestHelper.ApplyUiCulture(culture);
+
             var settings = new FakeSettingsService();
             settings.Settings.UiCulture = culture;
 
             var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("admin", settings: settings);
+            Window? window = null;
 
             try
             {
+                HeadlessViewTestHelper.ApplyUiCulture(culture);
                 vm.TicketsPanel.NotifyLocalization();
                 vm.CurrentSection = AppSections.Tickets;
                 vm.TicketsPanel.StatusMessage = AppStrings.GetFormat("Tickets_Loaded", 0, 0);
 
                 var panelView = new TicketsPanelView { DataContext = vm };
-                HeadlessViewTestHelper.ShowInWindow(panelView);
+                window = HeadlessViewTestHelper.ShowInWindow(panelView);
+                HeadlessViewTestHelper.WaitForUiIdle(panelView);
 
                 foreach (var label in forbiddenButtonLabels)
                 {
@@ -1149,6 +1156,7 @@ public class HeadlessViewsTests
                         $"Tickets panel must not show admin toolbar label: {label}");
                 }
 
+                HeadlessViewTestHelper.ApplyUiCulture(culture);
                 Assert.Equal(expectedSearchPlaceholder, AppStrings.Get("Tickets_SearchPlaceholder"));
                 Assert.True(
                     HeadlessViewTestHelper.FindDescendants<Avalonia.Controls.TextBox>(panelView).Any(),
@@ -1171,14 +1179,24 @@ public class HeadlessViewsTests
                 {
                     vm.TicketsPanel.SelectedCategoryFilterOption = vm.TicketsPanel.FilterCategoryOptions
                         .First(option => option.Key == categoryFilterKey);
+
+                    HeadlessViewTestHelper.WaitForCondition(
+                        () => !vm.TicketsPanel.IsLoading,
+                        timeoutMs: 5000);
+                    HeadlessViewTestHelper.ApplyUiCulture(culture);
+                    HeadlessViewTestHelper.WaitForUiIdle(panelView);
                 }
 
-                if (expectedCategoryFilterLabel is not null)
+                if (expectedCategoryFilterLabel is not null && categoryFilterKey is not null)
                 {
+                    HeadlessViewTestHelper.ApplyUiCulture(culture);
                     Assert.Equal(expectedCategoryFilterLabel, vm.TicketsPanel.SelectedCategoryFilterOption?.Label);
                     Assert.True(
-                        HeadlessViewTestHelper.ContainsText(panelView, expectedCategoryFilterLabel),
-                        "Category filter label should be visible in the tickets toolbar.");
+                        HeadlessViewTestHelper.ComboBoxHasSelectedCategory(
+                            panelView,
+                            categoryFilterKey,
+                            expectedCategoryFilterLabel),
+                        "Category filter ComboBox should expose the selected localized label.");
                 }
 
                 Assert.True(HeadlessViewTestHelper.ContainsText(panelView, vm.TicketsPanel.StatusMessage));
@@ -1186,6 +1204,7 @@ public class HeadlessViewsTests
             }
             finally
             {
+                HeadlessViewTestHelper.CloseWindow(window);
                 TestApiFactory.Cleanup(tempDir);
             }
         });

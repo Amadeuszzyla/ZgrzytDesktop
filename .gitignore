@@ -33,9 +33,11 @@ coveragereport/
 *.lcov
 
 # Publish / release artifacts
+release/
 publish/
 **/publish/
 *.zip
+*.sha256
 *.7z
 *.rar
 *.tar

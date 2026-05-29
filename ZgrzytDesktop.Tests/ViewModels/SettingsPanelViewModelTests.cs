@@ -62,42 +62,12 @@ public class SettingsPanelViewModelTests
         settings ??= new FakeSettingsService();
         auth ??= new FakeAuthService();
 
-        var bridge = new DashboardVmBridge
-        {
-            ExecuteApiAsyncCore = async (action, setStatusMessage, unexpectedStatusMessage, unexpectedToastMessage,
-                offlineToastMessage, showApiErrorToast, setOfflineOnServiceUnavailable, onServiceUnavailableAsync) =>
-            {
-                try
-                {
-                    await action();
-                    return true;
-                }
-                catch (ApiException ex)
-                {
-                    setStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
-                        ex.ResponseContent ?? ex.Message,
-                        ex.StatusCode));
-                    return false;
-                }
-                catch
-                {
-                    setStatusMessage?.Invoke(unexpectedStatusMessage ?? AppStrings.Get("Api_UnexpectedError"));
-                    return false;
-                }
-            },
-            ShowToastKey = TestToastCallbacks.NoopKey,
-            ShowToastRaw = TestToastCallbacks.NoopRaw,
-            LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
-            GetIsOffline = () => false,
-            SetIsOffline = _ => { },
-            NotifyLocalization = () => { },
-            GetCurrentSection = () => AppSections.Settings
-        };
+        var context = TestDashboardContext.CreateDefault(AppSections.Settings).WithApiErrorHandling();
 
         return new SettingsPanelViewModel(
             settings,
             auth,
-            bridge,
+            context,
             () => Task.CompletedTask);
     }
 }

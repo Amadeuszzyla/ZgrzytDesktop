@@ -17,14 +17,16 @@ Aplikacja (Avalonia, .NET 10, MVVM) komunikuje się z backendem Laravel przez RE
 | **i18n** | Polski / angielski (`AppStrings`) |
 | **Motyw** | Wyłącznie **jasny** (light-only) |
 | **Offline** | Cache zgłoszeń przy niedostępności API |
-| **Bezpieczeństwo lokalne** | Token, cache, audyt i ustawienia w `%AppData%\ZgrzytDesktop\` — szyfrowanie **DPAPI** (Windows) |
+| **Auto-wylogowanie** | `SessionInactivityMonitor` — wylogowanie po bezczynności; włącz/wyłącz i timeout (15 / 30 / 60 min) przez `AppSettings.AutoLogoutEnabled` i `AppSettings.AutoLogoutTimeoutMinutes` (`settings.json`) |
+| **Bezpieczeństwo lokalne** | Token, cache i audyt w `%AppData%\ZgrzytDesktop\` — szyfrowanie **DPAPI** (Windows); ustawienia UI jako zwykły JSON (bez sekretów) |
 
 ## Zabezpieczenia po stronie aplikacji desktopowej
 
 - **Uwierzytelnianie tokenowe** — logowanie przez `POST /api/login`, Bearer JWT w pliku chronionym DPAPI, odświeżanie sesji (`POST /api/refresh`), wylogowanie lokalne i przez API
 - **Kontrola dostępu na podstawie roli** — dashboard tylko dla ról **IT** i **admin**; konto `user` po logowaniu otrzymuje komunikat i jest wylogowywane
 - **Role-based UI w administracji** — admin: lista użytkowników, ban/aktywacja/odbanowanie; IT: tylko zakładka **Nowe konto**; niedostępne sekcje i akcje są ukryte, nie wyłączone
-- **Szyfrowanie lokalnych danych (Windows DPAPI)** — token, cache zgłoszeń, cache użytkownika, lokalny audyt i ustawienia w `%AppData%\ZgrzytDesktop\`
+- **Szyfrowanie lokalnych danych (Windows DPAPI)** — token (`token.txt`), cache zgłoszeń, cache użytkownika i lokalny audyt w `%AppData%\ZgrzytDesktop\`
+- **Ustawienia aplikacji (plaintext JSON)** — `Settings/settings.json` przechowuje wyłącznie preferencje UI (język, motyw, auto-wylogowanie, adres API); **bez** haseł i tokenów — celowo nie szyfrowane DPAPI
 - **Oczyszczanie HTML przed wyświetleniem** — tytuł/opis zgłoszenia i treść wiadomości (`HtmlTextSanitizer`); odrzucanie odpowiedzi HTML z API jako błędów (`ApiErrorSanitizer`)
 - **Brak logowania haseł i tokenów** — maskowanie wrażliwych pól w lokalnym audycie i komunikatach błędów API (`SensitiveDataMasker`, `SensitiveDataRedactor`)
 - **Obsługa błędów bez stack trace** — przyjazne, zlokalizowane komunikaty (PL/EN); stack trace i HTML z odpowiedzi API nie trafiają do UI
@@ -35,7 +37,6 @@ Aplikacja (Avalonia, .NET 10, MVVM) komunikuje się z backendem Laravel przez RE
 
 ### Znane ograniczenia
 
-- **Auto-wylogowanie po bezczynności** — nie jest jeszcze wdrożone jako stabilna funkcja produktowa (brak oficjalnego wymagania w release)
 - **Pełny audyt serwerowy** — wymaga endpointów backendowych (np. `GET /api/logs`); obecnie audyt jest **lokalny** (plik DPAPI)
 - **Edycja/usuwanie wiadomości** — wymaga dedykowanych endpointów backendowych; desktop ich nie symuluje
 - **Autoryzacja po stronie API** — UI ukrywa niedostępne akcje, ale ostateczna kontrola uprawnień musi być w backendzie
@@ -103,6 +104,14 @@ Testy integracyjne na żywym API (opcjonalnie): zmienne `ZGRZYT_API_URL`, `ZGRZY
 dotnet test -c Release --filter "Category=Integration"
 ```
 
+### Code coverage
+
+```powershell
+.\scripts\test-coverage.ps1
+```
+
+Coverlet (`coverlet.collector` w projektach testowych), bez integracji live API. Szczegóły: [TEST_COVERAGE.md](TEST_COVERAGE.md).
+
 ## Publikacja (Windows x64)
 
 **Rekomendacja:** cały folder `publish` w archiwum ZIP (self-contained), nie sam plik EXE.
@@ -111,7 +120,14 @@ dotnet test -c Release --filter "Category=Integration"
 .\scripts\publish-release.ps1
 ```
 
-Skrypt: `clean` → `restore` → `build` → `test` (bez integracji live) → `publish` → kopiuje `README_RELEASE.txt` → tworzy `ZgrzytDesktop-win-x64-release.zip`.
+Skrypt: `clean` → `restore` → `build` → `test` (bez integracji live) → `publish` → kopiuje `README_RELEASE.txt` → tworzy archiwum i checksumę:
+
+| Artefakt | Ścieżka |
+|----------|---------|
+| ZIP | `release/ZgrzytDesktop-win-x64-release.zip` |
+| SHA256 | `release/ZgrzytDesktop-win-x64-release.zip.sha256` |
+
+Katalog `release/` jest w `.gitignore` i **nie jest commitowany**.
 
 Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt).
 
@@ -126,13 +142,13 @@ Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt)
 
 Katalog: `%AppData%\ZgrzytDesktop\`
 
-| Plik | Zawartość |
-|------|-----------|
-| `token.txt` | Bearer JWT (DPAPI) |
-| `Cache/tickets-cache.json` | Cache zgłoszeń |
-| `Cache/user-cache.json` | Profil użytkownika |
-| `audit-log.json` | Lokalny audyt |
-| `Settings/settings.json` | Język UI, adres API (bez haseł) |
+| Plik | Zawartość | Ochrona |
+|------|-----------|---------|
+| `token.txt` | Bearer JWT | **DPAPI** |
+| `Cache/tickets-cache.json` | Cache zgłoszeń (tytuły, opisy) | **DPAPI** |
+| `Cache/user-cache.json` | Profil użytkownika (sesja) | **DPAPI** |
+| `audit-log.json` | Lokalny audyt | **DPAPI** |
+| `Settings/settings.json` | Język UI, motyw, auto-wylogowanie, adres API | Plaintext JSON (brak sekretów) |
 
 ## Struktura repozytorium
 
@@ -142,7 +158,10 @@ ZgrzytDesktop/
 ├── ZgrzytDesktop.Tests/
 ├── ZgrzytDesktop.Headless.Tests/
 ├── scripts/publish-release.ps1
+├── scripts/test-coverage.ps1
 ├── INTEGRATION_TESTS.md
+├── TEST_COVERAGE.md
+├── SECURITY.md
 ├── REQUIREMENTS.md
 ├── README_RELEASE.txt
 ├── .env.example
@@ -152,5 +171,7 @@ ZgrzytDesktop/
 ## Powiązane dokumenty
 
 - [REQUIREMENTS.md](REQUIREMENTS.md) — wymagania środowiska i produktu
+- [SECURITY.md](SECURITY.md) — zgłaszanie podatności, dane lokalne, sekrety, release
 - [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) — testy na żywym API
+- [TEST_COVERAGE.md](TEST_COVERAGE.md) — code coverage (coverlet)
 - [README_RELEASE.txt](README_RELEASE.txt) — instrukcja z paczki ZIP

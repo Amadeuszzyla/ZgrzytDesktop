@@ -27,7 +27,7 @@ public class LocalizationRuntimeTests
 
         var stats = new StatisticsPanelViewModel(
             new FakeTicketService(),
-            CreateBridge(),
+            CreateContext(),
             () => true);
         stats.ApplyFromTickets([], 0, fromCurrentPageOnly: false);
         Assert.Equal("No tickets to analyze.", stats.StatsScopeMessage);
@@ -49,7 +49,7 @@ public class LocalizationRuntimeTests
 
         var stats = new StatisticsPanelViewModel(
             new FakeTicketService(),
-            CreateBridge(),
+            CreateContext(),
             () => true);
         stats.ApplyFromTickets([], 0, fromCurrentPageOnly: false);
         Assert.Equal("Brak zgłoszeń do analizy.", stats.StatsScopeMessage);
@@ -123,22 +123,8 @@ public class LocalizationRuntimeTests
         Assert.NotEqual(polish, english);
     }
 
-    private static DashboardVmBridge CreateBridge() =>
-        new()
-        {
-            ShowToastKey = TestToastCallbacks.NoopKey,
-            ShowToastRaw = TestToastCallbacks.NoopRaw,
-            LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
-            NotifyLocalization = () => { },
-            GetIsOffline = () => false,
-            SetIsOffline = _ => { },
-            GetCurrentSection = () => AppSections.Statistics,
-            ExecuteApiAsyncCore = async (action, _, _, _, _, _, _, _) =>
-            {
-                await action();
-                return true;
-            }
-        };
+    private static TestDashboardContext CreateContext() =>
+        TestDashboardContext.CreateDefault(AppSections.Statistics);
 
     private static SettingsPanelViewModel CreateSettingsPanel()
     {
@@ -146,7 +132,7 @@ public class LocalizationRuntimeTests
         return new SettingsPanelViewModel(
             new SettingsService(tempDir),
             new FakeAuthService(),
-            CreateBridge(),
+            CreateContext(),
             () => Task.CompletedTask);
     }
 

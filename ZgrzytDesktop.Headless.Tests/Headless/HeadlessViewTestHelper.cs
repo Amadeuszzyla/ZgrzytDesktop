@@ -1,5 +1,8 @@
 using Avalonia.Controls;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
+using ZgrzytDesktop.Helpers;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Views;
 using AvaloniaControl = Avalonia.Controls.Control;
 
@@ -17,7 +20,46 @@ internal static class HeadlessViewTestHelper
         };
 
         window.Show();
+        WaitForUiIdle(content);
         return window;
+    }
+
+    public static void CloseWindow(Window? window)
+    {
+        if (window is null)
+            return;
+
+        window.Close();
+        WaitForUiIdle();
+    }
+
+    public static void ApplyUiCulture(string culture)
+    {
+        AppStrings.ApplyCulture(culture);
+    }
+
+    public static void WaitForUiIdle(AvaloniaControl? root = null)
+    {
+        if (root is not null)
+            root.UpdateLayout();
+
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    public static void WaitForCondition(Func<bool> predicate, int timeoutMs = 5000, int pollIntervalMs = 10)
+    {
+        var deadline = Environment.TickCount64 + timeoutMs;
+
+        while (!predicate())
+        {
+            if (Environment.TickCount64 >= deadline)
+                throw new TimeoutException("UI condition was not met before timeout.");
+
+            WaitForUiIdle();
+            Thread.Sleep(pollIntervalMs);
+        }
+
+        WaitForUiIdle();
     }
 
     public static LoginView CreateLoginView(object? dataContext = null)
@@ -48,6 +90,22 @@ internal static class HeadlessViewTestHelper
 
     public static IEnumerable<T> FindDescendants<T>(AvaloniaControl root) where T : AvaloniaControl =>
         EnumerateDescendants(root).OfType<T>();
+
+    public static Avalonia.Controls.ComboBox? FindCategoryFilterComboBox(AvaloniaControl root) =>
+        FindDescendants<Avalonia.Controls.ComboBox>(root)
+            .FirstOrDefault(comboBox =>
+                comboBox.ItemsSource is IEnumerable<object> items &&
+                items.Any(item => item is TicketCategoryFilterOption));
+
+    public static bool ComboBoxHasSelectedCategory(AvaloniaControl root, string categoryKey, string expectedLabel)
+    {
+        var comboBox = FindCategoryFilterComboBox(root);
+        if (comboBox?.SelectedItem is not TicketCategoryFilterOption selected)
+            return false;
+
+        return string.Equals(selected.Key, categoryKey, StringComparison.OrdinalIgnoreCase) &&
+               string.Equals(selected.Label, expectedLabel, StringComparison.Ordinal);
+    }
 
     public static bool ContainsText(AvaloniaControl root, string text)
     {

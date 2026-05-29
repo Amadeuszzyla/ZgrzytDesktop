@@ -51,7 +51,7 @@ Użytkownik uruchamia `ZgrzytDesktop.exe` z **całego** rozpakowanego folderu pu
 
 ## 5. Dane lokalne
 
-`%AppData%\ZgrzytDesktop\` — token, cache, audyt, ustawienia; ochrona **DPAPI** (CurrentUser). Aplikacja nie wymaga uprawnień administratora Windows.
+`%AppData%\ZgrzytDesktop\` — token, cache i audyt chronione **DPAPI** (CurrentUser); ustawienia UI w `Settings/settings.json` jako zwykły JSON (preferencje bez haseł/tokenów). Aplikacja nie wymaga uprawnień administratora Windows.
 
 Szczegóły: [README.md](README.md).
 
@@ -62,7 +62,8 @@ Szczegóły: [README.md](README.md).
 - **Uwierzytelnianie tokenem** — `POST /api/login`, Bearer w DPAPI (`token.txt`), `GET /api/user`, `POST /api/logout`, `POST /api/refresh`
 - **Dostęp do desktopa** — tylko role **IT** i **admin**; rola **`user`** nie wchodzi do dashboardu (`DesktopAccessHelper`)
 - **Role-based UI** — admin: zarządzanie użytkownikami; IT: rejestracja kont (**Nowe konto**); ukrywanie niedostępnych sekcji
-- **DPAPI** — token, cache zgłoszeń, cache użytkownika, lokalny audyt, ustawienia w `%AppData%\ZgrzytDesktop\`
+- **DPAPI** — token, cache zgłoszeń, cache użytkownika, lokalny audyt w `%AppData%\ZgrzytDesktop\`
+- **Ustawienia (plaintext)** — `Settings/settings.json` przez `SettingsService`; model `AppSettings` nie zawiera pól wrażliwych (hasła, tokeny)
 - **Sanityzacja HTML** — plain text w tytule/opisie zgłoszenia i wiadomościach; filtrowanie odpowiedzi HTML z API
 - **Brak haseł/tokenów w logach lokalnych** — maskowanie wrażliwych danych w audycie i błędach API
 - **Błędy bez stack trace** — zlokalizowane komunikaty (`ApiErrorSanitizer`, `LoginErrorMapper`)

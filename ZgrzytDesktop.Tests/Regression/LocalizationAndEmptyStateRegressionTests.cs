@@ -29,7 +29,7 @@ public class LocalizationAndEmptyStateRegressionTests
 
         var stats = new StatisticsPanelViewModel(
             new FakeTicketService(),
-            CreateStatisticsBridge(),
+            CreateStatisticsContext(),
             () => true);
         stats.ApplyFromTickets([], 0, fromCurrentPageOnly: false);
 
@@ -111,7 +111,7 @@ public class LocalizationAndEmptyStateRegressionTests
 
         var stats = new StatisticsPanelViewModel(
             new FakeTicketService(),
-            CreateStatisticsBridge(),
+            CreateStatisticsContext(),
             () => true);
         stats.ApplyFromTickets([], 0, fromCurrentPageOnly: false);
 
@@ -338,46 +338,25 @@ public class LocalizationAndEmptyStateRegressionTests
         public void Dispose() => AppStrings.ApplyCulture("pl");
     }
 
-    private static DashboardVmBridge CreateStatisticsBridge() =>
-        new()
-        {
-            ShowToastKey = TestToastCallbacks.NoopKey,
-            ShowToastRaw = TestToastCallbacks.NoopRaw,
-            LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
-            NotifyLocalization = () => { },
-            GetIsOffline = () => false,
-            SetIsOffline = _ => { },
-            GetCurrentSection = () => AppSections.Statistics,
-            ExecuteApiAsyncCore = async (action, _, _, _, _, _, _, _) =>
-            {
-                await action();
-                return true;
-            }
-        };
+    private static TestDashboardContext CreateStatisticsContext() =>
+        TestDashboardContext.CreateDefault(AppSections.Statistics);
 
     private static SettingsPanelViewModel CreateSettingsPanel(
         FakeSettingsService? settings = null,
         Action<string>? onToast = null)
     {
         settings ??= new FakeSettingsService();
+        var context = new TestDashboardContext
+        {
+            CurrentSection = AppSections.Settings,
+            ShowToastKeyHandler = TestToastCallbacks.ResolveKeyTo(onToast),
+            ShowToastRawHandler = (message, _) => onToast?.Invoke(message)
+        };
+
         return new SettingsPanelViewModel(
             settings,
             new FakeAuthService(),
-            new DashboardVmBridge
-            {
-                ShowToastKey = TestToastCallbacks.ResolveKeyTo(onToast),
-                ShowToastRaw = (message, _) => onToast?.Invoke(message),
-                LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
-                NotifyLocalization = () => { },
-                GetIsOffline = () => false,
-                SetIsOffline = _ => { },
-                GetCurrentSection = () => AppSections.Settings,
-                ExecuteApiAsyncCore = async (action, _, _, _, _, _, _, _) =>
-                {
-                    await action();
-                    return true;
-                }
-            },
+            context,
             () => Task.CompletedTask);
     }
 

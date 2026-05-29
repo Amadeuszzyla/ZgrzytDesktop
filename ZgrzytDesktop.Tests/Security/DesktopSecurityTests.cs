@@ -113,6 +113,40 @@ public class DesktopSecurityTests
     }
 
     [Fact]
+    public async Task SettingsService_PersistsReadablePlaintextJson()
+    {
+        var directory = CreateTempDirectory();
+
+        try
+        {
+            var service = new SettingsService(directory);
+            var settings = new AppSettings
+            {
+                UiCulture = "en",
+                AutoLogoutEnabled = false,
+                AutoLogoutTimeoutMinutes = 60
+            };
+
+            await service.SaveAsync(settings);
+
+            var raw = await File.ReadAllTextAsync(Path.Combine(directory, "settings.json"));
+            Assert.Contains("\"UiCulture\"", raw, StringComparison.Ordinal);
+            Assert.Contains("en", raw, StringComparison.Ordinal);
+            Assert.DoesNotContain("password", raw, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("token", raw, StringComparison.OrdinalIgnoreCase);
+
+            var loaded = await service.LoadAsync();
+            Assert.Equal("en", loaded.UiCulture);
+            Assert.False(loaded.AutoLogoutEnabled);
+            Assert.Equal(60, loaded.AutoLogoutTimeoutMinutes);
+        }
+        finally
+        {
+            DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
     public async Task AuthService_LogoutAsync_ClearsStoredToken()
     {
         var (api, handler, tempDir) = TestApiFactory.CreateApi();

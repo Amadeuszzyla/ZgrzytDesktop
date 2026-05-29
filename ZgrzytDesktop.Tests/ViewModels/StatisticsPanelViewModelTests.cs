@@ -82,22 +82,9 @@ public class StatisticsPanelViewModelTests
     {
         tickets ??= new FakeTicketService();
 
-        var bridge = new DashboardVmBridge
-        {
-            ExecuteApiAsyncCore = async (action, _, _, _, _, _, _, _) =>
-            {
-                await action();
-                return true;
-            },
-            ShowToastKey = TestToastCallbacks.NoopKey,
-            ShowToastRaw = TestToastCallbacks.NoopRaw,
-            LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
-            GetIsOffline = () => false,
-            SetIsOffline = _ => { },
-            NotifyLocalization = () => { },
-            GetCurrentSection = () => AppSections.Statistics
-        };
-
-        return new StatisticsPanelViewModel(tickets, bridge, () => true);
+        return new StatisticsPanelViewModel(
+            tickets,
+            TestDashboardContext.CreateDefault(AppSections.Statistics),
+            () => true);
     }
 }
