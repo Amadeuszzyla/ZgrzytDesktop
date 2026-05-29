@@ -32,15 +32,27 @@ jobs:
       - name: Build
         run: dotnet build ZgrzytDesktop.sln -c Release --no-restore
 
-      - name: Test
+      - name: Test unit project
         shell: pwsh
         run: |
-          dotnet test ZgrzytDesktop.sln -c Release --no-build --filter "Category!=Integration" `
-            --logger "trx;LogFileName=test-results.trx" `
+          dotnet test ZgrzytDesktop.Tests/ZgrzytDesktop.Tests.csproj -c Release --no-build --filter "Category!=Integration" `
+            --logger "trx;LogFileName=unit-tests.trx" `
             --results-directory TestResults `
             --collect:"XPlat Code Coverage" `
             -- `
             DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+        continue-on-error: false
+
+      - name: Test headless project
+        shell: pwsh
+        run: |
+          dotnet test ZgrzytDesktop.Headless.Tests/ZgrzytDesktop.Headless.Tests.csproj -c Release --no-build `
+            --logger "trx;LogFileName=headless-tests.trx" `
+            --results-directory TestResults `
+            --collect:"XPlat Code Coverage" `
+            -- `
+            DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+        continue-on-error: false
 
       - name: Upload test results (TRX)
         if: always()
