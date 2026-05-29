@@ -16,6 +16,7 @@ public partial class DashboardViewModel
                 OnPropertyChanged(nameof(CanUseOnlineActions));
                 OnPropertyChanged(nameof(CanRequestAccount));
                 AdminPanel.NotifyCanRegisterUserChanged();
+                RequestAccountPanel?.NotifyCanSubmitChanged();
                 TicketDetailsPanel?.NotifyCapabilityProperties();
             }
         }

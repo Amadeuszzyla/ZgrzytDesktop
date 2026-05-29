@@ -2,7 +2,8 @@
     x:Class="ZgrzytDesktop.Views.LoginView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:CompileBindings="False">
+    xmlns:vm="using:ZgrzytDesktop.ViewModels"
+    x:DataType="vm:LoginViewModel">
 
     <Grid RowDefinitions="Auto,*" Background="{DynamicResource AppPageBackgroundBrush}">
 
@@ -26,7 +27,7 @@
                     Classes="version-badge"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right">
-                    <TextBlock Classes="version-badge-text" Text="v0.1.0-alpha" />
+                    <TextBlock Classes="version-badge-text" Text="{Binding AppVersionDisplay}" />
                 </Border>
             </Grid>
         </Border>

@@ -1,129 +1,130 @@
-<UserControl
-    x:Class="ZgrzytDesktop.Views.DashboardParts.StatisticsPanelView"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:CompileBindings="False">
-
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Classes="page-content stats-page-content">
-            <Border Classes="app-card stats-header-card">
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                    <StackPanel Grid.Column="0" Spacing="8">
-                        <TextBlock Classes="section-title-large" Text="{Binding StatisticsPanel.LblStatsTitle}" />
-                        <TextBlock Classes="section-subtitle" Text="{Binding StatisticsPanel.StatsScopeMessage}" />
-                        <TextBlock
-                            Classes="stats-loading-hint"
-                            Text="{Binding StatisticsPanel.LblStatsLoadingAllPages}"
-                            IsVisible="{Binding StatisticsPanel.IsLoadingAllStatistics}" />
-                    </StackPanel>
-                    <Button
-                        Grid.Column="1"
-                        Classes="btn-secondary stats-load-all-button"
-                        Content="{Binding StatisticsPanel.LblStatsLoadAll}"
-                        Command="{Binding StatisticsPanel.LoadAllPagesStatisticsCommand}"
-                        IsEnabled="{Binding StatisticsPanel.IsNotLoading}"
-                        VerticalAlignment="Center" />
-                </Grid>
-            </Border>
-
-            <Grid Classes="stats-kpi-grid" ColumnDefinitions="*,*,*,*,*" ColumnSpacing="14">
-                <Border Grid.Column="0" Classes="kpi-card kpi-card-accent-purple">
-                    <StackPanel Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiAll}" />
-                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsTotalTickets}" />
-                    </StackPanel>
-                </Border>
-                <Border Grid.Column="1" Classes="kpi-card kpi-card-accent-violet">
-                    <StackPanel Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiNew}" />
-                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsNewTickets}" />
-                    </StackPanel>
-                </Border>
-                <Border Grid.Column="2" Classes="kpi-card kpi-card-accent-amber">
-                    <StackPanel Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiInProgress}" />
-                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsInProgressTickets}" />
-                    </StackPanel>
-                </Border>
-                <Border Grid.Column="3" Classes="kpi-card kpi-card-accent-green">
-                    <StackPanel Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiClosed}" />
-                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsClosedTickets}" />
-                    </StackPanel>
-                </Border>
-                <Border Grid.Column="4" Classes="kpi-card kpi-card-accent-red">
-                    <StackPanel Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiHighPriority}" />
-                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsHighPriorityTickets}" />
-                    </StackPanel>
-                </Border>
-            </Grid>
-
-            <Grid Classes="stats-charts-grid" ColumnDefinitions="*,*,*" ColumnSpacing="16">
-                <Border Grid.Column="0" Classes="app-card stats-chart-card">
-                    <StackPanel Spacing="16">
-                        <TextBlock Classes="stats-chart-title" Text="{Binding StatisticsPanel.LblStatsChartByStatus}" />
-                        <StackPanel Classes="stats-progress-group">
-                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
-                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsKpiNew}" TextWrapping="Wrap" />
-                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsStatusChartMaximum}" Value="{Binding StatisticsPanel.StatsNewTickets}" Foreground="{DynamicResource AppAccentBrush}" />
-                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsNewTickets}" />
-                            </Grid>
-                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
-                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsKpiInProgress}" TextWrapping="Wrap" />
-                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsStatusChartMaximum}" Value="{Binding StatisticsPanel.StatsInProgressTickets}" Foreground="{DynamicResource AppWarningBrush}" />
-                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsInProgressTickets}" />
-                            </Grid>
-                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
-                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsKpiClosed}" TextWrapping="Wrap" />
-                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsStatusChartMaximum}" Value="{Binding StatisticsPanel.StatsClosedTickets}" Foreground="{DynamicResource AppSuccessBrush}" />
-                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsClosedTickets}" />
-                            </Grid>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Column="1" Classes="app-card stats-chart-card">
-                    <StackPanel Spacing="16">
-                        <TextBlock Classes="stats-chart-title" Text="{Binding StatisticsPanel.LblStatsChartByPriority}" />
-                        <StackPanel Classes="stats-progress-group">
-                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
-                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsPriorityLow}" TextWrapping="Wrap" />
-                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsPriorityChartMaximum}" Value="{Binding StatisticsPanel.StatsLowPriorityTickets}" Foreground="{DynamicResource AppAccentBrush}" />
-                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsLowPriorityTickets}" />
-                            </Grid>
-                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
-                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsPriorityMedium}" TextWrapping="Wrap" />
-                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsPriorityChartMaximum}" Value="{Binding StatisticsPanel.StatsMediumPriorityTickets}" Foreground="{DynamicResource AppWarningBrush}" />
-                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsMediumPriorityTickets}" />
-                            </Grid>
-                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
-                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsPriorityHigh}" TextWrapping="Wrap" />
-                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsPriorityChartMaximum}" Value="{Binding StatisticsPanel.StatsHighPriorityTickets}" Foreground="{DynamicResource AppDangerBrush}" />
-                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsHighPriorityTickets}" />
-                            </Grid>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Column="2" Classes="app-card stats-chart-card">
-                    <StackPanel Spacing="16">
-                        <TextBlock Classes="stats-chart-title" Text="{Binding StatisticsPanel.LblStatsChartAssignment}" />
-                        <StackPanel Classes="stats-progress-group">
-                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
-                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsAssigned}" TextWrapping="Wrap" />
-                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsAssignmentChartMaximum}" Value="{Binding StatisticsPanel.StatsAssignedTickets}" Foreground="{DynamicResource AppAccentBrush}" />
-                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsAssignedTickets}" />
-                            </Grid>
-                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
-                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsUnassigned}" TextWrapping="Wrap" />
-                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsAssignmentChartMaximum}" Value="{Binding StatisticsPanel.StatsUnassignedTickets}" Foreground="{DynamicResource AppWarningBrush}" />
-                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsUnassignedTickets}" />
-                            </Grid>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </StackPanel>
-    </ScrollViewer>
-</UserControl>
+<UserControl
+    x:Class="ZgrzytDesktop.Views.DashboardParts.StatisticsPanelView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ZgrzytDesktop.ViewModels"
+    x:DataType="vm:DashboardViewModel">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Classes="page-content stats-page-content">
+            <Border Classes="app-card stats-header-card">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                    <StackPanel Grid.Column="0" Spacing="8">
+                        <TextBlock Classes="section-title-large" Text="{Binding StatisticsPanel.LblStatsTitle}" />
+                        <TextBlock Classes="section-subtitle" Text="{Binding StatisticsPanel.StatsScopeMessage}" />
+                        <TextBlock
+                            Classes="stats-loading-hint"
+                            Text="{Binding StatisticsPanel.LblStatsLoadingAllPages}"
+                            IsVisible="{Binding StatisticsPanel.IsLoadingAllStatistics}" />
+                    </StackPanel>
+                    <Button
+                        Grid.Column="1"
+                        Classes="btn-secondary stats-load-all-button"
+                        Content="{Binding StatisticsPanel.LblStatsLoadAll}"
+                        Command="{Binding StatisticsPanel.LoadAllPagesStatisticsCommand}"
+                        IsEnabled="{Binding StatisticsPanel.IsNotLoading}"
+                        VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <Grid Classes="stats-kpi-grid" ColumnDefinitions="*,*,*,*,*" ColumnSpacing="14">
+                <Border Grid.Column="0" Classes="kpi-card kpi-card-accent-purple">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiAll}" />
+                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsTotalTickets}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="kpi-card kpi-card-accent-violet">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiNew}" />
+                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsNewTickets}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="kpi-card kpi-card-accent-amber">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiInProgress}" />
+                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsInProgressTickets}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Classes="kpi-card kpi-card-accent-green">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiClosed}" />
+                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsClosedTickets}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="4" Classes="kpi-card kpi-card-accent-red">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Classes="kpi-label" Text="{Binding StatisticsPanel.LblStatsKpiHighPriority}" />
+                        <TextBlock Classes="kpi-value" Text="{Binding StatisticsPanel.StatsHighPriorityTickets}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Grid Classes="stats-charts-grid" ColumnDefinitions="*,*,*" ColumnSpacing="16">
+                <Border Grid.Column="0" Classes="app-card stats-chart-card">
+                    <StackPanel Spacing="16">
+                        <TextBlock Classes="stats-chart-title" Text="{Binding StatisticsPanel.LblStatsChartByStatus}" />
+                        <StackPanel Classes="stats-progress-group">
+                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
+                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsKpiNew}" TextWrapping="Wrap" />
+                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsStatusChartMaximum}" Value="{Binding StatisticsPanel.StatsNewTickets}" Foreground="{DynamicResource AppAccentBrush}" />
+                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsNewTickets}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
+                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsKpiInProgress}" TextWrapping="Wrap" />
+                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsStatusChartMaximum}" Value="{Binding StatisticsPanel.StatsInProgressTickets}" Foreground="{DynamicResource AppWarningBrush}" />
+                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsInProgressTickets}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
+                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsKpiClosed}" TextWrapping="Wrap" />
+                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsStatusChartMaximum}" Value="{Binding StatisticsPanel.StatsClosedTickets}" Foreground="{DynamicResource AppSuccessBrush}" />
+                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsClosedTickets}" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="app-card stats-chart-card">
+                    <StackPanel Spacing="16">
+                        <TextBlock Classes="stats-chart-title" Text="{Binding StatisticsPanel.LblStatsChartByPriority}" />
+                        <StackPanel Classes="stats-progress-group">
+                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
+                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsPriorityLow}" TextWrapping="Wrap" />
+                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsPriorityChartMaximum}" Value="{Binding StatisticsPanel.StatsLowPriorityTickets}" Foreground="{DynamicResource AppAccentBrush}" />
+                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsLowPriorityTickets}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
+                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsPriorityMedium}" TextWrapping="Wrap" />
+                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsPriorityChartMaximum}" Value="{Binding StatisticsPanel.StatsMediumPriorityTickets}" Foreground="{DynamicResource AppWarningBrush}" />
+                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsMediumPriorityTickets}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
+                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsPriorityHigh}" TextWrapping="Wrap" />
+                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsPriorityChartMaximum}" Value="{Binding StatisticsPanel.StatsHighPriorityTickets}" Foreground="{DynamicResource AppDangerBrush}" />
+                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsHighPriorityTickets}" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Classes="app-card stats-chart-card">
+                    <StackPanel Spacing="16">
+                        <TextBlock Classes="stats-chart-title" Text="{Binding StatisticsPanel.LblStatsChartAssignment}" />
+                        <StackPanel Classes="stats-progress-group">
+                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
+                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsAssigned}" TextWrapping="Wrap" />
+                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsAssignmentChartMaximum}" Value="{Binding StatisticsPanel.StatsAssignedTickets}" Foreground="{DynamicResource AppAccentBrush}" />
+                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsAssignedTickets}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*,44" ColumnSpacing="12">
+                                <TextBlock Grid.Column="0" Classes="stats-progress-label" Text="{Binding StatisticsPanel.LblStatsUnassigned}" TextWrapping="Wrap" />
+                                <ProgressBar Grid.Column="1" Classes="stats-progress" Minimum="0" Maximum="{Binding StatisticsPanel.StatsAssignmentChartMaximum}" Value="{Binding StatisticsPanel.StatsUnassignedTickets}" Foreground="{DynamicResource AppWarningBrush}" />
+                                <TextBlock Grid.Column="2" Classes="stats-progress-value" Text="{Binding StatisticsPanel.StatsUnassignedTickets}" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

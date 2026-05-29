@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Helpers;
 
 namespace ZgrzytDesktop.Security;
 
@@ -108,7 +109,7 @@ public sealed class SessionInactivityMonitor : IDisposable
             _timer = null;
         }
 
-        _ = callback();
+        SafeFireAndForget.Run(callback);
     }
 
     public void Dispose() => Stop();

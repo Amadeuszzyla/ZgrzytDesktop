@@ -3,12 +3,10 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Exceptions;
-using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Security;
 using ZgrzytDesktop.Services.Interfaces;
@@ -74,16 +72,6 @@ public class ApiService : IApiService
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", accessToken);
-    }
-
-    public void SetBearerToken(string? accessToken)
-    {
-        SetToken(accessToken);
-    }
-
-    public void SetAuthorizationToken(string? accessToken)
-    {
-        SetToken(accessToken);
     }
 
     public void ClearToken()
@@ -205,60 +193,6 @@ public class ApiService : IApiService
                normalized.Equals("logout", StringComparison.OrdinalIgnoreCase);
     }
 
-    public async Task<ApiConnectionTestResult> TestConnectionAsync()
-    {
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, NormalizeEndpoint("user"));
-            AddAuthorizationHeader(request);
-
-            var response = await _httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return new ApiConnectionTestResult
-                {
-                    Success = true,
-                    Message = AppStrings.Get("Api_TestConnection_Success")
-                };
-            }
-
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                return new ApiConnectionTestResult
-                {
-                    Success = true,
-                    Message = AppStrings.Get("Api_TestConnection_Unauthorized")
-                };
-            }
-
-            return new ApiConnectionTestResult
-            {
-                Success = false,
-                Message = AppStrings.GetFormat(
-                    "Api_TestConnection_Error",
-                    (int)response.StatusCode,
-                    response.StatusCode)
-            };
-        }
-        catch
-        {
-            return new ApiConnectionTestResult
-            {
-                Success = false,
-                Message = AppStrings.Get("Api_TestConnection_Failed")
-            };
-        }
-    }
-
-    private void AddAuthorizationHeader(HttpRequestMessage request)
-    {
-        if (!string.IsNullOrWhiteSpace(_accessToken))
-        {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-        }
-    }
-
     private void TryLoadStoredToken(ITokenStorage tokenStorage)
     {
         try
@@ -274,39 +208,11 @@ public class ApiService : IApiService
         }
     }
 
-    private void TryApplyTokenFromSecondArgument(object? tokenOrStorage)
+    private void AddAuthorizationHeader(HttpRequestMessage request)
     {
-        if (tokenOrStorage is null)
-            return;
-
-        if (tokenOrStorage is string token)
+        if (!string.IsNullOrWhiteSpace(_accessToken))
         {
-            SetToken(token);
-            return;
-        }
-
-        try
-        {
-            var type = tokenOrStorage.GetType();
-
-            var loadTokenSyncMethod = type.GetMethod(
-                "LoadTokenSync",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-            );
-
-            if (loadTokenSyncMethod is not null)
-            {
-                var result = loadTokenSyncMethod.Invoke(tokenOrStorage, null);
-
-                if (result is string loadedToken && !string.IsNullOrWhiteSpace(loadedToken))
-                {
-                    SetToken(loadedToken);
-                }
-            }
-        }
-        catch
-        {
-            // Kompatybilność wsteczna — brak tokena nie może zatrzymać aplikacji.
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
         }
     }
 
@@ -359,11 +265,4 @@ public class ApiService : IApiService
 
         return ApiUrlSecurityHelper.EnsureSecureApiBaseUrl(normalized);
     }
-}
-
-public class ApiConnectionTestResult
-{
-    public bool Success { get; set; }
-
-    public string Message { get; set; } = string.Empty;
 }

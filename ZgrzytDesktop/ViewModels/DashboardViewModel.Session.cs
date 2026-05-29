@@ -4,7 +4,7 @@ public partial class DashboardViewModel
 {
     internal void ClearSessionData()
     {
-        _ticketPollingTimer?.Stop();
+        _ticketPolling?.Stop();
         TicketsPanel.ClearSessionState();
         TicketDetailsPanel.ClearSessionState();
     }

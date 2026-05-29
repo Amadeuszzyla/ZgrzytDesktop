@@ -22,7 +22,7 @@ public sealed partial class AdminPanelViewModel
                 return;
 
             if (!_suppressAdminFilterReload && _callbacks.GetIsAdminRole())
-                _ = LoadUsersAsync();
+                SafeFireAndForget.Run(LoadUsersAsync());
         }
     }
 
@@ -59,7 +59,7 @@ public sealed partial class AdminPanelViewModel
         _suppressAdminFilterReload = false;
 
         if (reload && _callbacks.GetIsAdminRole())
-            _ = LoadUsersAsync();
+            SafeFireAndForget.Run(LoadUsersAsync());
     }
 
     private UserAdminListFilter GetSelectedListFilter() =>

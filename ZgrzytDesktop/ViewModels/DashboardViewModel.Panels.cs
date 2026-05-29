@@ -82,33 +82,31 @@ public partial class DashboardViewModel
 
     public bool IsLoadingAllStatistics => StatisticsPanel.IsLoadingAllStatistics;
 
-    private DashboardVmBridge CreateModuleBridge() =>
-        new()
-        {
-            ExecuteApiAsyncCore = ExecuteApiAsync,
-            ShowToastKey = ShowToastKey,
-            ShowToastRaw = ShowToast,
-            LogAuditAsync = LogAuditAsync,
-            GetIsOffline = () => IsOffline,
-            SetIsOffline = value => IsOffline = value,
-            NotifyLocalization = NotifyLocalizationProperties,
-            GetCurrentSection = () => CurrentSection
-        };
+    private IDashboardContext CreateDashboardContext() =>
+        new DashboardContext(
+            executeApiAsync: ExecuteApiAsync,
+            showToastKey: ShowToastKey,
+            showToastRaw: ShowToast,
+            logAuditAsync: LogAuditAsync,
+            getIsOffline: () => IsOffline,
+            setIsOffline: value => IsOffline = value,
+            notifyLocalization: NotifyLocalizationProperties,
+            getCurrentSection: () => CurrentSection);
 
     private void InitializeDashboardPanels()
     {
-        var bridge = CreateModuleBridge();
+        _dashboardContext = CreateDashboardContext();
 
         AuditPanel = new AuditPanelViewModel(_auditLogService);
         SettingsPanel = new SettingsPanelViewModel(
             _settingsService,
             _authService,
-            bridge,
+            _dashboardContext,
             () => AuditPanel.RefreshAsync(),
             _onAutoLogoutSettingsChanged);
         StatisticsPanel = new StatisticsPanelViewModel(
             _ticketService,
-            bridge,
+            _dashboardContext,
             () => TicketsPanel.IsNotLoading);
     }
 }

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.ViewModels.DashboardModules;
 
 namespace ZgrzytDesktop.ViewModels;
@@ -24,7 +25,7 @@ public partial class DashboardViewModel
                 NotifyOnlineActionsChanged = NotifyOnlineActionsChanged,
                 GetApiErrorMessage = GetApiErrorMessage,
                 GetCurrentUserId = () => CurrentUser.Id,
-                TicketSelected = ticketId => _ = LoadTicketDetailsAndOpenAsync(ticketId),
+                TicketSelected = ticketId => SafeFireAndForget.Run(LoadTicketDetailsAndOpenAsync(ticketId)),
                 RefreshPaginationSideEffects = () => TicketDetailsPanel.NotifyCapabilityProperties(),
                 LogAuditAsync = LogAuditAsync,
                 ExecuteApiAsyncCore = ExecuteApiAsync
@@ -45,6 +46,7 @@ public partial class DashboardViewModel
         OnPropertyChanged(nameof(CanUseOnlineActions));
         OnPropertyChanged(nameof(CanRequestAccount));
         AdminPanel.NotifyCanRegisterUserChanged();
+        RequestAccountPanel?.NotifyCanSubmitChanged();
     }
 
     private Task LoadTicketsAsync(bool silentRefresh = false) =>

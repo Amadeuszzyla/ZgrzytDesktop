@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Helpers;
 
 namespace ZgrzytDesktop.ViewModels.DashboardModules;
 
@@ -70,7 +71,7 @@ public sealed partial class TicketsPanelViewModel
                 RefreshPaginationProperties();
 
                 if (!_isChangingPageInternally)
-                    _ = LoadTicketsAsync();
+                    SafeFireAndForget.Run(LoadTicketsAsync());
             }
         }
     }
@@ -105,7 +106,7 @@ public sealed partial class TicketsPanelViewModel
             {
                 SetSelectedPageSizeSilently(value);
                 SetCurrentPageSilently(1);
-                _ = LoadTicketsAsync();
+                SafeFireAndForget.Run(LoadTicketsAsync());
             }
         }
     }

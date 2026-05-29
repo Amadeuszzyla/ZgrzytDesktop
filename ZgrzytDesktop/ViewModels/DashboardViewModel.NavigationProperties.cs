@@ -9,14 +9,6 @@ public partial class DashboardViewModel
 {
     private string _currentSection = AppSections.Tickets;
 
-    private string _requestName = string.Empty;
-    private string _requestLogin = string.Empty;
-    private string _requestEmail = string.Empty;
-    private string _requestPassword = string.Empty;
-    private string _requestPasswordConfirmation = string.Empty;
-    private string _requestAccountStatusMessage = string.Empty;
-    private bool _isRequestingAccount;
-
     public const int TicketAutoRefreshIntervalSeconds = 45;
 
     public string CurrentSection
@@ -86,52 +78,4 @@ public partial class DashboardViewModel
         AppSections.Admin => AppStrings.Get("Section_Admin"),
         _ => AppStrings.Get("App_Title")
     };
-
-    public string RequestName
-    {
-        get => _requestName;
-        set => SetProperty(ref _requestName, value);
-    }
-
-    public string RequestLogin
-    {
-        get => _requestLogin;
-        set => SetProperty(ref _requestLogin, value);
-    }
-
-    public string RequestEmail
-    {
-        get => _requestEmail;
-        set => SetProperty(ref _requestEmail, value);
-    }
-
-    public string RequestPassword
-    {
-        get => _requestPassword;
-        set => SetProperty(ref _requestPassword, value);
-    }
-
-    public string RequestPasswordConfirmation
-    {
-        get => _requestPasswordConfirmation;
-        set => SetProperty(ref _requestPasswordConfirmation, value);
-    }
-
-    public string RequestAccountStatusMessage
-    {
-        get => _requestAccountStatusMessage;
-        set => SetProperty(ref _requestAccountStatusMessage, value);
-    }
-
-    public bool IsRequestingAccount
-    {
-        get => _isRequestingAccount;
-        private set
-        {
-            if (SetProperty(ref _isRequestingAccount, value))
-                OnPropertyChanged(nameof(CanRequestAccount));
-        }
-    }
-
-    public bool CanRequestAccount => CanUseOnlineActions && !IsRequestingAccount;
 }

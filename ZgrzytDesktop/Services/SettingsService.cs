@@ -12,6 +12,11 @@ using ZgrzytDesktop.Services.Interfaces;
 
 namespace ZgrzytDesktop.Services;
 
+/// <summary>
+/// Persists non-sensitive UI preferences (<see cref="AppSettings"/>).
+/// Stored as plaintext JSON — no passwords or tokens. Sensitive data uses
+/// <see cref="SecureLocalFileStorage"/> elsewhere (token, cache, audit).
+/// </summary>
 public class SettingsService : ISettingsService
 {
     private readonly string _filePath;

@@ -15,7 +15,7 @@ namespace ZgrzytDesktop.ViewModels.DashboardModules;
 public sealed class StatisticsPanelViewModel : ViewModelBase
 {
     private readonly ITicketService _ticketService;
-    private readonly DashboardVmBridge _bridge;
+    private readonly IDashboardContext _context;
     private readonly Func<bool> _getTicketsNotLoading;
 
     private int _statsTotalTickets;
@@ -37,11 +37,11 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
 
     public StatisticsPanelViewModel(
         ITicketService ticketService,
-        DashboardVmBridge bridge,
+        IDashboardContext context,
         Func<bool> getTicketsNotLoading)
     {
         _ticketService = ticketService;
-        _bridge = bridge;
+        _context = context;
         _getTicketsNotLoading = getTicketsNotLoading;
 
         LoadAllPagesStatisticsCommand = new AsyncRelayCommand(LoadAllPagesStatisticsAsync);
@@ -237,7 +237,7 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
 
     private async Task LoadAllPagesStatisticsAsync()
     {
-        if (_bridge.GetIsOffline())
+        if (_context.IsOffline)
         {
             StatsScopeMessage = AppStrings.Get("Stats_AllPagesRequiresOnline");
             return;
@@ -247,7 +247,7 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
         {
             IsLoadingAllStatistics = true;
 
-            await _bridge.ExecuteApiAsync(
+            await _context.ExecuteApiAsync(
                 async () =>
                 {
                     var aggregated = new List<Ticket>();
@@ -272,7 +272,7 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
                     } while (page <= lastPage);
 
                     ApplyTicketStatistics(aggregated, totalInSystem, fromCurrentPageOnly: false);
-                    _bridge.ShowToastKey("Stats_Loaded", ToastTypes.Success, aggregated.Count);
+                    _context.ShowToastKey("Stats_Loaded", ToastTypes.Success, aggregated.Count);
                 },
                 setStatusMessage: message => StatsScopeMessage = message,
                 unexpectedStatusMessageKey: "Stats_LoadAllPagesFailed",

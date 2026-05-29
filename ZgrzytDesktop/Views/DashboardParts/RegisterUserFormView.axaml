@@ -2,8 +2,8 @@
     x:Class="ZgrzytDesktop.Views.DashboardParts.RegisterUserFormView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:ZgrzytDesktop.Helpers"
     xmlns:vm="using:ZgrzytDesktop.ViewModels"
-    x:CompileBindings="False"
     x:DataType="vm:DashboardViewModel">
 
     <StackPanel Spacing="16">
@@ -63,7 +63,7 @@
                 SelectedItem="{Binding SelectedNewUserRole}"
                 IsEnabled="{Binding CanRegisterUser}">
                 <ComboBox.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="helpers:RegisterUserRoleOption">
                         <TextBlock Text="{Binding Label}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>

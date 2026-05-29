@@ -3,9 +3,10 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:ZgrzytDesktop.Converters"
+    xmlns:helpers="using:ZgrzytDesktop.Helpers"
+    xmlns:models="using:ZgrzytDesktop.Models"
     xmlns:parts="clr-namespace:ZgrzytDesktop.Views.DashboardParts"
     xmlns:vm="using:ZgrzytDesktop.ViewModels"
-    x:CompileBindings="False"
     x:DataType="vm:DashboardViewModel">
 
     <UserControl.Resources>
@@ -64,7 +65,7 @@
                                     IsEnabled="{Binding TicketDetailsPanel.CanShowAdminAssignmentControls}"
                                     HorizontalAlignment="Stretch">
                                     <ComboBox.ItemTemplate>
-                                        <DataTemplate>
+                                        <DataTemplate x:DataType="helpers:AssignableUserOption">
                                             <TextBlock Text="{Binding Label}" />
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
@@ -266,7 +267,7 @@
                             <StackPanel Classes="details-messages-list" MaxWidth="720" HorizontalAlignment="Left">
                                 <ItemsControl ItemsSource="{Binding TicketDetailsPanel.Messages}">
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
+                                        <DataTemplate x:DataType="models:Message">
                                             <Border Classes="message-bubble" MaxWidth="520">
                                                 <StackPanel Spacing="8">
                                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
@@ -313,7 +314,7 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding TicketDetailsPanel.TicketAuditLogEntries}">
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="models:AuditLogEntry">
                                         <Border Classes="message-bubble" Margin="0,0,0,8">
                                             <StackPanel Spacing="4">
                                                 <TextBlock

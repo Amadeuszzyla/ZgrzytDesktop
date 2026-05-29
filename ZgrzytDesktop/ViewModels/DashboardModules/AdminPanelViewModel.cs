@@ -164,7 +164,7 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
         {
             AdminTab = AdminTabs.Users;
             ApplyDefaultFilter();
-            _ = LoadUsersAsync();
+            SafeFireAndForget.Run(LoadUsersAsync());
             return;
         }
 

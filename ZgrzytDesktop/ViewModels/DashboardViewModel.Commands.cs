@@ -42,7 +42,7 @@ public partial class DashboardViewModel
         ShowAdminPageCommand = new RelayCommand(ShowAdminPage);
         ShowAdminUsersTabCommand = AdminPanel.ShowAdminUsersTabCommand;
         ShowAdminNewAccountTabCommand = AdminPanel.ShowAdminNewAccountTabCommand;
-        RequestAccountCommand = new AsyncRelayCommand(RequestAccountAsync);
+        RequestAccountCommand = RequestAccountPanel.SubmitCommand;
 
         LoadAdminUsersCommand = AdminPanel.LoadAdminUsersCommand;
         BanAdminUserCommand = AdminPanel.BanAdminUserCommand;

@@ -7,6 +7,8 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath>
+        <Version>0.1.0</Version>
+        <InformationalVersion>0.1.0-alpha</InformationalVersion>
     </PropertyGroup>
 
     <ItemGroup>

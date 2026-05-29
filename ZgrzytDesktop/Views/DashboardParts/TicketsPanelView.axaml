@@ -1,11 +1,14 @@
 ﻿<UserControl
     x:Class="ZgrzytDesktop.Views.DashboardParts.TicketsPanelView"
+    x:Name="TicketsPanelRoot"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:ZgrzytDesktop.Converters"
+    xmlns:helpers="using:ZgrzytDesktop.Helpers"
+    xmlns:models="using:ZgrzytDesktop.Models"
     xmlns:parts="clr-namespace:ZgrzytDesktop.Views.DashboardParts"
+    xmlns:sys="using:System"
     xmlns:vm="using:ZgrzytDesktop.ViewModels"
-    x:CompileBindings="False"
     x:DataType="vm:DashboardViewModel">
 
     <UserControl.Resources>
@@ -31,7 +34,7 @@
                             SelectedItem="{Binding TicketsPanel.SelectedFilterStatusOption}"
                             IsEnabled="{Binding TicketsPanel.IsNotLoading}">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="helpers:TicketFilterOption">
                                     <TextBlock Text="{Binding Label}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -45,7 +48,7 @@
                             SelectedItem="{Binding TicketsPanel.SelectedFilterPriorityOption}"
                             IsEnabled="{Binding TicketsPanel.IsNotLoading}">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="helpers:TicketFilterOption">
                                     <TextBlock Text="{Binding Label}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -59,7 +62,7 @@
                             SelectedItem="{Binding TicketsPanel.SelectedFilterAssignmentOption}"
                             IsEnabled="{Binding TicketsPanel.IsNotLoading}">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="helpers:TicketFilterOption">
                                     <TextBlock Text="{Binding Label}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -100,7 +103,7 @@
                             SelectedItem="{Binding TicketsPanel.SelectedCategoryFilterOption}"
                             IsEnabled="{Binding TicketsPanel.IsNotLoading}">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="helpers:TicketCategoryFilterOption">
                                     <TextBlock Text="{Binding Label}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -114,7 +117,7 @@
                             SelectedItem="{Binding TicketsPanel.SelectedTicketSortField}"
                             IsEnabled="{Binding TicketsPanel.IsNotLoading}">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="helpers:TicketSortFieldOption">
                                     <TextBlock Text="{Binding Label}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -128,7 +131,7 @@
                             SelectedItem="{Binding TicketsPanel.SelectedTicketSortDirection}"
                             IsEnabled="{Binding TicketsPanel.IsNotLoading}">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="helpers:TicketSortDirectionOption">
                                     <TextBlock Text="{Binding Label}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -192,7 +195,7 @@
                     IsEnabled="{Binding TicketsPanel.IsNotLoading}"
                     IsVisible="{Binding TicketsPanel.HasNoTickets, Converter={StaticResource InvertBoolConverter}}">
                     <ListBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="models:Ticket">
                             <Border Classes="ticket-card" Padding="16,14">
                                 <Grid RowDefinitions="Auto,Auto,Auto,Auto">
                                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="12">
@@ -226,7 +229,7 @@
                                         Spacing="4"
                                         Margin="0,8,0,0"
                                         IsVisible="{Binding AssignedTo, Converter={StaticResource ObjectIsNotNullConverter}}">
-                                        <TextBlock Classes="ticket-card-meta" Text="{Binding LblDetailsAssignedHint}" />
+                                        <TextBlock Classes="ticket-card-meta" Text="{Binding #TicketsPanelRoot.((vm:DashboardViewModel)DataContext).LblDetailsAssignedHint}" />
                                         <TextBlock
                                             Classes="ticket-card-meta"
                                             Text="{Binding AssignedTo.Name}"
@@ -237,7 +240,7 @@
                                         Grid.Row="2"
                                         Classes="ticket-card-meta-muted"
                                         Margin="0,8,0,0"
-                                        Text="{Binding LblDetailsNotAssignedHint}"
+                                        Text="{Binding #TicketsPanelRoot.((vm:DashboardViewModel)DataContext).LblDetailsNotAssignedHint}"
                                         IsVisible="{Binding AssignedTo, Converter={StaticResource ObjectIsNotNullConverter}, ConverterParameter=invert}" />
 
                                     <Grid
@@ -318,7 +321,7 @@
                                     SelectedItem="{Binding TicketsPanel.SelectedNewTicketCategory}"
                                     IsEnabled="{Binding CanUseOnlineActions}">
                                     <ComboBox.ItemTemplate>
-                                        <DataTemplate>
+                                        <DataTemplate x:DataType="sys:String">
                                             <TextBlock Text="{Binding Converter={StaticResource CategoryDisplayConverter}}" />
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>

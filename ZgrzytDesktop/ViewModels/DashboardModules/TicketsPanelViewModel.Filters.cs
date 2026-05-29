@@ -37,7 +37,7 @@ public sealed partial class TicketsPanelViewModel
             if (SetProperty(ref _selectedTicketSortField, value))
             {
                 SetCurrentPageSilently(1);
-                _ = LoadTicketsAsync();
+                SafeFireAndForget.Run(LoadTicketsAsync());
             }
         }
     }
@@ -50,7 +50,7 @@ public sealed partial class TicketsPanelViewModel
             if (SetProperty(ref _selectedTicketSortDirection, value))
             {
                 SetCurrentPageSilently(1);
-                _ = LoadTicketsAsync();
+                SafeFireAndForget.Run(LoadTicketsAsync());
             }
         }
     }
@@ -71,7 +71,7 @@ public sealed partial class TicketsPanelViewModel
 
             SelectedFilterStatus = value.Value;
             SetCurrentPageSilently(1);
-            _ = LoadTicketsAsync();
+            SafeFireAndForget.Run(LoadTicketsAsync());
         }
     }
 
@@ -91,7 +91,7 @@ public sealed partial class TicketsPanelViewModel
 
             SelectedFilterPriority = value.Value;
             SetCurrentPageSilently(1);
-            _ = LoadTicketsAsync();
+            SafeFireAndForget.Run(LoadTicketsAsync());
         }
     }
 
@@ -113,7 +113,7 @@ public sealed partial class TicketsPanelViewModel
             OnPropertyChanged(nameof(SelectedAssignmentFilterKey));
             OnPropertyChanged(nameof(SelectedFilterAssignmentOption));
             SetCurrentPageSilently(1);
-            _ = LoadTicketsAsync();
+            SafeFireAndForget.Run(LoadTicketsAsync());
         }
     }
 
@@ -125,7 +125,7 @@ public sealed partial class TicketsPanelViewModel
             if (SetProperty(ref _selectedTicketQueueView, value))
             {
                 SetCurrentPageSilently(1);
-                _ = LoadTicketsAsync();
+                SafeFireAndForget.Run(LoadTicketsAsync());
             }
         }
     }
@@ -140,7 +140,7 @@ public sealed partial class TicketsPanelViewModel
 
             SetSelectedTicketQueueViewSilently(value.Value);
             SetCurrentPageSilently(1);
-            _ = LoadTicketsAsync();
+            SafeFireAndForget.Run(LoadTicketsAsync());
         }
     }
 
@@ -182,7 +182,7 @@ public sealed partial class TicketsPanelViewModel
             OnPropertyChanged(nameof(SelectedCategory));
             OnPropertyChanged(nameof(SelectedCategoryFilterOption));
             SetCurrentPageSilently(1);
-            _ = LoadTicketsAsync();
+            SafeFireAndForget.Run(LoadTicketsAsync());
         }
     }
 
@@ -209,7 +209,7 @@ public sealed partial class TicketsPanelViewModel
         OnPropertyChanged(nameof(SelectedCategoryFilterOption));
         SetCurrentPageSilently(1);
 
-        _ = LoadTicketsAsync();
+        SafeFireAndForget.Run(LoadTicketsAsync());
     }
 
     private void InitializeCollections()
