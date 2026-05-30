@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Input;
-using ZgrzytDesktop.Constants;
 
 namespace ZgrzytDesktop.ViewModels;
 
@@ -35,11 +34,11 @@ public partial class DashboardViewModel
 
     private void InitializeCommands()
     {
-        ShowTicketsPageCommand = new RelayCommand(ShowTicketsPage);
-        ShowSettingsPageCommand = new RelayCommand(ShowSettingsPage);
-        ShowRequestAccountPageCommand = new RelayCommand(ShowRequestAccountPage);
-        ShowStatisticsPageCommand = new RelayCommand(ShowStatisticsPage);
-        ShowAdminPageCommand = new RelayCommand(ShowAdminPage);
+        ShowTicketsPageCommand = _navigation.ShowTicketsPageCommand;
+        ShowSettingsPageCommand = _navigation.ShowSettingsPageCommand;
+        ShowRequestAccountPageCommand = _navigation.ShowRequestAccountPageCommand;
+        ShowStatisticsPageCommand = _navigation.ShowStatisticsPageCommand;
+        ShowAdminPageCommand = _navigation.ShowAdminPageCommand;
         ShowAdminUsersTabCommand = AdminPanel.ShowAdminUsersTabCommand;
         ShowAdminNewAccountTabCommand = AdminPanel.ShowAdminNewAccountTabCommand;
         RequestAccountCommand = RequestAccountPanel.SubmitCommand;

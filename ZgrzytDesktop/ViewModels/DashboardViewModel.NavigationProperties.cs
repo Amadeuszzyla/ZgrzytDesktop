@@ -1,81 +1,48 @@
-using System;
-using ZgrzytDesktop.Constants;
-using ZgrzytDesktop.Helpers;
-using ZgrzytDesktop.Resources;
+using ZgrzytDesktop.ViewModels.DashboardModules;
 
 namespace ZgrzytDesktop.ViewModels;
 
 public partial class DashboardViewModel
 {
-    private string _currentSection = AppSections.Tickets;
+    private DashboardNavigationViewModel _navigation = null!;
 
     public const int TicketAutoRefreshIntervalSeconds = 45;
 
     public string CurrentSection
     {
-        get => _currentSection;
-        set
-        {
-            if (SetProperty(ref _currentSection, value))
-            {
-                OnPropertyChanged(nameof(IsTicketsPageVisible));
-                OnPropertyChanged(nameof(IsDetailsPageVisible));
-                OnPropertyChanged(nameof(IsSettingsPageVisible));
-                OnPropertyChanged(nameof(IsRequestAccountPageVisible));
-                OnPropertyChanged(nameof(IsStatisticsPageVisible));
-                OnPropertyChanged(nameof(IsAdminPageVisible));
-                OnPropertyChanged(nameof(CurrentSectionTitle));
-                OnPropertyChanged(nameof(IsTicketsNavActive));
-                OnPropertyChanged(nameof(IsRequestAccountNavActive));
-                OnPropertyChanged(nameof(ShowRequestAccountNav));
-                OnPropertyChanged(nameof(ShowAdministrationNav));
-                OnPropertyChanged(nameof(IsStatisticsNavActive));
-                OnPropertyChanged(nameof(IsSettingsNavActive));
-                OnPropertyChanged(nameof(IsAdminNavActive));
-                OnPropertyChanged(nameof(IsAdminUsersPanelVisible));
-                OnPropertyChanged(nameof(IsAdminNewAccountPanelVisible));
-            }
-        }
+        get => _navigation.CurrentSection;
+        set => _navigation.CurrentSection = value;
     }
 
-    public bool IsTicketsNavActive => CurrentSection == AppSections.Tickets;
+    public bool IsTicketsNavActive => _navigation.IsTicketsNavActive;
 
-    public bool IsRequestAccountNavActive => CurrentSection == AppSections.RequestAccount;
+    public bool IsRequestAccountNavActive => _navigation.IsRequestAccountNavActive;
 
-    public bool IsStatisticsNavActive => CurrentSection == AppSections.Statistics;
+    public bool IsStatisticsNavActive => _navigation.IsStatisticsNavActive;
 
-    public bool IsSettingsNavActive => CurrentSection == AppSections.Settings;
+    public bool IsSettingsNavActive => _navigation.IsSettingsNavActive;
 
-    public bool IsAdminNavActive => CurrentSection == AppSections.Admin;
+    public bool IsAdminNavActive => _navigation.IsAdminNavActive;
 
-    public bool IsTicketsPageVisible => CurrentSection == AppSections.Tickets;
+    public bool IsTicketsPageVisible => _navigation.IsTicketsPageVisible;
 
-    public bool IsDetailsPageVisible => CurrentSection == AppSections.Details;
+    public bool IsDetailsPageVisible => _navigation.IsDetailsPageVisible;
 
-    public bool IsSettingsPageVisible => CurrentSection == AppSections.Settings;
+    public bool IsSettingsPageVisible => _navigation.IsSettingsPageVisible;
 
-    public bool IsRequestAccountPageVisible => CurrentSection == AppSections.RequestAccount;
+    public bool IsRequestAccountPageVisible => _navigation.IsRequestAccountPageVisible;
 
-    public bool IsStatisticsPageVisible => CurrentSection == AppSections.Statistics;
+    public bool IsStatisticsPageVisible => _navigation.IsStatisticsPageVisible;
 
-    public bool IsAdminPageVisible => CurrentSection == AppSections.Admin;
+    public bool IsAdminPageVisible => _navigation.IsAdminPageVisible;
 
-    public bool IsAdminRole => AppRoleHelper.IsAdmin(CurrentUser.Role);
+    public bool IsAdminRole => _navigation.IsAdminRole;
 
-    public bool IsStaffRole => AppRoleHelper.IsDesktopStaff(CurrentUser.Role);
+    public bool IsStaffRole => _navigation.IsStaffRole;
 
-    public bool ShowAdministrationNav => IsStaffRole;
+    public bool ShowAdministrationNav => _navigation.ShowAdministrationNav;
 
-    public bool ShowRequestAccountNav => !IsStaffRole;
+    public bool ShowRequestAccountNav => _navigation.ShowRequestAccountNav;
 
-    public string CurrentSectionTitle => CurrentSection switch
-    {
-        AppSections.Tickets => AppStrings.Get("Section_Tickets"),
-        AppSections.Details => AppStrings.Get("Section_Details"),
-        AppSections.Settings => AppStrings.Get("Section_Settings"),
-        AppSections.RequestAccount => AppStrings.Get("Section_RequestAccount"),
-        AppSections.Statistics => AppStrings.Get("Section_Statistics"),
-        AppSections.Admin => AppStrings.Get("Section_Admin"),
-        _ => AppStrings.Get("App_Title")
-    };
+    public string CurrentSectionTitle => _navigation.CurrentSectionTitle;
 }

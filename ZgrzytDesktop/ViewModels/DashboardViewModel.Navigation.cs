@@ -1,36 +1,35 @@
+using System.ComponentModel;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.ViewModels.DashboardModules;
+
 namespace ZgrzytDesktop.ViewModels;
 
 public partial class DashboardViewModel
 {
-    private void ShowTicketsPage()
+    private void InitializeNavigation()
     {
-        CurrentSection = AppSections.Tickets;
+        _navigation = new DashboardNavigationViewModel(
+            CurrentUser,
+            onSettingsNavigated: () => SafeFireAndForget.Run(AuditPanel.RefreshAsync()),
+            onAdminNavigated: isAdminRole => AdminPanel.PrepareAdminPage(isAdminRole));
+
+        _navigation.PropertyChanged += OnNavigationPropertyChanged;
     }
 
-    private void ShowSettingsPage()
+    private void OnNavigationPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        CurrentSection = AppSections.Settings;
-        SafeFireAndForget.Run(AuditPanel.RefreshAsync());
-    }
+        if (string.IsNullOrEmpty(e.PropertyName))
+            return;
 
-    private void ShowRequestAccountPage()
-    {
-        CurrentSection = AppSections.RequestAccount;
-    }
+        OnPropertyChanged(e.PropertyName);
 
-    private void ShowStatisticsPage()
-    {
-        CurrentSection = AppSections.Statistics;
-    }
-
-    private void ShowAdminPage()
-    {
-        CurrentSection = AppSections.Admin;
-        AdminPanel.PrepareAdminPage(IsAdminRole);
+        if (e.PropertyName == nameof(DashboardNavigationViewModel.CurrentSection))
+        {
+            OnPropertyChanged(nameof(IsAdminUsersPanelVisible));
+            OnPropertyChanged(nameof(IsAdminNewAccountPanelVisible));
+        }
     }
 
     private async Task LogoutAsync()

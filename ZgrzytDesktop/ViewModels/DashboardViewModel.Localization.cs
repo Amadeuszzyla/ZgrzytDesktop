@@ -40,7 +40,7 @@ public partial class DashboardViewModel
         OnPropertyChanged(nameof(LblNavAdmin));
         OnPropertyChanged(nameof(LblNavLogout));
         OnPropertyChanged(nameof(LblHeaderSubtitle));
-        OnPropertyChanged(nameof(CurrentSectionTitle));
+        _navigation.NotifyLocalization();
         OnPropertyChanged(nameof(LblTicketsFiltersTitle));
         OnPropertyChanged(nameof(LblTicketsFiltersSubtitle));
         OnPropertyChanged(nameof(LblTicketsSearchPlaceholder));

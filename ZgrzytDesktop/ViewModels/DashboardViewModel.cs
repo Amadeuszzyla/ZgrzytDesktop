@@ -95,6 +95,9 @@ public partial class DashboardViewModel : ViewModelBase
                     OnPropertyChanged(forwarded);
             };
 
+            using (StartupPerf.Measure("Initialize API coordinator"))
+                InitializeApiCoordinator();
+
             using (StartupPerf.Measure("Initialize dashboard panels"))
                 InitializeDashboardPanels();
 
@@ -109,6 +112,9 @@ public partial class DashboardViewModel : ViewModelBase
 
             using (StartupPerf.Measure("Initialize admin panel"))
                 InitializeAdminPanel();
+
+            using (StartupPerf.Measure("Initialize navigation"))
+                InitializeNavigation();
 
             using (StartupPerf.Measure("Initialize commands"))
                 InitializeCommands();
