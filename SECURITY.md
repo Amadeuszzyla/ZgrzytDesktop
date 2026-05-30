@@ -1,8 +1,8 @@
-# Bezpieczeństwo — ZGRZYT Desktop
+# Bezpieczeństwo — ZgrzytDesktop
 
-Ten dokument opisuje zasady zgłaszania podatności, lokalne przechowywanie danych oraz ograniczenia klienta desktopowego.
+Ten dokument opisuje zgłaszanie podatności, lokalne przechowywanie danych, ograniczenia klienta desktopowego oraz praktyki release.
 
-## Zgłaszanie podatności
+## 1. Zgłaszanie podatności
 
 Jeśli odkryjesz problem bezpieczeństwa:
 
@@ -13,7 +13,7 @@ Jeśli odkryjesz problem bezpieczeństwa:
 
 Nie prowadzimy programu bug bounty. Doceniamy jednak odpowiedzialne zgłoszenia.
 
-## Dane przechowywane lokalnie
+## 2. Dane lokalne aplikacji
 
 Aplikacja zapisuje dane w katalogu użytkownika Windows:
 
@@ -29,63 +29,75 @@ Aplikacja zapisuje dane w katalogu użytkownika Windows:
 
 **Hasła logowania nie są zapisywane** na dysku. Po zalogowaniu przechowywany jest wyłącznie token zwrócony przez API.
 
-## Ochrona danych lokalnych
+## 3. Ochrona lokalnych danych
 
 | Zasób | Ochrona |
 |-------|---------|
-| Token sesji | **Windows DPAPI** (`DataProtectionScope.CurrentUser`) |
+| Token sesji (`token.txt`) | **Windows DPAPI** (`DataProtectionScope.CurrentUser`) |
 | Cache zgłoszeń i użytkownika | **DPAPI** |
-| Lokalny audyt | **DPAPI** |
+| Lokalny audyt (`audit-log.json`) | **DPAPI** |
 | Ustawienia (`settings.json`) | Plaintext JSON — **bez haseł i tokenów** |
 
 DPAPI wiąże dane z bieżącym kontem Windows. Chroni przed odczytem przez innych użytkowników tego samego komputera, ale **nie** przed oprogramowaniem działającym w kontekście zalogowanego użytkownika ani przed pełnym dostępem do dysku (administrator, malware, backup).
 
-## Czego klient desktopowy nie gwarantuje
+## 4. Zabezpieczenia aplikacji desktopowej
 
-Bez współpracy i poprawnej konfiguracji **backendu API** aplikacja nie może zapewnić:
+| Mechanizm | Opis |
+|-----------|------|
+| **Bearer token** | `POST /api/login`, token w DPAPI, `POST /api/refresh`, wylogowanie lokalne i przez API |
+| **Role IT / admin / user** | Dashboard tylko dla IT i admin; rola `user` jest wylogowywana po logowaniu |
+| **Role-based UI** | Admin: zarządzanie użytkownikami; IT: rejestracja kont; niedostępne sekcje są ukryte |
+| **Sanityzacja HTML** | `HtmlTextSanitizer` — tytuł/opis zgłoszenia i wiadomości; odrzucanie HTML z API jako błędów |
+| **Maskowanie w logach** | `SensitiveDataMasker`, `SensitiveDataRedactor` — brak haseł/tokenów w audycie i błędach |
+| **Brak stack trace w UI** | Zlokalizowane komunikaty (PL/EN); stack trace nie trafia do użytkownika |
+| **Auto-wylogowanie** | `SessionInactivityMonitor` — wylogowanie po bezczynności (konfigurowalny timeout) |
+| **HTTPS** | Domyślny URL produkcyjny używa `https://`; zdalne `http://` jest podnoszone do HTTPS (`ApiUrlSecurityHelper`) |
 
-- weryfikacji tożsamości i uprawnień po stronie serwera,
-- integralności i poufności danych przechowywanych w bazie API,
-- ochrony przed manipulacją żądaniami HTTP (np. modyfikacja klienta, proxy, replay),
-- unieważnienia skradzionego tokena (revocation) — zależy od polityki API,
-- zgodności z politykami organizacji (SIEM, DLP, MDM) — to warstwa wdrożeniowa poza samym EXE.
+## 5. API i ograniczenia
 
-Ukrycie przycisku lub panelu w UI **nie stanowi** kontroli bezpieczeństwa.
+- **Ostateczna autoryzacja musi być po stronie backendu** — każde żądanie weryfikuje token, rolę i reguły biznesowe serwera.
+- **Ukrycie przycisku w UI nie jest zabezpieczeniem** — zmodyfikowany klient lub bezpośrednie żądanie HTTP musi być odrzucone przez API.
+- **Poza zakresem desktopu:** rate limiting, pełna rotacja/revocation tokenów po stronie serwera, pełny audyt serwerowy (`GET /api/logs`), wymuszenie TLS po stronie infrastruktury.
 
-## Autoryzacja po stronie API
+Klient desktop wysyła token w nagłówku `Authorization` i ukrywa elementy UI według roli, ale **nie decyduje** o dostępie do danych.
 
-**Każde żądanie do API musi być autoryzowane i autentykowane po stronie serwera** — na podstawie tokena, roli i reguł biznesowych backendu.
-
-Klient desktop:
-
-- wysyła token w nagłówku `Authorization`,
-- ukrywa elementy UI według roli (IT, admin, user),
-
-ale **nie decyduje** o dostępie do danych. Endpointy API muszą odrzucać nieautoryzowane operacje niezależnie od tego, czy użytkownik zmodyfikował aplikację lub wysłał żądanie spoza UI.
-
-## Sekrety w repozytorium i CI
+## 6. Sekrety
 
 | Zasada | Szczegóły |
 |--------|-----------|
 | Nie commituj `.env` | Plik jest w `.gitignore`. Wzorzec: [.env.example](.env.example) |
-| Nie commituj tokenów, haseł, kluczy API | Ani w kodzie, ani w testach, ani w logach CI |
-| Testy integracyjne | Używaj **zmiennych środowiskowych**: `ZGRZYT_API_URL`, `ZGRZYT_LOGIN`, `ZGRZYT_PASSWORD` — patrz [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) |
-| CI / pipeline | Sekrety jako **GitHub Actions Secrets** (lub odpowiednik), nie w commitowanym YAML |
+| Zmienne testów integracyjnych | `ZGRZYT_API_URL`, `ZGRZYT_LOGIN`, `ZGRZYT_PASSWORD` — tylko lokalnie lub jako **GitHub Actions Secrets** |
+| Nie loguj haseł/tokenów | Ani w kodzie, ani w testach, ani w logach CI |
+| Domyślny CI | `dotnet test --filter "Category!=Integration"` — testy live pomijane bez sekretów |
 
-Domyślny `dotnet test` w CI **pomija** testy `Category=Integration`, dopóki nie skonfigurujesz sekretów świadomie.
+PowerShell (sesja bieżąca):
 
-## Bezpieczeństwo release
+```powershell
+$env:ZGRZYT_API_URL = "https://zgrzyt-api.onrender.com/api/"
+$env:ZGRZYT_LOGIN = "twoj_login"
+$env:ZGRZYT_PASSWORD = "twoje_haslo"
+```
 
-| Obszar | Zalecenie |
-|--------|-----------|
-| **HTTPS** | Produkcyjne API **musi** używać HTTPS. Domyślny URL w aplikacji wskazuje na endpoint HTTPS. |
-| **Podpisywanie aplikacji** | **Rekomendowane** dla wdrożeń organizacyjnych (Authenticode) — zmniejsza ryzyko fałszywych instalatorów. Workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) i [`scripts/publish-release.ps1`](scripts/publish-release.ps1) **nie podpisują** jeszcze `ZgrzytDesktop.exe` — Authenticode pozostaje **TODO** (komentarz w skrypcie/workflow). |
-| **Checksumy release** | **Rekomendowane** — publikuj SHA-256 archiwum ZIP obok paczki, aby użytkownicy mogli zweryfikować integralność pobranego pliku. Workflow release generuje plik `.sha256` jako artefakt GitHub Actions. |
+## 7. Release security
 
-Skrypt publikacji lokalnej: [`scripts/publish-release.ps1`](scripts/publish-release.ps1). Ręczny build w CI: [`.github/workflows/release.yml`](.github/workflows/release.yml). Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt).
+| Obszar | Stan |
+|--------|------|
+| **SHA256** | Workflow release generuje `.sha256` dla instalatora, deinstalatora i portable ZIP |
+| **Authenticode** | **Nie skonfigurowany** — brak podpisu cyfrowego EXE/instalatora |
+| **SmartScreen** | Windows może pokazać ostrzeżenie przy pierwszym uruchomieniu niepodpisanego pliku |
+| **Deinstalator** | `ZgrzytDesktopUninstall.exe` **nie usuwa plików ręcznie** — szuka `unins000.exe` w rejestrze Windows (AppId / DisplayName) z fallbackiem do `%LocalAppData%\Programs\ZgrzytDesktop\` i uruchamia deinstalator Inno Setup |
 
-## Powiązane dokumenty
+Skrypt publikacji lokalnej: [`scripts/publish-release.ps1`](scripts/publish-release.ps1). Build release w CI: [`.github/workflows/release.yml`](.github/workflows/release.yml).
 
-- [README.md](README.md) — sekcja „Dane lokalne”
-- [REQUIREMENTS.md](REQUIREMENTS.md) — wymagania środowiska
-- [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) — bezpieczna konfiguracja testów live API
+## 8. Checklist bezpieczeństwa przed oddaniem
+
+- [ ] Brak sekretów, haseł i tokenów w repozytorium (w tym `.env`, logi, testy)
+- [ ] Brak haseł i tokenów w lokalnym audycie i komunikatach błędów
+- [ ] `dotnet test ZgrzytDesktop.sln -c Release --filter "Category!=Integration"` przechodzi
+- [ ] Artefakty release mają pliki `.sha256`
+- [ ] Aplikacja używa HTTPS dla produkcyjnego API
+- [ ] Testy integracyjne live uruchamiane tylko ze świadomie skonfigurowanymi sekretami
+
+## Powiązane
+
+- [README.md](README.md) — architektura, testy, CI/CD, uruchomienie release

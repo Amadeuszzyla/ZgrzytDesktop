@@ -22,7 +22,7 @@ $ReleaseDir = Join-Path $RepoRoot "release"
 $ZipName = "ZgrzytDesktop-win-x64-release.zip"
 $ZipPath = Join-Path $ReleaseDir $ZipName
 $ChecksumPath = "$ZipPath.sha256"
-$ReadmeRelease = Join-Path $RepoRoot "README_RELEASE.txt"
+$WriteReadmeScript = Join-Path $RepoRoot "scripts\write-publish-readme.ps1"
 
 function Write-Step {
     param([Parameter(Mandatory)][string] $Message)
@@ -133,13 +133,13 @@ if (-not (Test-Path $exePath)) {
     throw "Brak ZgrzytDesktop.exe w publish: $exePath"
 }
 
-if (-not (Test-Path $ReadmeRelease)) {
-    throw "Brak README_RELEASE.txt w katalogu glownym repozytorium."
+if (-not (Test-Path $WriteReadmeScript)) {
+    throw "Brak skryptu write-publish-readme.ps1: $WriteReadmeScript"
 }
 
-Write-Step "Kopiowanie README_RELEASE.txt do publish"
-Copy-Item -Path $ReadmeRelease -Destination (Join-Path $PublishDir "README_RELEASE.txt") -Force
-Write-StepOk "README_RELEASE.txt skopiowany"
+Write-Step "Generowanie README_RELEASE.txt w publish"
+& $WriteReadmeScript -DestinationPath (Join-Path $PublishDir "README_RELEASE.txt")
+Write-StepOk "README_RELEASE.txt wygenerowany"
 
 # ---------------------------------------------------------------------------
 # TODO: Podpisywanie kodu (Authenticode)

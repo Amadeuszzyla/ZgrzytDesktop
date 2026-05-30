@@ -7,16 +7,13 @@ public class MessageApiLimitationTests
     [Fact]
     public void Documentation_MentionsMessageEditDeleteRequiresBackendEndpoint()
     {
-        var requirements = File.ReadAllText(
-            Path.Combine(TestPaths.RepoRoot, "REQUIREMENTS.md"));
         var readme = File.ReadAllText(
             Path.Combine(TestPaths.RepoRoot, "README.md"));
 
-        Assert.Contains("edycja", requirements, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("usuwanie", requirements, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("endpoint", requirements, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("edycja", readme, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("usuwanie", readme, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("endpoint", readme, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("messages", readme, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("edycji", readme, StringComparison.OrdinalIgnoreCase);
     }
 }
 

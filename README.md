@@ -1,146 +1,235 @@
-# ZGRZYT Desktop
+# ZgrzytDesktop
 
 Desktopowy klient systemu **ZGRZYT** (Zintegrowany System Zgłoszeń i Rejestru Zdarzeń Technicznych) dla personelu **IT** i **administratorów**.
 
-Aplikacja (Avalonia, .NET 10, MVVM) komunikuje się z backendem Laravel przez REST API (`Bearer`, Laravel Sanctum). Konto z rolą zwykłego użytkownika (`user`) **nie ma dostępu** do panelu desktopowego — po logowaniu wyświetlany jest komunikat o braku uprawnień i następuje wylogowanie.
+**Stack:** C# / .NET 10 / Avalonia UI / MVVM. Aplikacja komunikuje się z backendem Laravel przez REST API (`Bearer`, Laravel Sanctum). Konto z rolą zwykłego użytkownika (`user`) **nie ma dostępu** do panelu — po logowaniu wyświetlany jest komunikat o braku uprawnień i następuje wylogowanie.
 
-## Funkcje
+## Główne funkcje
 
 | Obszar | Opis |
 |--------|------|
-| **Logowanie** | `POST /api/login`, token JWT w pamięci i w pliku chronionym DPAPI, `GET /api/user`, wylogowanie; przy **401** jedna próba `POST /api/refresh` |
-| **Zgłoszenia** | Listy: wszystkie / aktywne / nieprzypisane (`tickets`, `active-tickets`, `unassigned-tickets`); filtry statusu i priorytetu, wyszukiwanie, sortowanie, paginacja |
-| **Szczegóły** | Podgląd zgłoszenia, wątek wiadomości (`GET`/`POST .../messages` — odczyt i dodawanie), edycja statusu i priorytetu, przypisanie (`assigned_it_id`: admin wybiera IT/admin, IT — „Przypisz do mnie”), zamknięcie, usunięcie (wg uprawnień API) |
-| **Administracja** | (**admin**) listy użytkowników, ban, aktywacja, odbanowanie; (**it** i **admin**) zakładka **Nowe konto** → `POST /api/register` z wyborem roli `user` / `it` / `admin` |
-| **Statystyki** | Liczba zgłoszeń, statusy, priorytety, przypisania/nieprzypisane; zakres: bieżąca strona lub wszystkie strony listy. Czas pierwszej reakcji **nie** jest prezentowany — API nie dostarcza stabilnych danych do jego obliczenia. |
-| **Lokalny audyt** | Historia działań w aplikacji (ustawienia + szczegóły zgłoszenia), plik szyfrowany DPAPI — **bez** `GET /api/logs` z backendu |
-| **i18n** | Polski / angielski (`AppStrings`) |
-| **Motyw** | Wyłącznie **jasny** (light-only) |
-| **Offline** | Cache zgłoszeń przy niedostępności API |
-| **Auto-wylogowanie** | `SessionInactivityMonitor` — wylogowanie po bezczynności; włącz/wyłącz i timeout (15 / 30 / 60 min) przez `AppSettings.AutoLogoutEnabled` i `AppSettings.AutoLogoutTimeoutMinutes` (`settings.json`) |
-| **Bezpieczeństwo lokalne** | Token, cache i audyt w `%AppData%\ZgrzytDesktop\` — szyfrowanie **DPAPI** (Windows); ustawienia UI jako zwykły JSON (bez sekretów) |
-
-## Zabezpieczenia po stronie aplikacji desktopowej
-
-- **Uwierzytelnianie tokenowe** — logowanie przez `POST /api/login`, Bearer JWT w pliku chronionym DPAPI, odświeżanie sesji (`POST /api/refresh`), wylogowanie lokalne i przez API
-- **Kontrola dostępu na podstawie roli** — dashboard tylko dla ról **IT** i **admin**; konto `user` po logowaniu otrzymuje komunikat i jest wylogowywane
-- **Role-based UI w administracji** — admin: lista użytkowników, ban/aktywacja/odbanowanie; IT: tylko zakładka **Nowe konto**; niedostępne sekcje i akcje są ukryte, nie wyłączone
-- **Szyfrowanie lokalnych danych (Windows DPAPI)** — token (`token.txt`), cache zgłoszeń, cache użytkownika i lokalny audyt w `%AppData%\ZgrzytDesktop\`
-- **Ustawienia aplikacji (plaintext JSON)** — `Settings/settings.json` przechowuje wyłącznie preferencje UI (język, motyw, auto-wylogowanie, adres API); **bez** haseł i tokenów — celowo nie szyfrowane DPAPI
-- **Oczyszczanie HTML przed wyświetleniem** — tytuł/opis zgłoszenia i treść wiadomości (`HtmlTextSanitizer`); odrzucanie odpowiedzi HTML z API jako błędów (`ApiErrorSanitizer`)
-- **Brak logowania haseł i tokenów** — maskowanie wrażliwych pól w lokalnym audycie i komunikatach błędów API (`SensitiveDataMasker`, `SensitiveDataRedactor`)
-- **Obsługa błędów bez stack trace** — przyjazne, zlokalizowane komunikaty (PL/EN); stack trace i HTML z odpowiedzi API nie trafiają do UI
-- **Lokalizowana obsługa błędów logowania** — `LoginErrorMapper` mapuje wyjątki API na komunikaty `AppStrings`
-- **Komunikacja z API przez HTTPS** — domyślny adres produkcyjny używa `https://`; zdalne `http://` jest automatycznie podnoszone do HTTPS (`ApiUrlSecurityHelper`); lokalny dev może używać `http://127.0.0.1`
-- **Wylogowanie czyści sesję lokalną** — token, cache zgłoszeń, cache użytkownika; język UI pozostaje w ustawieniach
-- **Brak fałszywej edycji/usuwania wiadomości** — desktop obsługuje tylko odczyt i dodawanie wiadomości; brak symulacji `PUT`/`DELETE` na wątku czatu
-
-### Znane ograniczenia
-
-- **Pełny audyt serwerowy** — wymaga endpointów backendowych (np. `GET /api/logs`); obecnie audyt jest **lokalny** (plik DPAPI)
-- **Edycja/usuwanie wiadomości** — wymaga dedykowanych endpointów backendowych; desktop ich nie symuluje
-- **Autoryzacja po stronie API** — UI ukrywa niedostępne akcje, ale ostateczna kontrola uprawnień musi być w backendzie
-- **Rate limiting, rotacja tokenów po stronie serwera** — poza zakresem aplikacji desktopowej
-
-**Nie da się wymusić wyłącznie z desktopu:** TLS/HTTPS po stronie serwera, timeout sesji API, autoryzacja endpointów, serwerowa walidacja danych.
-
-## API
-
-Domyślny adres produkcyjny (kod / `settings.json`, bez edycji URL w UI ustawień):
-
-```text
-https://zgrzyt-api.onrender.com/api/
-```
-
-Lokalny development (opcjonalnie): `http://127.0.0.1:9000/api/`
-
-### Tworzenie kont vs prośba o konto
-
-| Endpoint | Zastosowanie |
-|----------|----------------|
-| `POST /api/register` | **Admin/IT** tworzą konto w **Administracja → Nowe konto** (body: `name`, `login`, `email`, `password`, `password_confirmation`, `role`) |
-| `POST /api/request-account` | Osobny flow prośby o konto (`AuthService`) — **nie** służy do tworzenia kont przez panel administracyjny |
-
-### Uwagi techniczne
-
-- **`GET /api/tickets`:** OpenAPI czasem opisuje tablicę; runtime API zwraca **paginację Laravel** (`current_page`, `data`, `last_page`, …) — desktop jest zgodny z API produkcyjnym.
-- **Kolejki active/unassigned:** do API idą `page`, `per_page`, `search`; przy filtrach status/priorytet/sort — pobranie wielu stron i przetwarzanie lokalne (`TicketQueueListProcessor`).
-- **Wiadomości w czacie:** brak w desktopie edycji/usuwania pojedynczych wiadomości — API nie udostępnia stabilnych endpointów `PUT`/`PATCH`/`DELETE` na `.../messages/{id}`; aplikacja nie ukrywa ani nie fałszuje treści lokalnie.
+| **Logowanie** | Ręczne logowanie i auto-login przy starcie |
+| **Role** | IT, admin, user (desktop tylko dla IT/admin) |
+| **Lista zgłoszeń** | Wszystkie, aktywne, nieprzypisane |
+| **Filtrowanie** | Status, priorytet, wyszukiwanie, sortowanie, paginacja |
+| **Szczegóły zgłoszenia** | Podgląd, edycja statusu/priorytetu, zamknięcie, usunięcie |
+| **Wiadomości** | Odczyt i dodawanie w wątku zgłoszenia |
+| **Przypisywanie** | Admin wybiera IT/admin; IT — „Przypisz do mnie” |
+| **Panel administracyjny** | Zarządzanie użytkownikami (admin), tworzenie kont |
+| **Statystyki** | Liczba zgłoszeń, statusy, priorytety, przypisania |
+| **Ustawienia** | Język, auto-wylogowanie, odświeżenie sesji |
+| **Lokalny audyt** | Historia działań w aplikacji (plik DPAPI) |
+| **Cache / offline** | Podgląd wcześniej zapisanych zgłoszeń przy braku API |
+| **i18n** | Polski / angielski |
+| **Auto-wylogowanie** | Wylogowanie po bezczynności (konfigurowalny timeout) |
 
 ## Wymagania
 
-- Windows 10/11
-- [.NET SDK 10](https://dotnet.microsoft.com/download) do budowy ze źródeł
-- Konto **IT** lub **admin** w systemie ZGRZYT
-
-Szczegóły środowiska: [REQUIREMENTS.md](REQUIREMENTS.md).
-
-## Uruchomienie (developerskie)
-
-```powershell
-cd C:\ścieżka\do\ZgrzytDesktop
-dotnet restore
-dotnet build
-dotnet test
-dotnet run --project .\ZgrzytDesktop\ZgrzytDesktop.csproj
-```
+| Obszar | Wymaganie |
+|--------|-----------|
+| System | Windows 10/11 (x64) |
+| Development | [.NET SDK 10](https://dotnet.microsoft.com/download) zgodny z `global.json` |
+| Runtime (release) | Paczka **self-contained** nie wymaga instalacji .NET Runtime |
+| Konto | **IT** lub **admin** w systemie ZGRZYT |
+| Sieć | Dostęp do API (produkcyjnego lub lokalnego dev) |
 
 Przed `dotnet build` zamknij uruchomioną aplikację, aby uniknąć blokady plików w `bin\`.
 
+## API
+
+| Środowisko | URL |
+|------------|-----|
+| Produkcja | `https://zgrzyt-api.onrender.com/api/` |
+| Development (lokalnie) | `http://127.0.0.1:9000/api/` |
+
+### Podstawowe endpointy
+
+| Metoda | Endpoint | Opis |
+|--------|----------|------|
+| POST | `/api/login` | Logowanie, token Bearer |
+| GET | `/api/user` | Profil zalogowanego użytkownika |
+| POST | `/api/logout` | Wylogowanie sesji |
+| POST | `/api/refresh` | Odświeżenie tokena |
+| GET | `/api/tickets` | Lista zgłoszeń (paginacja Laravel) |
+| GET | `/api/active-tickets` | Aktywne zgłoszenia (staff) |
+| GET | `/api/unassigned-tickets` | Nieprzypisane zgłoszenia (staff) |
+| GET/POST | `/api/tickets/{id}/messages` | Wiadomości w zgłoszeniu |
+| POST | `/api/register` | Tworzenie konta (admin/IT) |
+| POST | `/api/request-account` | Prośba o konto (osobny flow) |
+
+### Uwagi techniczne
+
+- **`GET /api/tickets`:** runtime API zwraca paginację Laravel (`current_page`, `data`, `last_page`, …).
+- **Wiadomości:** desktop obsługuje odczyt i dodawanie; **edycja/usuwanie pojedynczych wiadomości** wymaga dedykowanych endpointów backendowych — aplikacja ich nie symuluje.
+- **Tworzenie kont vs prośba o konto:** `POST /api/register` służy panelowi Administracja → Nowe konto; `POST /api/request-account` to osobny flow.
+
+## Uruchomienie developerskie
+
+```powershell
+dotnet restore
+dotnet build ZgrzytDesktop.sln -c Release
+dotnet test ZgrzytDesktop.sln -c Release --filter "Category!=Integration"
+dotnet run --project .\ZgrzytDesktop\ZgrzytDesktop.csproj
+```
+
+## Uruchomienie gotowej aplikacji
+
+Artefakty release (GitHub Actions → workflow **Release** → Artifacts):
+
+| Artefakt | Opis |
+|----------|------|
+| `ZgrzytDesktopSetup.exe` | Instalator Inno Setup — instaluje aplikację w `%LocalAppData%\Programs\ZgrzytDesktop\` |
+| `ZgrzytDesktopUninstall.exe` | Dedykowany deinstalator — uruchamia `unins000.exe` zainstalowanej aplikacji (rejestr Windows + fallback) |
+| `ZgrzytDesktop-win-x64-release.zip` | Wersja **portable** (self-contained folder w archiwum) |
+| `*.sha256` | Sumy kontrolne SHA-256 do weryfikacji integralności pobranych plików |
+
+**Portable ZIP:** rozpakuj **cały** folder publish i uruchom `ZgrzytDesktop.exe`. Usunięcie wersji portable = skasowanie folderu ręcznie (oraz opcjonalnie `%AppData%\ZgrzytDesktop\`).
+
+**Instalator / deinstalator:** odinstalowanie przez Ustawienia Windows, menu Start lub `ZgrzytDesktopUninstall.exe` usuwa folder instalacji i dane w `%AppData%\ZgrzytDesktop\`.
+
+**SmartScreen:** brak podpisu Authenticode może powodować ostrzeżenie Windows przy pierwszym uruchomieniu — zweryfikuj plik przez `.sha256` przed instalacją.
+
+Lokalny build release: `.\scripts\publish-release.ps1` → katalog `release/` (gitignored).
+
+### Weryfikacja SHA256 (PowerShell)
+
+```powershell
+$filePath = ".\ZgrzytDesktopSetup.exe"
+$checksumPath = ".\ZgrzytDesktopSetup.exe.sha256"
+
+$computed = (Get-FileHash -Path $filePath -Algorithm SHA256).Hash.ToLowerInvariant()
+$expected = (Get-Content -Path $checksumPath -Raw).Trim().Split([char[]]@(' ', "`t"), [StringSplitOptions]::RemoveEmptyEntries)[0].ToLowerInvariant()
+
+if ($computed -eq $expected) { Write-Host "SHA256 OK" } else { throw "SHA256 mismatch" }
+```
+
 ## Testy
 
-```powershell
-dotnet test -c Release
-```
-
-| Projekt | Typowe wyniki |
-|---------|----------------|
-| `ZgrzytDesktop.Tests` | testy jednostkowe i integracyjne (integracja live **skipped** bez env) |
-| `ZgrzytDesktop.Headless.Tests` | testy UI headless (Avalonia) |
-
-Testy integracyjne na żywym API (opcjonalnie): zmienne `ZGRZYT_API_URL`, `ZGRZYT_LOGIN`, `ZGRZYT_PASSWORD` — patrz [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md).
+### Domyślny zestaw (bez live API)
 
 ```powershell
-dotnet test -c Release --filter "Category=Integration"
+dotnet test ZgrzytDesktop.sln -c Release --filter "Category!=Integration"
 ```
 
-### Code coverage
+### Projekty testowe
+
+| Projekt | Zakres |
+|---------|--------|
+| `ZgrzytDesktop.Tests` | Testy jednostkowe, mock API, logika ViewModeli, serwisy, bezpieczeństwo |
+| `ZgrzytDesktop.Headless.Tests` | Testy headless UI (Avalonia) — layout, binding, widoki |
+
+### Testy integracyjne (live API, opcjonalne)
+
+Wymagają zmiennych środowiskowych:
+
+| Zmienna | Przykład |
+|---------|----------|
+| `ZGRZYT_API_URL` | `https://zgrzyt-api.onrender.com/api/` |
+| `ZGRZYT_LOGIN` | login konta IT/admin |
+| `ZGRZYT_PASSWORD` | hasło (tylko lokalnie / GitHub Secrets) |
+
+```powershell
+dotnet test ZgrzytDesktop.sln -c Release --filter "Category=Integration"
+```
+
+**Bez ustawionych zmiennych** testy `Category=Integration` są **Skipped** (nie Failed). Wzorzec konfiguracji: [.env.example](.env.example). Ręczny smoke API: `.\scripts\smoke-live-api.ps1`.
+
+Testy live są **read-only** (poza `POST /api/logout` w izolowanej sesji) — nie tworzą zgłoszeń ani kont na produkcji.
+
+## Coverage
+
+- Coverage jest zbierany w **CI** (`coverlet.collector`) i uploadowany jako artefakt **CoverageReports** (Cobertura XML).
+- Wyniki TRX trafiają do artefaktu **TestResults**.
+- Testy integracyjne (`Category=Integration`) są wykluczone z coverage w CI i lokalnym skrypcie.
+- Coverage obejmuje głównie: logikę serwisów, ViewModeli, bezpieczeństwo, storage, parsery i helpery — nie cały warstw UI Avalonia.
+
+Lokalnie:
 
 ```powershell
 .\scripts\test-coverage.ps1
+.\scripts\test-coverage.ps1 -TryHtmlReport   # opcjonalny HTML (ReportGenerator)
 ```
 
-Coverlet (`coverlet.collector` w projektach testowych), bez integracji live API. Szczegóły: [TEST_COVERAGE.md](TEST_COVERAGE.md).
+Wyniki lokalne: katalog `coverage/` (gitignored).
 
-**CI (GitHub Actions):** workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) uploaduje artefakty **TestResults** (TRX) oraz **CoverageReports** (Cobertura XML) z katalogu `TestResults/`.
+## CI/CD
 
-## Publikacja (Windows x64)
+### `.github/workflows/ci.yml`
 
-**Rekomendacja:** cały folder `publish` w archiwum ZIP (self-contained), nie sam plik EXE.
+Uruchamiany przy push i pull request:
 
-```powershell
-.\scripts\publish-release.ps1
+- `dotnet restore` → `dotnet build` (Release)
+- testy jednostkowe (`Category!=Integration`) + headless
+- upload **TestResults** (TRX)
+- upload **CoverageReports** (Cobertura XML)
+
+### `.github/workflows/release.yml`
+
+Ręczny workflow (`workflow_dispatch`):
+
+- build + test (bez integracji live)
+- publish self-contained `win-x64`
+- portable **ZIP** + SHA256
+- instalator Inno Setup (`ZgrzytDesktopSetup.exe`) + SHA256
+- dedykowany deinstalator (`ZgrzytDesktopUninstall.exe`) + SHA256
+
+**Artefakty release (6 plików):**
+
+- `ZgrzytDesktopSetup.exe`
+- `ZgrzytDesktopSetup.exe.sha256`
+- `ZgrzytDesktopUninstall.exe`
+- `ZgrzytDesktopUninstall.exe.sha256`
+- `ZgrzytDesktop-win-x64-release.zip`
+- `ZgrzytDesktop-win-x64-release.zip.sha256`
+
+## Architektura
+
+- **UI:** Avalonia (XAML, style w `Styles/`, widoki w `Views/` i `Views/DashboardParts/`)
+- **MVVM:** ViewModels z `CommunityToolkit.Mvvm` (`ObservableObject`, `[RelayCommand]`)
+- **Shell:** `MainWindowViewModel` — przełączanie login ↔ dashboard, sesja, auto-login
+- **Dashboard:** `DashboardViewModel` — fasada nawigacji, toasty, kompozycja paneli
+- **Panele:** osobne ViewModele (`TicketsPanelViewModel`, `TicketDetailsPanelViewModel`, `AdminPanelViewModel`, `SettingsPanelViewModel`, `StatisticsPanelViewModel`, `AuditPanelViewModel`, …)
+- **Koordynacja API:** `DashboardApiCoordinator` — refresh, offline, timeout
+- **Serwisy:** `IApiService`, `IAuthService`, `ITicketService`, `IUserAdminService`, `ISettingsService`, cache, audyt — DI w `App.axaml.cs`
+- **DTO / modele:** mapowanie JSON ↔ modele domenowe
+- **Storage lokalny:** `%AppData%\ZgrzytDesktop\` — token, cache, ustawienia, audyt (DPAPI)
+
+## Struktura repozytorium
+
+```text
+ZgrzytDesktop/
+├── ZgrzytDesktop/              # aplikacja Avalonia
+├── ZgrzytDesktop.Tests/        # testy jednostkowe
+├── ZgrzytDesktop.Headless.Tests/
+├── ZgrzytDesktop.Uninstaller/  # wrapper deinstalatora (release artifact)
+├── installer/                  # Inno Setup (ZgrzytDesktop.iss)
+├── assets/branding/            # logo, ikony instalatora
+├── scripts/                    # publish-release, test-coverage, smoke-live-api, …
+├── .github/workflows/          # ci.yml, release.yml
+├── README.md
+├── SECURITY.md
+├── .env.example
+└── ZgrzytDesktop.sln
 ```
 
-Skrypt: `clean` → `restore` → `build` → `test` (bez integracji live) → `publish` → kopiuje `README_RELEASE.txt` → tworzy archiwum i checksumę:
+## Użyte wzorce projektowe
 
-| Artefakt | Ścieżka |
-|----------|---------|
-| ZIP | `release/ZgrzytDesktop-win-x64-release.zip` |
-| SHA256 | `release/ZgrzytDesktop-win-x64-release.zip.sha256` |
+| Wzorzec | Zastosowanie |
+|---------|--------------|
+| **MVVM** | Separacja widoków (AXAML) i logiki (`ViewModels/`) |
+| **Dependency Injection** | Rejestracja serwisów w `App.axaml.cs` |
+| **Service Layer** | `Services/` — API, auth, tickets, admin, settings |
+| **Facade / Coordinator** | `DashboardViewModel`, `DashboardApiCoordinator` |
+| **Command** | `[RelayCommand]` — akcje UI |
+| **Observer / Data Binding** | Avalonia bindings, `INotifyPropertyChanged` |
+| **Adapter / Wrapper** | `ZgrzytDesktop.Uninstaller` — uruchamianie `unins000.exe` |
+| **DTO / Mapper** | Modele JSON, helpery konwersji |
 
-Katalog `release/` jest w `.gitignore` i **nie jest commitowany**.
+## Bezpieczeństwo
 
-**CI (GitHub Actions):** ręczny workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) (`workflow_dispatch`) — restore, build, test (bez integracji live), publish `win-x64` self-contained, ZIP + SHA256; artefakty **ZgrzytDesktop-win-x64-release.zip** i **ZgrzytDesktop-win-x64-release.zip.sha256** do pobrania z runu workflow (bez automatycznego GitHub Release).
+Skrót: token i cache chronione **DPAPI**, hasła nie są zapisywane lokalnie, dashboard tylko dla IT/admin, HTTPS dla produkcyjnego API, SHA256 dla artefaktów release.
 
-Instrukcja dla użytkownika końcowego oraz **ręczny smoke test artefaktu z Actions** (checksum SHA256, rozpakowanie, weryfikacja EXE, ekran logowania, wersja): [README_RELEASE.txt](README_RELEASE.txt) — sekcja *Smoke test release*.
-
-## Architektura (skrót)
-
-- **Shell:** `MainWindowViewModel` (login ↔ dashboard), `DashboardViewModel` (nawigacja, toasty, fasada etykiet).
-- **Panele:** `TicketsPanelViewModel`, `TicketDetailsPanelViewModel`, `AdminPanelViewModel`, `SettingsPanelViewModel`, `StatisticsPanelViewModel`, `AuditPanelViewModel`.
-- **Serwisy:** `IApiService`, `IAuthService`, `ITicketService`, `IUserAdminService`, `ISettingsService`, `ILocalAuditLogService`, cache — rejestracja w `App.axaml.cs`.
-- **Widoki:** `Views/DashboardParts/` (topbar, listy kart zgłoszeń i użytkowników, formularze).
+Szczegóły: **[SECURITY.md](SECURITY.md)** — zgłaszanie podatności, dane lokalne, sekrety, release security, checklist przed oddaniem.
 
 ## Dane lokalne
 
@@ -148,34 +237,8 @@ Katalog: `%AppData%\ZgrzytDesktop\`
 
 | Plik | Zawartość | Ochrona |
 |------|-----------|---------|
-| `token.txt` | Bearer JWT | **DPAPI** |
-| `Cache/tickets-cache.json` | Cache zgłoszeń (tytuły, opisy) | **DPAPI** |
-| `Cache/user-cache.json` | Profil użytkownika (sesja) | **DPAPI** |
-| `audit-log.json` | Lokalny audyt | **DPAPI** |
-| `Settings/settings.json` | Język UI, motyw, auto-wylogowanie, adres API | Plaintext JSON (brak sekretów) |
-
-## Struktura repozytorium
-
-```text
-ZgrzytDesktop/
-├── ZgrzytDesktop/           # aplikacja Avalonia
-├── ZgrzytDesktop.Tests/
-├── ZgrzytDesktop.Headless.Tests/
-├── scripts/publish-release.ps1
-├── scripts/test-coverage.ps1
-├── INTEGRATION_TESTS.md
-├── TEST_COVERAGE.md
-├── SECURITY.md
-├── REQUIREMENTS.md
-├── README_RELEASE.txt
-├── .env.example
-└── ZgrzytDesktop.sln
-```
-
-## Powiązane dokumenty
-
-- [REQUIREMENTS.md](REQUIREMENTS.md) — wymagania środowiska i produktu
-- [SECURITY.md](SECURITY.md) — zgłaszanie podatności, dane lokalne, sekrety, release
-- [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) — testy na żywym API
-- [TEST_COVERAGE.md](TEST_COVERAGE.md) — code coverage (coverlet)
-- [README_RELEASE.txt](README_RELEASE.txt) — instrukcja z paczki ZIP
+| `token.txt` | Bearer JWT | DPAPI |
+| `Cache/tickets-cache.json` | Cache zgłoszeń | DPAPI |
+| `Cache/user-cache.json` | Profil użytkownika | DPAPI |
+| `audit-log.json` | Lokalny audyt | DPAPI |
+| `Settings/settings.json` | Preferencje UI (język, auto-wylogowanie, API URL) | Plaintext JSON (bez sekretów) |

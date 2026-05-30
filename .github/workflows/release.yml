@@ -61,17 +61,14 @@ jobs:
         run: |
           $publishDir = Join-Path $env:GITHUB_WORKSPACE "ZgrzytDesktop/bin/$env:CONFIGURATION/net10.0-windows/$env:RUNTIME/publish"
           $exePath = Join-Path $publishDir "ZgrzytDesktop.exe"
-          $readme = Join-Path $env:GITHUB_WORKSPACE "README_RELEASE.txt"
 
           if (-not (Test-Path $exePath)) {
             throw "Missing publish output: $exePath"
           }
 
-          if (-not (Test-Path $readme)) {
-            throw "Missing README_RELEASE.txt in repository root."
-          }
-
-          Copy-Item -Path $readme -Destination (Join-Path $publishDir "README_RELEASE.txt") -Force
+          $readmeScript = Join-Path $env:GITHUB_WORKSPACE "scripts/write-publish-readme.ps1"
+          $readmePath = Join-Path $publishDir "README_RELEASE.txt"
+          & $readmeScript -DestinationPath $readmePath
 
           # TODO: Authenticode code signing (optional, requires a code-signing certificate).
           # Example after configuring signtool + certificate in the runner or a secure signing service:

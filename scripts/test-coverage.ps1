@@ -149,4 +149,4 @@ if ($htmlGenerated) {
     Write-Host "  HTML:    $ReportDir\index.html"
 }
 Write-Host ""
-Write-Host "Szczegoly: TEST_COVERAGE.md" -ForegroundColor DarkGray
+Write-Host "Szczegoly: README.md (sekcja Coverage)" -ForegroundColor DarkGray
