@@ -40,6 +40,9 @@ jobs:
       - name: Test
         run: dotnet test ZgrzytDesktop.sln -c ${{ env.CONFIGURATION }} --no-build --filter "Category!=Integration"
 
+      - name: Restore publish runtime
+        run: dotnet restore ${{ env.PROJECT }} -r ${{ env.RUNTIME }}
+
       - name: Publish (self-contained win-x64)
         run: |
           dotnet publish ${{ env.PROJECT }} `
