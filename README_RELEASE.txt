@@ -90,3 +90,57 @@ z runu workflow (Actions → Release → wybrany run → Artifacts):
 
 Kryterium PASS: checksuma OK, EXE i README w paczce, aplikacja startuje,
 ekran logowania i wersja widoczne. FAIL: brak pliku, błąd hash, crash przy starcie.
+
+
+Smoke test instalatora (GitHub Actions — dla QA / maintainerów)
+================================================================
+
+Po ręcznym uruchomieniu workflow Release pobierz artefakty instalatora z runu
+(Actions → Release → wybrany run → Artifacts):
+
+  - ZgrzytDesktopSetup.exe
+  - ZgrzytDesktopSetup.exe.sha256
+
+1. Pobierz oba pliki do tego samego folderu, np. C:\Temp\ZgrzytInstaller\
+
+2. Zweryfikuj checksumę (PowerShell):
+
+   cd C:\Temp\ZgrzytInstaller
+
+   $setupPath = ".\ZgrzytDesktopSetup.exe"
+   $checksumPath = ".\ZgrzytDesktopSetup.exe.sha256"
+
+   $computed = (Get-FileHash -Path $setupPath -Algorithm SHA256).Hash.ToLowerInvariant()
+   $expected = (Get-Content -Path $checksumPath -Raw).Trim().Split([char[]]@(' ', "`t"), [StringSplitOptions]::RemoveEmptyEntries)[0].ToLowerInvariant()
+
+   if ($computed -eq $expected) {
+       Write-Host "SHA256 OK: $computed"
+   } else {
+       throw "SHA256 mismatch. Expected=$expected Actual=$computed"
+   }
+
+3. Uruchom instalator (double-click lub z wiersza poleceń):
+
+   Start-Process -FilePath $setupPath -Wait
+
+   Podczas instalacji:
+   - domyślnie powstaje skrót w menu Start (ZgrzytDesktop),
+   - opcjonalnie zaznacz skrót na pulpicie.
+
+4. Uruchom aplikację ze skrótu Start Menu lub z folderu instalacji
+   (domyślnie: %LocalAppData%\Programs\ZgrzytDesktop\ZgrzytDesktop.exe).
+
+5. Smoke test UI (ręcznie):
+
+   [ ] Instalator kończy się bez błędu.
+   [ ] Skrót w menu Start działa.
+   [ ] Aplikacja startuje (ekran logowania, badge wersji).
+   [ ] README_RELEASE.txt jest w folderze instalacji obok ZgrzytDesktop.exe.
+
+6. Odinstalowanie (opcjonalnie):
+
+   Ustawienia Windows → Aplikacje → ZgrzytDesktop → Odinstaluj
+   (lub wpis „Odinstaluj ZgrzytDesktop” w menu Start).
+
+Kryterium PASS: checksuma OK, instalacja i skrót Start Menu działają, aplikacja startuje.
+FAIL: błąd hash, instalator się wykrzacza, brak skrótu, crash przy starcie.

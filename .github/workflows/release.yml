@@ -12,6 +12,7 @@ env:
   RUNTIME: win-x64
   PROJECT: ZgrzytDesktop/ZgrzytDesktop.csproj
   ZIP_NAME: ZgrzytDesktop-win-x64-release.zip
+  SETUP_NAME: ZgrzytDesktopSetup.exe
 
 jobs:
   build-release:
@@ -98,6 +99,43 @@ jobs:
           "ZIP_PATH=$zipPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "CHECKSUM_PATH=$checksumPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            throw "Inno Setup compiler not found: $iscc"
+          }
+
+          $version = dotnet msbuild $env:PROJECT -nologo -getProperty:Version
+          if (-not $version) {
+            throw "Could not read Version from project."
+          }
+
+          $issPath = Join-Path $env:GITHUB_WORKSPACE "installer/ZgrzytDesktop.iss"
+          $releaseDir = Join-Path $env:GITHUB_WORKSPACE "release"
+
+          & $iscc "/DAppVersionDefine=$version" "/DPublishDir=$env:PUBLISH_DIR" "/DOutputDir=$releaseDir" $issPath
+          if ($LASTEXITCODE -ne 0) {
+            throw "ISCC failed with exit code $LASTEXITCODE"
+          }
+
+          $setupPath = Join-Path $releaseDir $env:SETUP_NAME
+          if (-not (Test-Path $setupPath)) {
+            throw "Missing installer: $setupPath"
+          }
+
+          $setupChecksumPath = "$setupPath.sha256"
+          $hash = (Get-FileHash -Path $setupPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          $fileName = [IO.Path]::GetFileName($setupPath)
+          [IO.File]::WriteAllText($setupChecksumPath, ("{0}  {1}" -f $hash, $fileName), [Text.UTF8Encoding]::new($false))
+
+          "SETUP_PATH=$setupPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "SETUP_CHECKSUM_PATH=$setupChecksumPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Upload release ZIP
         uses: actions/upload-artifact@v4
         with:
@@ -110,4 +148,18 @@ jobs:
         with:
           name: ${{ env.ZIP_NAME }}.sha256
           path: ${{ env.CHECKSUM_PATH }}
+          if-no-files-found: error
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.SETUP_NAME }}
+          path: ${{ env.SETUP_PATH }}
+          if-no-files-found: error
+
+      - name: Upload installer SHA256 checksum
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.SETUP_NAME }}.sha256
+          path: ${{ env.SETUP_CHECKSUM_PATH }}
           if-no-files-found: error
