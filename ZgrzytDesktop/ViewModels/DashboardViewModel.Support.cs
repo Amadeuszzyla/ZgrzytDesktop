@@ -8,6 +8,7 @@ using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
+using ZgrzytDesktop.ViewModels.DashboardModules;
 
 namespace ZgrzytDesktop.ViewModels;
 
@@ -65,14 +66,10 @@ public partial class DashboardViewModel
 
     internal async Task<bool> ExecuteApiAsync(
         Func<Task> action,
-        Action<string>? setStatusMessage = null,
-        string? unexpectedStatusMessageKey = null,
-        string? unexpectedToastMessageKey = null,
-        string? offlineToastMessageKey = null,
-        bool showApiErrorToast = true,
-        bool setOfflineOnServiceUnavailable = true,
-        Func<ApiException, Task>? onServiceUnavailableAsync = null)
+        DashboardApiExecutionOptions? options = null)
     {
+        options ??= new DashboardApiExecutionOptions();
+
         try
         {
             await action();
@@ -80,34 +77,44 @@ public partial class DashboardViewModel
         }
         catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
         {
-            if (onServiceUnavailableAsync is not null)
+            _diagnosticLogService?.LogWarning(
+                $"API request failed ({(int)ex.StatusCode} {ex.StatusCode})",
+                ex);
+
+            if (options.OnServiceUnavailableAsync is not null)
             {
-                await onServiceUnavailableAsync(ex);
+                await options.OnServiceUnavailableAsync(ex);
                 return false;
             }
 
-            if (setOfflineOnServiceUnavailable)
+            if (options.SetOfflineOnServiceUnavailable)
                 IsOffline = true;
 
             HandleApiError(
                 ex,
-                setStatusMessage,
-                offlineToastMessageKey,
-                showApiErrorToast,
-                setOfflineOnServiceUnavailable);
+                options.SetStatusMessage,
+                options.OfflineToastMessageKey,
+                options.ShowApiErrorToast,
+                options.SetOfflineOnServiceUnavailable);
             return false;
         }
         catch (ApiException ex)
         {
-            HandleApiError(ex, setStatusMessage, showToast: showApiErrorToast);
+            _diagnosticLogService?.LogWarning(
+                $"API request failed ({(int)ex.StatusCode} {ex.StatusCode})",
+                ex);
+
+            HandleApiError(ex, options.SetStatusMessage, showToast: options.ShowApiErrorToast);
             return false;
         }
-        catch
+        catch (Exception ex)
         {
+            _diagnosticLogService?.LogError("Unexpected error during API operation", ex);
+
             HandleUnexpectedError(
-                setStatusMessage,
-                unexpectedStatusMessageKey,
-                unexpectedToastMessageKey);
+                options.SetStatusMessage,
+                options.UnexpectedStatusMessageKey,
+                options.UnexpectedToastMessageKey);
             return false;
         }
     }

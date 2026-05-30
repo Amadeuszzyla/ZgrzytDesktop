@@ -102,7 +102,8 @@ public class DesktopSecurityHardeningTests
             userCache,
             new FakeAuditLogService(),
             new FakeUserAdminService(),
-            api));
+            api,
+            NullLocalDiagnosticLogService.Instance));
 
         await vm.LogoutForTestsAsync();
 

@@ -1,5 +1,6 @@
 using ZgrzytDesktop.Cache;
 using ZgrzytDesktop.Models;
+using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Storage;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Tests.Infrastructure;
@@ -136,7 +137,8 @@ public class MainWindowDesktopAccessTests
             userCache,
             new FakeAuditLogService(),
             new FakeUserAdminService(),
-            api);
+            api,
+            NullLocalDiagnosticLogService.Instance);
 
         var window = new MainWindowViewModel(deps, runStartup: false);
         return (window, userCache, tempDir);

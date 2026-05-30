@@ -131,7 +131,7 @@ public class ToastLocalizationTests
                 RefreshTicketsAsync = () => Task.CompletedTask,
                 NavigateToTickets = () => { },
                 ClearSelectedTicket = () => { },
-                ExecuteApiAsyncCore = async (action, _, _, _, _, _, _, _) =>
+                ExecuteApiAsyncCore = async (action, _) =>
                 {
                     await action();
                     return true;

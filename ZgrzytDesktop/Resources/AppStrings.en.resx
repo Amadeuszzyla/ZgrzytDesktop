@@ -405,7 +405,7 @@
   <data name="RequestAccount_ValidationEmail" xml:space="preserve"><value>Enter email address.</value></data>
   <data name="Security_SessionExpiredInactivity" xml:space="preserve"><value>Session expired due to inactivity.</value></data>
   <data name="Security_ApiUrlMustBeHttps" xml:space="preserve"><value>The API URL must use HTTPS.</value></data>
-  <data name="Settings_AutoLogout" xml:space="preserve"><value>Auto logout after inactivity</value></data>
+  <data name="Settings_AutoLogout" xml:space="preserve"><value>Enable auto logout after inactivity</value></data>
   <data name="Settings_AutoLogoutTimeout" xml:space="preserve"><value>Inactivity timeout (minutes)</value></data>
   <data name="Settings_ResetApiUrl" xml:space="preserve"><value>Reset API URL to default</value></data>
   <data name="Settings_ApiUrlResetDone" xml:space="preserve"><value>Production API URL has been restored to the default.</value></data>

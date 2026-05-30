@@ -18,6 +18,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ILocalTicketCacheService _ticketCacheService;
     private readonly ILocalUserCacheService _userCacheService;
     private readonly ILocalAuditLogService _auditLogService;
+    private readonly ILocalDiagnosticLogService _diagnosticLogService;
     private readonly IUserAdminService _userAdminService;
     private readonly IApiService _apiService;
 
@@ -37,7 +38,8 @@ public partial class MainWindowViewModel : ViewModelBase
         ILocalUserCacheService userCacheService,
         ILocalAuditLogService auditLogService,
         IUserAdminService userAdminService,
-        IApiService apiService)
+        IApiService apiService,
+        ILocalDiagnosticLogService diagnosticLogService)
         : this(
             new MainWindowDependencies(
                 authService,
@@ -47,7 +49,8 @@ public partial class MainWindowViewModel : ViewModelBase
                 userCacheService,
                 auditLogService,
                 userAdminService,
-                apiService),
+                apiService,
+                diagnosticLogService),
             runStartup: true)
     {
     }
@@ -62,6 +65,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _auditLogService = dependencies.AuditLogService;
         _userAdminService = dependencies.UserAdminService;
         _apiService = dependencies.ApiService;
+        _diagnosticLogService = dependencies.DiagnosticLogService;
 
         _currentViewModel = CreateLoginViewModel();
 
@@ -83,7 +87,8 @@ public partial class MainWindowViewModel : ViewModelBase
             ILocalUserCacheService userCacheService,
             ILocalAuditLogService auditLogService,
             IUserAdminService userAdminService,
-            IApiService apiService)
+            IApiService apiService,
+            ILocalDiagnosticLogService diagnosticLogService)
         {
             AuthService = authService;
             TicketService = ticketService;
@@ -93,6 +98,7 @@ public partial class MainWindowViewModel : ViewModelBase
             AuditLogService = auditLogService;
             UserAdminService = userAdminService;
             ApiService = apiService;
+            DiagnosticLogService = diagnosticLogService;
         }
 
         public IAuthService AuthService { get; }
@@ -109,6 +115,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         public IUserAdminService UserAdminService { get; }
         public IApiService ApiService { get; }
+
+        public ILocalDiagnosticLogService DiagnosticLogService { get; }
     }
 
     private async Task TryAutoLoginAsync()
@@ -208,8 +216,8 @@ public partial class MainWindowViewModel : ViewModelBase
             _auditLogService,
             _userAdminService,
             () => LogoutAsync(),
-            ApplyAutoLogoutSettings
-        );
+            ApplyAutoLogoutSettings,
+            _diagnosticLogService);
         if (_apiService is ApiService apiService)
             apiService.OnSessionExpiredAsync = dashboard.HandleSessionExpiredFromApiAsync;
         return dashboard;

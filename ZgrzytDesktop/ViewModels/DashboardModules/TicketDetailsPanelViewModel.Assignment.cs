@@ -301,15 +301,18 @@ public sealed partial class TicketDetailsPanelViewModel
 
                     SyncSelectedAssignedUserFromTicket();
                 },
-                setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessageKey: unexpectedStatusKey,
-                unexpectedToastMessageKey: unexpectedToastKey,
-                onServiceUnavailableAsync: async _ =>
+                new DashboardApiExecutionOptions
                 {
-                    _callbacks.SetIsOffline(true);
-                    DetailsStatusMessage = AppStrings.Get("Details_OfflineAssignFailed");
-                    _callbacks.ShowToastKey("Toast_TicketAssignOffline", ToastTypes.Error);
-                    await Task.CompletedTask;
+                    SetStatusMessage = message => DetailsStatusMessage = message,
+                    UnexpectedStatusMessageKey = unexpectedStatusKey,
+                    UnexpectedToastMessageKey = unexpectedToastKey,
+                    OnServiceUnavailableAsync = async _ =>
+                    {
+                        _callbacks.SetIsOffline(true);
+                        DetailsStatusMessage = AppStrings.Get("Details_OfflineAssignFailed");
+                        _callbacks.ShowToastKey("Toast_TicketAssignOffline", ToastTypes.Error);
+                        await Task.CompletedTask;
+                    }
                 });
         }
         finally

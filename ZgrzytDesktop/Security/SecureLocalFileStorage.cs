@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Diagnostics;
 
 namespace ZgrzytDesktop.Security;
 
@@ -13,12 +14,25 @@ public static class SecureLocalFileStorage
 
         AppDataPaths.EnsureDirectoryForFile(filePath);
 
-        var protectedText = LocalDataProtector.ProtectString(plainText);
+        try
+        {
+            var protectedText = LocalDataProtector.ProtectString(plainText);
 
-        if (string.IsNullOrWhiteSpace(protectedText))
-            throw new LocalDataProtectionException("Data protection produced no output.");
+            if (string.IsNullOrWhiteSpace(protectedText))
+                throw new LocalDataProtectionException("Data protection produced no output.");
 
-        await File.WriteAllTextAsync(filePath, protectedText);
+            await File.WriteAllTextAsync(filePath, protectedText);
+        }
+        catch (LocalDataProtectionException ex)
+        {
+            DiagnosticLogBridge.LogError("Local data protection failed during encrypted file write", ex);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            DiagnosticLogBridge.LogError("Encrypted local file write failed", ex);
+            throw;
+        }
     }
 
     public static async Task<string?> ReadDecryptedAsync(
@@ -44,14 +58,15 @@ public static class SecureLocalFileStorage
             {
                 await WriteEncryptedAsync(filePath, stored);
             }
-            catch
+            catch (Exception ex)
             {
-                // Migracja nie może zablokować odczytu.
+                DiagnosticLogBridge.LogWarning("Failed to migrate legacy plaintext local file to encrypted storage", ex);
             }
 
             return stored;
         }
 
+        DiagnosticLogBridge.LogWarning("Unable to decrypt local protected file");
         return null;
     }
 

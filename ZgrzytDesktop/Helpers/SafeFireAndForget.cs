@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Diagnostics;
 
 namespace ZgrzytDesktop.Helpers;
 
@@ -63,6 +64,8 @@ public static class SafeFireAndForget
 
     private static void InvokeErrorHandler(Exception exception, Action<Exception>? onError)
     {
+        DiagnosticLogBridge.LogError("Unhandled fire-and-forget task failure", exception);
+
         if (onError is null)
             return;
 

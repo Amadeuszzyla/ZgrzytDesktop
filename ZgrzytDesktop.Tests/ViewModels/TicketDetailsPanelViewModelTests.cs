@@ -514,11 +514,11 @@ public class TicketDetailsPanelViewModelTests
         };
     }
 
-    private static Func<Func<Task>, Action<string>?, string?, string?, string?, bool, bool, Func<ApiException, Task>?, Task<bool>>
-        CreateTestExecuteApiAsync() =>
-        async (action, setStatusMessage, unexpectedStatusMessage, unexpectedToastMessage, offlineToastMessage,
-            showApiErrorToast, setOfflineOnServiceUnavailable, onServiceUnavailableAsync) =>
+    private static Func<Func<Task>, DashboardApiExecutionOptions?, Task<bool>> CreateTestExecuteApiAsync() =>
+        async (action, options) =>
         {
+            options ??= new DashboardApiExecutionOptions();
+
             try
             {
                 await action();
@@ -526,30 +526,30 @@ public class TicketDetailsPanelViewModelTests
             }
             catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
             {
-                if (onServiceUnavailableAsync is not null)
+                if (options.OnServiceUnavailableAsync is not null)
                 {
-                    await onServiceUnavailableAsync(ex);
+                    await options.OnServiceUnavailableAsync(ex);
                     return false;
                 }
 
-                setStatusMessage?.Invoke(
-                    offlineToastMessage is not null
-                        ? AppStrings.Get(offlineToastMessage)
+                options.SetStatusMessage?.Invoke(
+                    options.OfflineToastMessageKey is not null
+                        ? AppStrings.Get(options.OfflineToastMessageKey)
                         : ex.Message);
                 return false;
             }
             catch (ApiException ex)
             {
-                setStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
+                options.SetStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
                     ex.ResponseContent ?? ex.Message,
                     ex.StatusCode));
                 return false;
             }
             catch
             {
-                setStatusMessage?.Invoke(
-                    unexpectedStatusMessage is not null
-                        ? AppStrings.Get(unexpectedStatusMessage)
+                options.SetStatusMessage?.Invoke(
+                    options.UnexpectedStatusMessageKey is not null
+                        ? AppStrings.Get(options.UnexpectedStatusMessageKey)
                         : AppStrings.Get("Api_UnexpectedError"));
                 return false;
             }

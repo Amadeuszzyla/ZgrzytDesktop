@@ -115,7 +115,7 @@ public class TicketDisplayLocalizationTests
             TicketSelected = _ => { },
             RefreshPaginationSideEffects = () => { },
             LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
-            ExecuteApiAsyncCore = async (action, _, _, _, _, _, _, _) =>
+            ExecuteApiAsyncCore = async (action, _) =>
             {
                 await action();
                 return true;
@@ -141,7 +141,7 @@ public class TicketDisplayLocalizationTests
             RefreshTicketsAsync = () => Task.CompletedTask,
             NavigateToTickets = () => { },
             ClearSelectedTicket = () => { },
-            ExecuteApiAsyncCore = async (action, _, _, _, _, _, _, _) =>
+            ExecuteApiAsyncCore = async (action, _) =>
             {
                 await action();
                 return true;

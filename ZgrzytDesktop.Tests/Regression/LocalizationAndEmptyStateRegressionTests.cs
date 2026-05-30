@@ -375,7 +375,7 @@ public class LocalizationAndEmptyStateRegressionTests
                     ex.ResponseContent ?? ex.Message,
                     ex.StatusCode),
                 LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
-                ExecuteApiAsyncCore = async (action, setStatusMessage, _, _, _, _, _, _) =>
+                ExecuteApiAsyncCore = async (action, options) =>
                 {
                     try
                     {
@@ -384,7 +384,7 @@ public class LocalizationAndEmptyStateRegressionTests
                     }
                     catch (ApiException ex)
                     {
-                        setStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
+                        options?.SetStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
                             ex.ResponseContent ?? ex.Message,
                             ex.StatusCode));
                         return false;
@@ -413,7 +413,7 @@ public class LocalizationAndEmptyStateRegressionTests
                 TicketSelected = _ => { },
                 RefreshPaginationSideEffects = () => { },
                 LogAuditAsync = (_, _, _, _) => Task.CompletedTask,
-                ExecuteApiAsyncCore = async (action, _, _, _, _, _, _, _) =>
+                ExecuteApiAsyncCore = async (action, _) =>
                 {
                     await action();
                     return true;

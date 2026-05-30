@@ -24,34 +24,17 @@ public sealed class TestDashboardContext : IDashboardContext
     public Func<string, int?, string?, object?[]?, Task> LogAuditAsyncHandler { get; init; } =
         (_, _, _, _) => Task.CompletedTask;
 
-    public Func<Func<Task>, Action<string>?, string?, string?, string?, bool, bool, Func<ApiException, Task>?, Task<bool>>?
-        ExecuteApiAsyncHandler { get; init; }
+    public Func<Func<Task>, DashboardApiExecutionOptions?, Task<bool>>? ExecuteApiAsyncHandler { get; init; }
 
     public static TestDashboardContext CreateDefault(string currentSection = AppSections.Settings) =>
         new() { CurrentSection = currentSection };
 
     public Task<bool> ExecuteApiAsync(
         Func<Task> action,
-        Action<string>? setStatusMessage = null,
-        string? unexpectedStatusMessageKey = null,
-        string? unexpectedToastMessageKey = null,
-        string? offlineToastMessageKey = null,
-        bool showApiErrorToast = true,
-        bool setOfflineOnServiceUnavailable = true,
-        Func<ApiException, Task>? onServiceUnavailableAsync = null)
+        DashboardApiExecutionOptions? options = null)
     {
         if (ExecuteApiAsyncHandler is not null)
-        {
-            return ExecuteApiAsyncHandler(
-                action,
-                setStatusMessage,
-                unexpectedStatusMessageKey,
-                unexpectedToastMessageKey,
-                offlineToastMessageKey,
-                showApiErrorToast,
-                setOfflineOnServiceUnavailable,
-                onServiceUnavailableAsync);
-        }
+            return ExecuteApiAsyncHandler(action, options);
 
         return RunPassThroughAsync(action);
     }
@@ -80,8 +63,10 @@ public sealed class TestDashboardContext : IDashboardContext
             ShowToastRawHandler = ShowToastRawHandler,
             NotifyLocalizationHandler = NotifyLocalizationHandler,
             LogAuditAsyncHandler = LogAuditAsyncHandler,
-            ExecuteApiAsyncHandler = async (action, setStatusMessage, unexpectedStatusMessage, _, _, _, _, _) =>
+            ExecuteApiAsyncHandler = async (action, options) =>
             {
+                options ??= new DashboardApiExecutionOptions();
+
                 try
                 {
                     await action();
@@ -89,15 +74,15 @@ public sealed class TestDashboardContext : IDashboardContext
                 }
                 catch (ApiException ex)
                 {
-                    setStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
+                    options.SetStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
                         ex.ResponseContent ?? ex.Message,
                         ex.StatusCode));
                     return false;
                 }
                 catch
                 {
-                    setStatusMessage?.Invoke(
-                        unexpectedStatusMessage ?? AppStrings.Get("Api_UnexpectedError"));
+                    options.SetStatusMessage?.Invoke(AppStrings.Get(
+                        options.UnexpectedStatusMessageKey ?? "Api_UnexpectedError"));
                     return false;
                 }
             }

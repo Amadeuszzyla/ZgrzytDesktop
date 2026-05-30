@@ -89,15 +89,18 @@ public sealed partial class TicketDetailsPanelViewModel
                         "Details_UpdateAuditDesc",
                         [SelectedStatus, SelectedPriority]);
                 },
-                setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessageKey: "Details_SaveUnexpectedError",
-                unexpectedToastMessageKey: "Details_SaveFailed",
-                onServiceUnavailableAsync: async _ =>
+                new DashboardApiExecutionOptions
                 {
-                    _callbacks.SetIsOffline(true);
-                    DetailsStatusMessage = AppStrings.Get("Details_OfflineSaveFailed");
-                    _callbacks.ShowToastKey("Toast_TicketSaveOffline", ToastTypes.Error);
-                    await Task.CompletedTask;
+                    SetStatusMessage = message => DetailsStatusMessage = message,
+                    UnexpectedStatusMessageKey = "Details_SaveUnexpectedError",
+                    UnexpectedToastMessageKey = "Details_SaveFailed",
+                    OnServiceUnavailableAsync = async _ =>
+                    {
+                        _callbacks.SetIsOffline(true);
+                        DetailsStatusMessage = AppStrings.Get("Details_OfflineSaveFailed");
+                        _callbacks.ShowToastKey("Toast_TicketSaveOffline", ToastTypes.Error);
+                        await Task.CompletedTask;
+                    }
                 });
         }
         finally
@@ -170,10 +173,12 @@ public sealed partial class TicketDetailsPanelViewModel
                         "Details_CloseAuditDesc",
                         null);
                 },
-                setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessageKey: "Details_CloseUnexpectedError",
-                unexpectedToastMessageKey: "Details_CloseFailed",
-                showApiErrorToast: true);
+                new DashboardApiExecutionOptions
+                {
+                    SetStatusMessage = message => DetailsStatusMessage = message,
+                    UnexpectedStatusMessageKey = "Details_CloseUnexpectedError",
+                    UnexpectedToastMessageKey = "Details_CloseFailed"
+                });
 
             if (!closed)
             {
@@ -232,9 +237,12 @@ public sealed partial class TicketDetailsPanelViewModel
                         "Details_DeleteAuditDesc",
                         null);
                 },
-                setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessageKey: "Details_DeleteFailed",
-                unexpectedToastMessageKey: "Details_DeleteFailed");
+                new DashboardApiExecutionOptions
+                {
+                    SetStatusMessage = message => DetailsStatusMessage = message,
+                    UnexpectedStatusMessageKey = "Details_DeleteFailed",
+                    UnexpectedToastMessageKey = "Details_DeleteFailed"
+                });
         }
         finally
         {

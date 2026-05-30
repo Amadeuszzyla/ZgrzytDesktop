@@ -133,7 +133,7 @@ Katalog `release/` jest w `.gitignore` i **nie jest commitowany**.
 
 **CI (GitHub Actions):** ręczny workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) (`workflow_dispatch`) — restore, build, test (bez integracji live), publish `win-x64` self-contained, ZIP + SHA256; artefakty **ZgrzytDesktop-win-x64-release.zip** i **ZgrzytDesktop-win-x64-release.zip.sha256** do pobrania z runu workflow (bez automatycznego GitHub Release).
 
-Instrukcja dla użytkownika końcowego: [README_RELEASE.txt](README_RELEASE.txt).
+Instrukcja dla użytkownika końcowego oraz **ręczny smoke test artefaktu z Actions** (checksum SHA256, rozpakowanie, weryfikacja EXE, ekran logowania, wersja): [README_RELEASE.txt](README_RELEASE.txt) — sekcja *Smoke test release*.
 
 ## Architektura (skrót)
 

@@ -405,7 +405,7 @@
   <data name="RequestAccount_ValidationEmail" xml:space="preserve"><value>Podaj adres e-mail.</value></data>
   <data name="Security_SessionExpiredInactivity" xml:space="preserve"><value>Sesja wygasła z powodu bezczynności.</value></data>
   <data name="Security_ApiUrlMustBeHttps" xml:space="preserve"><value>Adres API musi używać HTTPS.</value></data>
-  <data name="Settings_AutoLogout" xml:space="preserve"><value>Automatyczne wylogowanie po bezczynności</value></data>
+  <data name="Settings_AutoLogout" xml:space="preserve"><value>Włącz auto-wylogowanie po bezczynności</value></data>
   <data name="Settings_AutoLogoutTimeout" xml:space="preserve"><value>Czas bezczynności (minuty)</value></data>
   <data name="Settings_ResetApiUrl" xml:space="preserve"><value>Przywróć domyślny adres API</value></data>
   <data name="Settings_ApiUrlResetDone" xml:space="preserve"><value>Przywrócono domyślny adres API produkcyjnego.</value></data>

@@ -274,10 +274,13 @@ public sealed class StatisticsPanelViewModel : ViewModelBase
                     ApplyTicketStatistics(aggregated, totalInSystem, fromCurrentPageOnly: false);
                     _context.ShowToastKey("Stats_Loaded", ToastTypes.Success, aggregated.Count);
                 },
-                setStatusMessage: message => StatsScopeMessage = message,
-                unexpectedStatusMessageKey: "Stats_LoadAllPagesFailed",
-                unexpectedToastMessageKey: "Stats_LoadAllFailed",
-                setOfflineOnServiceUnavailable: false);
+                new DashboardApiExecutionOptions
+                {
+                    SetStatusMessage = message => StatsScopeMessage = message,
+                    UnexpectedStatusMessageKey = "Stats_LoadAllPagesFailed",
+                    UnexpectedToastMessageKey = "Stats_LoadAllFailed",
+                    SetOfflineOnServiceUnavailable = false
+                });
         }
         finally
         {

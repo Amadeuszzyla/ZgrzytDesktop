@@ -183,15 +183,18 @@ public sealed class RequestAccountPanelViewModel : ViewModelBase
                         "RequestAccount_AuditDesc",
                         [request.Login]);
                 },
-                setStatusMessage: message => StatusMessage = message,
-                unexpectedStatusMessageKey: "RequestAccount_UnexpectedError",
-                unexpectedToastMessageKey: "RequestAccount_UnexpectedError",
-                onServiceUnavailableAsync: async _ =>
+                new DashboardApiExecutionOptions
                 {
-                    _context.IsOffline = true;
-                    StatusMessage = AppStrings.Get("RequestAccount_OfflineError");
-                    _context.ShowToastKey("Toast_RequestAccountOffline", ToastTypes.Warning);
-                    await Task.CompletedTask;
+                    SetStatusMessage = message => StatusMessage = message,
+                    UnexpectedStatusMessageKey = "RequestAccount_UnexpectedError",
+                    UnexpectedToastMessageKey = "RequestAccount_UnexpectedError",
+                    OnServiceUnavailableAsync = async _ =>
+                    {
+                        _context.IsOffline = true;
+                        StatusMessage = AppStrings.Get("RequestAccount_OfflineError");
+                        _context.ShowToastKey("Toast_RequestAccountOffline", ToastTypes.Warning);
+                        await Task.CompletedTask;
+                    }
                 });
         }
         finally

@@ -31,6 +31,20 @@
                             HorizontalAlignment="Stretch" />
                     </StackPanel>
 
+                    <StackPanel Spacing="8" MaxWidth="480" HorizontalAlignment="Left">
+                        <CheckBox
+                            Content="{Binding SettingsPanel.LblSettingsAutoLogout}"
+                            IsChecked="{Binding SettingsPanel.AutoLogoutEnabled}" />
+                        <TextBlock Classes="account-form-label" Text="{Binding SettingsPanel.LblSettingsAutoLogoutTimeout}" />
+                        <ComboBox
+                            Classes="settings-select"
+                            ItemsSource="{Binding SettingsPanel.AutoLogoutTimeoutOptions}"
+                            SelectedItem="{Binding SettingsPanel.SelectedAutoLogoutTimeoutMinutes}"
+                            IsEnabled="{Binding SettingsPanel.AutoLogoutEnabled}"
+                            MinHeight="44"
+                            HorizontalAlignment="Stretch" />
+                    </StackPanel>
+
                     <WrapPanel Classes="settings-actions-wrap" Orientation="Horizontal">
                         <Button
                             Classes="btn-primary"

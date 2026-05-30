@@ -82,15 +82,18 @@ public sealed partial class TicketDetailsPanelViewModel
                         "Details_MessageAuditDesc",
                         null);
                 },
-                setStatusMessage: message => DetailsStatusMessage = message,
-                unexpectedStatusMessageKey: "Details_MessageSendUnexpectedError",
-                unexpectedToastMessageKey: "Details_MessageSendFailed",
-                onServiceUnavailableAsync: async _ =>
+                new DashboardApiExecutionOptions
                 {
-                    _callbacks.SetIsOffline(true);
-                    DetailsStatusMessage = AppStrings.Get("Details_OfflineSendFailed");
-                    _callbacks.ShowToastKey("Toast_MessageSendOffline", ToastTypes.Error);
-                    await Task.CompletedTask;
+                    SetStatusMessage = message => DetailsStatusMessage = message,
+                    UnexpectedStatusMessageKey = "Details_MessageSendUnexpectedError",
+                    UnexpectedToastMessageKey = "Details_MessageSendFailed",
+                    OnServiceUnavailableAsync = async _ =>
+                    {
+                        _callbacks.SetIsOffline(true);
+                        DetailsStatusMessage = AppStrings.Get("Details_OfflineSendFailed");
+                        _callbacks.ShowToastKey("Toast_MessageSendOffline", ToastTypes.Error);
+                        await Task.CompletedTask;
+                    }
                 });
         }
         finally

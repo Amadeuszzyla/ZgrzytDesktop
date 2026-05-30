@@ -64,8 +64,10 @@ public class SettingsPanelHeadlessTests : HeadlessViewTestsBase
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblSettingsSave));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblSettingsRefreshSession));
                 Assert.False(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_ResetApiUrl")));
-                Assert.False(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_AutoLogout")));
-                Assert.Equal(1, HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(settingsPanel!));
+                Assert.True(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_AutoLogout")));
+                Assert.True(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_AutoLogoutTimeout")));
+                Assert.Equal(2, HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.ComboBox>(settingsPanel!));
+                Assert.Equal(1, HeadlessViewTestHelper.CountDescendants<Avalonia.Controls.CheckBox>(settingsPanel!));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, "Lokalny audyt aplikacji"));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, "Odśwież audyt"));
                 Assert.False(HeadlessViewTestHelper.ContainsText(window, "Wyczyść audyt"));

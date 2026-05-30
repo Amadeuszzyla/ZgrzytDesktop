@@ -15,6 +15,8 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 {
     public const string LightThemeMode = "Light";
 
+    public static readonly int[] AutoLogoutTimeoutMinuteOptions = { 15, 30, 60 };
+
     private readonly ISettingsService _settingsService;
     private readonly IAuthService _authService;
     private readonly IDashboardContext _context;
@@ -23,6 +25,8 @@ public sealed class SettingsPanelViewModel : ViewModelBase
 
     private string _settingsStatusMessage = AppStrings.Get("Settings_StatusReady");
     private string _selectedUiCulture = "pl";
+    private bool _autoLogoutEnabled = true;
+    private int _selectedAutoLogoutTimeoutMinutes = 30;
 
     public SettingsPanelViewModel(
         ISettingsService settingsService,
@@ -40,11 +44,16 @@ public sealed class SettingsPanelViewModel : ViewModelBase
         foreach (var culture in new[] { "pl", "en" })
             UiCultures.Add(culture);
 
+        foreach (var minutes in AutoLogoutTimeoutMinuteOptions)
+            AutoLogoutTimeoutOptions.Add(minutes);
+
         SaveSettingsCommand = new AsyncRelayCommand(SaveSettingsAsync);
         RefreshSessionCommand = new AsyncRelayCommand(RefreshSessionAsync);
     }
 
     public ObservableCollection<string> UiCultures { get; } = new();
+
+    public ObservableCollection<int> AutoLogoutTimeoutOptions { get; } = new();
 
     public string SelectedThemeMode => LightThemeMode;
 
@@ -60,6 +69,20 @@ public sealed class SettingsPanelViewModel : ViewModelBase
         set => SetProperty(ref _selectedUiCulture, value);
     }
 
+    public bool AutoLogoutEnabled
+    {
+        get => _autoLogoutEnabled;
+        set => SetProperty(ref _autoLogoutEnabled, value);
+    }
+
+    public int SelectedAutoLogoutTimeoutMinutes
+    {
+        get => _selectedAutoLogoutTimeoutMinutes;
+        set => SetProperty(
+            ref _selectedAutoLogoutTimeoutMinutes,
+            SessionInactivityMonitor.NormalizeTimeout(value));
+    }
+
     public string LblSettingsTitle => AppStrings.Get("Settings_Title");
 
     public string LblSettingsSubtitle => AppStrings.Get("Settings_Subtitle");
@@ -69,6 +92,10 @@ public sealed class SettingsPanelViewModel : ViewModelBase
     public string LblSettingsSave => AppStrings.Get("Settings_Save");
 
     public string LblSettingsRefreshSession => AppStrings.Get("Settings_RefreshSession");
+
+    public string LblSettingsAutoLogout => AppStrings.Get("Settings_AutoLogout");
+
+    public string LblSettingsAutoLogoutTimeout => AppStrings.Get("Settings_AutoLogoutTimeout");
 
     public string LblAuditUserFormat => AppStrings.Get("Audit_User");
 
@@ -82,6 +109,9 @@ public sealed class SettingsPanelViewModel : ViewModelBase
     {
         var appSettings = _settingsService.LoadSync();
         SelectedUiCulture = SettingsService.NormalizeUiCulture(appSettings.UiCulture);
+        AutoLogoutEnabled = appSettings.AutoLogoutEnabled;
+        SelectedAutoLogoutTimeoutMinutes = SessionInactivityMonitor.NormalizeTimeout(
+            appSettings.AutoLogoutTimeoutMinutes);
         SettingsService.ApplyThemeMode(LightThemeMode);
         _applyAutoLogoutSettings?.Invoke(
             appSettings.AutoLogoutEnabled,
@@ -95,6 +125,8 @@ public sealed class SettingsPanelViewModel : ViewModelBase
         OnPropertyChanged(nameof(LblSettingsLanguage));
         OnPropertyChanged(nameof(LblSettingsSave));
         OnPropertyChanged(nameof(LblSettingsRefreshSession));
+        OnPropertyChanged(nameof(LblSettingsAutoLogout));
+        OnPropertyChanged(nameof(LblSettingsAutoLogoutTimeout));
         OnPropertyChanged(nameof(LblAuditUserFormat));
         OnPropertyChanged(nameof(LblAuditTicketFormat));
 
@@ -114,17 +146,22 @@ public sealed class SettingsPanelViewModel : ViewModelBase
                     ApiBaseUrl = existing.ApiBaseUrl,
                     ThemeMode = LightThemeMode,
                     UiCulture = SettingsService.NormalizeUiCulture(SelectedUiCulture),
-                    AutoLogoutEnabled = existing.AutoLogoutEnabled,
+                    AutoLogoutEnabled = AutoLogoutEnabled,
                     AutoLogoutTimeoutMinutes = SessionInactivityMonitor.NormalizeTimeout(
-                        existing.AutoLogoutTimeoutMinutes)
+                        SelectedAutoLogoutTimeoutMinutes)
                 };
 
                 await _settingsService.SaveAsync(settings);
 
                 SelectedUiCulture = settings.UiCulture;
+                AutoLogoutEnabled = settings.AutoLogoutEnabled;
+                SelectedAutoLogoutTimeoutMinutes = settings.AutoLogoutTimeoutMinutes;
                 SettingsService.ApplyThemeMode(LightThemeMode);
                 AppStrings.ApplyCulture(settings.UiCulture);
                 _context.NotifyLocalization();
+                _applyAutoLogoutSettings?.Invoke(
+                    settings.AutoLogoutEnabled,
+                    settings.AutoLogoutTimeoutMinutes);
 
                 SettingsStatusMessage = string.Empty;
 
@@ -139,8 +176,11 @@ public sealed class SettingsPanelViewModel : ViewModelBase
                 if (_context.CurrentSection == AppSections.Settings)
                     await _refreshAuditWhenOnSettingsPage();
             },
-            unexpectedToastMessageKey: "Toast_SettingsSaveFailed",
-            showApiErrorToast: false);
+            new DashboardApiExecutionOptions
+            {
+                UnexpectedToastMessageKey = "Toast_SettingsSaveFailed",
+                ShowApiErrorToast = false
+            });
     }
 
     private async Task RefreshSessionAsync()
@@ -162,9 +202,12 @@ public sealed class SettingsPanelViewModel : ViewModelBase
                 SettingsStatusMessage = AppStrings.Get("Settings_StatusSessionNoToken");
                 _context.ShowToastKey("Toast_SessionRefreshFailed", ToastTypes.Warning);
             },
-            setStatusMessage: message => SettingsStatusMessage = message,
-            unexpectedStatusMessageKey: "Settings_StatusSessionRefreshFailed",
-            unexpectedToastMessageKey: "Toast_SessionRefreshFailed");
+            new DashboardApiExecutionOptions
+            {
+                SetStatusMessage = message => SettingsStatusMessage = message,
+                UnexpectedStatusMessageKey = "Settings_StatusSessionRefreshFailed",
+                UnexpectedToastMessageKey = "Toast_SessionRefreshFailed"
+            });
     }
 
 }

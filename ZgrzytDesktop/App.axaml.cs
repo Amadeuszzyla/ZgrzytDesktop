@@ -6,6 +6,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using ZgrzytDesktop.Cache;
+using ZgrzytDesktop.Diagnostics;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Services.Interfaces;
@@ -88,6 +89,7 @@ public partial class App : Application
         services.AddSingleton<ITicketService, TicketService>();
         services.AddSingleton<IUserAdminService, UserAdminService>();
         services.AddSingleton<ILocalAuditLogService, LocalAuditLogService>();
+        services.AddSingleton<ILocalDiagnosticLogService, LocalDiagnosticLogService>();
         services.AddSingleton<ILocalTicketCacheService, LocalTicketCacheService>();
         services.AddSingleton<ILocalUserCacheService, LocalUserCacheService>();
         services.AddSingleton<MainWindowViewModel>();
@@ -107,6 +109,7 @@ public partial class App : Application
         var settings = settingsService.LoadSync();
         AppStrings.ApplyCulture(settings.UiCulture);
         SettingsService.ApplyThemeMode(settings.ThemeMode);
+        DiagnosticLogBridge.Service = provider.GetRequiredService<ILocalDiagnosticLogService>();
 
         return provider;
     }

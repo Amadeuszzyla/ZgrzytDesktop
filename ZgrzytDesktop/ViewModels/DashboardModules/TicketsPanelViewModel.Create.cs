@@ -119,15 +119,18 @@ public sealed partial class TicketsPanelViewModel
                             [createdTicket.Title]);
                     }
                 },
-                setStatusMessage: message => CreateTicketStatusMessage = message,
-                unexpectedStatusMessageKey: "Tickets_CreateUnexpectedError",
-                unexpectedToastMessageKey: "Tickets_CreateError",
-                onServiceUnavailableAsync: async _ =>
+                new DashboardApiExecutionOptions
                 {
-                    _callbacks.SetIsOffline(true);
-                    CreateTicketStatusMessage = AppStrings.Get("Tickets_CreateOfflineError");
-                    _callbacks.ShowToastKey("Toast_TicketCreateOffline", ToastTypes.Error);
-                    await Task.CompletedTask;
+                    SetStatusMessage = message => CreateTicketStatusMessage = message,
+                    UnexpectedStatusMessageKey = "Tickets_CreateUnexpectedError",
+                    UnexpectedToastMessageKey = "Tickets_CreateError",
+                    OnServiceUnavailableAsync = async _ =>
+                    {
+                        _callbacks.SetIsOffline(true);
+                        CreateTicketStatusMessage = AppStrings.Get("Tickets_CreateOfflineError");
+                        _callbacks.ShowToastKey("Toast_TicketCreateOffline", ToastTypes.Error);
+                        await Task.CompletedTask;
+                    }
                 });
         }
         finally

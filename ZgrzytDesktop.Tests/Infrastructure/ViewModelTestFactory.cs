@@ -96,6 +96,7 @@ public static class ViewModelTestFactory
             userCache,
             audit,
             new FakeUserAdminService(),
-            api);
+            api,
+            NullLocalDiagnosticLogService.Instance);
     }
 }

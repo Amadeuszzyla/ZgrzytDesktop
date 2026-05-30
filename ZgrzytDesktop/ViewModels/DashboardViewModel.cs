@@ -18,6 +18,7 @@ public partial class DashboardViewModel : ViewModelBase
     private readonly ISettingsService _settingsService;
     private readonly ILocalTicketCacheService _ticketCacheService;
     private readonly ILocalAuditLogService _auditLogService;
+    private readonly ILocalDiagnosticLogService? _diagnosticLogService;
     private readonly IUserAdminService _userAdminService;
     private readonly Func<Task> _onLogoutRequested;
     private readonly Action<bool, int>? _onAutoLogoutSettingsChanged;
@@ -35,7 +36,8 @@ public partial class DashboardViewModel : ViewModelBase
         ILocalAuditLogService auditLogService,
         IUserAdminService userAdminService,
         Func<Task> onLogoutRequested,
-        Action<bool, int>? onAutoLogoutSettingsChanged = null)
+        Action<bool, int>? onAutoLogoutSettingsChanged = null,
+        ILocalDiagnosticLogService? diagnosticLogService = null)
         : this(
             currentUser,
             authService,
@@ -46,7 +48,8 @@ public partial class DashboardViewModel : ViewModelBase
             userAdminService,
             onLogoutRequested,
             BootstrapOptions.Production,
-            onAutoLogoutSettingsChanged)
+            onAutoLogoutSettingsChanged,
+            diagnosticLogService)
     {
     }
 
@@ -60,7 +63,8 @@ public partial class DashboardViewModel : ViewModelBase
         IUserAdminService userAdminService,
         Func<Task> onLogoutRequested,
         BootstrapOptions bootstrap,
-        Action<bool, int>? onAutoLogoutSettingsChanged = null)
+        Action<bool, int>? onAutoLogoutSettingsChanged = null,
+        ILocalDiagnosticLogService? diagnosticLogService = null)
     {
         CurrentUser = currentUser;
         _authService = authService;
@@ -68,6 +72,7 @@ public partial class DashboardViewModel : ViewModelBase
         _settingsService = settingsService;
         _ticketCacheService = ticketCacheService;
         _auditLogService = auditLogService;
+        _diagnosticLogService = diagnosticLogService;
         _userAdminService = userAdminService;
         _onLogoutRequested = onLogoutRequested;
         _onAutoLogoutSettingsChanged = onAutoLogoutSettingsChanged;

@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Helpers;
 
 namespace ZgrzytDesktop.ViewModels.DashboardModules;
@@ -10,9 +9,7 @@ namespace ZgrzytDesktop.ViewModels.DashboardModules;
 /// </summary>
 public sealed class DashboardContext : IDashboardContext
 {
-    private readonly Func<Func<Task>, Action<string>?, string?, string?, string?, bool, bool, Func<ApiException, Task>?, Task<bool>>
-        _executeApiAsync;
-
+    private readonly Func<Func<Task>, DashboardApiExecutionOptions?, Task<bool>> _executeApiAsync;
     private readonly ToastKeyCallback _showToastKey;
     private readonly Action<string, string> _showToastRaw;
     private readonly Func<string, int?, string?, object?[]?, Task> _logAuditAsync;
@@ -22,8 +19,7 @@ public sealed class DashboardContext : IDashboardContext
     private readonly Func<string> _getCurrentSection;
 
     public DashboardContext(
-        Func<Func<Task>, Action<string>?, string?, string?, string?, bool, bool, Func<ApiException, Task>?, Task<bool>>
-            executeApiAsync,
+        Func<Func<Task>, DashboardApiExecutionOptions?, Task<bool>> executeApiAsync,
         ToastKeyCallback showToastKey,
         Action<string, string> showToastRaw,
         Func<string, int?, string?, object?[]?, Task> logAuditAsync,
@@ -51,23 +47,9 @@ public sealed class DashboardContext : IDashboardContext
     public string CurrentSection => _getCurrentSection();
 
     public Task<bool> ExecuteApiAsync(
-        Func<Task> action,
-        Action<string>? setStatusMessage = null,
-        string? unexpectedStatusMessageKey = null,
-        string? unexpectedToastMessageKey = null,
-        string? offlineToastMessageKey = null,
-        bool showApiErrorToast = true,
-        bool setOfflineOnServiceUnavailable = true,
-        Func<ApiException, Task>? onServiceUnavailableAsync = null) =>
-        _executeApiAsync(
-            action,
-            setStatusMessage,
-            unexpectedStatusMessageKey,
-            unexpectedToastMessageKey,
-            offlineToastMessageKey,
-            showApiErrorToast,
-            setOfflineOnServiceUnavailable,
-            onServiceUnavailableAsync);
+        Func<Task> operation,
+        DashboardApiExecutionOptions? options = null) =>
+        _executeApiAsync(operation, options);
 
     public void ShowToastKey(string resourceKey, string toastType, params object[] formatArgs) =>
         _showToastKey(resourceKey, toastType, formatArgs);

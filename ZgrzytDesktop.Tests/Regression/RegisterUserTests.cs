@@ -213,7 +213,7 @@ public class RegisterUserTests
                     context.AuditCalls.Add((action, ticketId));
                     return Task.CompletedTask;
                 },
-                ExecuteApiAsyncCore = async (action, setStatusMessage, _, _, _, _, _, _) =>
+                ExecuteApiAsyncCore = async (action, options) =>
                 {
                     try
                     {
@@ -222,14 +222,14 @@ public class RegisterUserTests
                     }
                     catch (ApiException ex)
                     {
-                        setStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
+                        options?.SetStatusMessage?.Invoke(ApiErrorSanitizer.SanitizeApiErrorMessage(
                             ex.ResponseContent ?? ex.Message,
                             ex.StatusCode));
                         return false;
                     }
                     catch
                     {
-                        setStatusMessage?.Invoke(AppStrings.Get("RegisterUser_Failed"));
+                        options?.SetStatusMessage?.Invoke(AppStrings.Get("RegisterUser_Failed"));
                         return false;
                     }
                 }

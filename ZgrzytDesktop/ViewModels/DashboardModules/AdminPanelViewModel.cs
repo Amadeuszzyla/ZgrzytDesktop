@@ -240,10 +240,13 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
                 _callbacks.ShowToastKey("Toast_UserBanned", ToastTypes.Success);
                 await _callbacks.LogAuditAsync("BanUser", null, "Audit_Desc_UserBanned", [login]);
             },
-            setStatusMessage: message => AdminStatusMessage = message,
-            unexpectedStatusMessageKey: "Toast_AdminBanFailed",
-            unexpectedToastMessageKey: "Toast_AdminBanFailed",
-            setOfflineOnServiceUnavailable: false);
+            new DashboardApiExecutionOptions
+            {
+                SetStatusMessage = message => AdminStatusMessage = message,
+                UnexpectedStatusMessageKey = "Toast_AdminBanFailed",
+                UnexpectedToastMessageKey = "Toast_AdminBanFailed",
+                SetOfflineOnServiceUnavailable = false
+            });
     }
 
     private async Task ActivateUserAsync()
@@ -264,10 +267,13 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
                 _callbacks.ShowToastKey("Toast_UserActivated", ToastTypes.Success);
                 await _callbacks.LogAuditAsync("ActivateUser", null, "Audit_Desc_UserActivated", [login]);
             },
-            setStatusMessage: message => AdminStatusMessage = message,
-            unexpectedStatusMessageKey: "Toast_AdminActivateFailed",
-            unexpectedToastMessageKey: "Toast_AdminActivateFailed",
-            setOfflineOnServiceUnavailable: false);
+            new DashboardApiExecutionOptions
+            {
+                SetStatusMessage = message => AdminStatusMessage = message,
+                UnexpectedStatusMessageKey = "Toast_AdminActivateFailed",
+                UnexpectedToastMessageKey = "Toast_AdminActivateFailed",
+                SetOfflineOnServiceUnavailable = false
+            });
     }
 
     private async Task UnbanUserAsync()
@@ -295,10 +301,13 @@ public sealed partial class AdminPanelViewModel : ViewModelBase
                 _callbacks.ShowToastKey("Toast_UserUnbanned", ToastTypes.Success);
                 await _callbacks.LogAuditAsync("UnbanUser", null, "Audit_Desc_UserUnbanned", [login]);
             },
-            setStatusMessage: message => AdminStatusMessage = message,
-            unexpectedStatusMessageKey: "Toast_AdminUnbanFailed",
-            unexpectedToastMessageKey: "Toast_AdminUnbanFailed",
-            setOfflineOnServiceUnavailable: false);
+            new DashboardApiExecutionOptions
+            {
+                SetStatusMessage = message => AdminStatusMessage = message,
+                UnexpectedStatusMessageKey = "Toast_AdminUnbanFailed",
+                UnexpectedToastMessageKey = "Toast_AdminUnbanFailed",
+                SetOfflineOnServiceUnavailable = false
+            });
     }
 
     private static string BuildAdminStatusMessage(int userCount, string filterLabel) =>

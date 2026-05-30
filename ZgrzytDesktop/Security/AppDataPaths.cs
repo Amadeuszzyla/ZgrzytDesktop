@@ -27,6 +27,10 @@ public static class AppDataPaths
 
     public static string SettingsFilePath => Path.Combine(SettingsDirectory, "settings.json");
 
+    public static string LogsDirectory => Path.Combine(RootDirectory, "Logs");
+
+    public static string DiagnosticLogFilePath => Path.Combine(LogsDirectory, "diagnostic.log");
+
     public static void EnsureDirectoryForFile(string filePath)
     {
         var directory = Path.GetDirectoryName(filePath);

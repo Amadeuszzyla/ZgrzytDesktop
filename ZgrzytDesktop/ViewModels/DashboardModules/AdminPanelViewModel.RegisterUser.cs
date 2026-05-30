@@ -172,10 +172,13 @@ public sealed partial class AdminPanelViewModel
                         "Audit_Desc_RegisterUser",
                         [request.Login, request.Role]);
                 },
-                setStatusMessage: message => RegisterUserStatusMessage = message,
-                unexpectedStatusMessageKey: "RegisterUser_Failed",
-                unexpectedToastMessageKey: "RegisterUser_Failed",
-                setOfflineOnServiceUnavailable: false);
+                new DashboardApiExecutionOptions
+                {
+                    SetStatusMessage = message => RegisterUserStatusMessage = message,
+                    UnexpectedStatusMessageKey = "RegisterUser_Failed",
+                    UnexpectedToastMessageKey = "RegisterUser_Failed",
+                    SetOfflineOnServiceUnavailable = false
+                });
         }
         finally
         {
