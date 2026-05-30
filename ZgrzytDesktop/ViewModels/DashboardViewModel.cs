@@ -98,6 +98,9 @@ public partial class DashboardViewModel : ViewModelBase
             using (StartupPerf.Measure("Initialize API coordinator"))
                 InitializeApiCoordinator();
 
+            using (StartupPerf.Measure("Initialize localization"))
+                InitializeLocalization();
+
             using (StartupPerf.Measure("Initialize dashboard panels"))
                 InitializeDashboardPanels();
 

@@ -1,9 +1,68 @@
+﻿using System;
+using System.Reflection;
 using ZgrzytDesktop.Resources;
 
-namespace ZgrzytDesktop.ViewModels;
+namespace ZgrzytDesktop.ViewModels.DashboardModules;
 
-public partial class DashboardViewModel
+/// <summary>
+/// Localized dashboard shell labels (nav, grids, tickets, details, admin, audit, request account).
+/// </summary>
+public sealed class DashboardLocalizationViewModel : ViewModelBase
 {
+    public string LblNavTickets => AppStrings.Get("Nav_Tickets");
+
+    public string LblNavRequestAccount => AppStrings.Get("Nav_RequestAccount");
+
+    public string LblNavStatistics => AppStrings.Get("Nav_Statistics");
+
+    public string LblNavSettings => AppStrings.Get("Nav_Settings");
+
+    public string LblNavAdmin => AppStrings.Get("Nav_Admin");
+
+    public string LblNavLogout => AppStrings.Get("Nav_Logout");
+
+    public string LblHeaderSubtitle => AppStrings.Get("Header_Subtitle");
+
+    public string LblTicketsFiltersTitle => AppStrings.Get("Tickets_FiltersTitle");
+
+    public string LblTicketsFiltersSubtitle => AppStrings.Get("Tickets_FiltersSubtitle");
+
+    public string LblTicketsSearchPlaceholder => AppStrings.Get("Tickets_SearchPlaceholder");
+
+    public string LblTicketsFilterCategory => AppStrings.Get("Tickets_FilterCategory");
+
+    public string LblTicketsSearch => AppStrings.Get("Tickets_Search");
+
+    public string LblTicketsClear => AppStrings.Get("Tickets_Clear");
+
+    public string LblTicketsRefreshNow => AppStrings.Get("Tickets_RefreshNow");
+
+    public string LblTicketsListTitle => AppStrings.Get("Tickets_ListTitle");
+
+    public string LblTicketsNewTitle => AppStrings.Get("Tickets_NewTitle");
+
+    public string LblTicketsSortField => AppStrings.Get("Tickets_SortField");
+
+    public string LblTicketsSortDirection => AppStrings.Get("Tickets_SortDirection");
+
+    public string LblAdminUsersTitle => AppStrings.Get("Admin_UsersTitle");
+
+    public string LblAdminUsersSubtitle => AppStrings.Get("Admin_UsersSubtitle");
+
+    public string LblAdminRefreshList => AppStrings.Get("Admin_RefreshList");
+
+    public string LblAdminActivate => AppStrings.Get("Admin_Activate");
+
+    public string LblAdminBan => AppStrings.Get("Admin_Ban");
+
+    public string LblAdminUnban => AppStrings.Get("Admin_Unban");
+
+    public string LblAdminUnbanPassword => AppStrings.Get("Admin_UnbanPassword");
+
+    public string LblAdminTabUsers => AppStrings.Get("Admin_TabUsers");
+
+    public string LblAdminTabNewAccount => AppStrings.Get("Admin_TabNewAccount");
+
     public string LblAppBrandName => AppStrings.Get("App_BrandName");
 
     public string LblAppBrandSuffix => AppStrings.Get("App_BrandSuffix");
@@ -184,97 +243,15 @@ public partial class DashboardViewModel
 
     public string LblAuditColumnDescription => AppStrings.Get("Audit_ColumnDescription");
 
-    private void NotifyUiLabels()
+    public void NotifyLabels()
     {
-        OnPropertyChanged(nameof(LblAppBrandName));
-        OnPropertyChanged(nameof(LblAppBrandSuffix));
-        OnPropertyChanged(nameof(LblGridId));
-        OnPropertyChanged(nameof(LblGridCategory));
-        OnPropertyChanged(nameof(LblGridTitle));
-        OnPropertyChanged(nameof(LblGridStatus));
-        OnPropertyChanged(nameof(LblGridPriority));
-        OnPropertyChanged(nameof(LblGridCreatedAt));
-        OnPropertyChanged(nameof(LblGridLogin));
-        OnPropertyChanged(nameof(LblGridEmail));
-        OnPropertyChanged(nameof(LblGridRole));
-        OnPropertyChanged(nameof(LblGridActive));
-        OnPropertyChanged(nameof(LblGridBan));
-        OnPropertyChanged(nameof(LblTicketsPageSizeLabel));
-        OnPropertyChanged(nameof(LblTicketsPageFirst));
-        OnPropertyChanged(nameof(LblTicketsPagePrevious));
-        OnPropertyChanged(nameof(LblTicketsPageLabel));
-        OnPropertyChanged(nameof(LblTicketsPageNext));
-        OnPropertyChanged(nameof(LblTicketsPageLast));
-        OnPropertyChanged(nameof(LblTicketsNewSubtitle));
-        OnPropertyChanged(nameof(LblTicketsFieldCategory));
-        OnPropertyChanged(nameof(LblTicketsFieldPriority));
-        OnPropertyChanged(nameof(LblTicketsFieldTitle));
-        OnPropertyChanged(nameof(LblTicketsFieldDescription));
-        OnPropertyChanged(nameof(LblTicketsNewTitlePlaceholder));
-        OnPropertyChanged(nameof(LblTicketsNewDescriptionPlaceholder));
-        OnPropertyChanged(nameof(LblTicketsCreateButton));
-        OnPropertyChanged(nameof(LblTicketsEmptyList));
-        OnPropertyChanged(nameof(LblDetailsBackToList));
-        OnPropertyChanged(nameof(LblDetailsInfoTitle));
-        OnPropertyChanged(nameof(LblDetailsProcessing));
-        OnPropertyChanged(nameof(LblDetailsReporter));
-        OnPropertyChanged(nameof(LblDetailsAssignedIt));
-        OnPropertyChanged(nameof(LblDetailsDescription));
-        OnPropertyChanged(nameof(LblDetailsCloseOwnHint));
-        OnPropertyChanged(nameof(LblDetailsStaffHint));
-        OnPropertyChanged(nameof(LblDetailsOfflineHint));
-        OnPropertyChanged(nameof(LblDetailsManageTitle));
-        OnPropertyChanged(nameof(LblDetailsSaveChanges));
-        OnPropertyChanged(nameof(LblDetailsAssignToMe));
-        OnPropertyChanged(nameof(LblTicketAssignTo));
-        OnPropertyChanged(nameof(LblTicketNoAssignableUsers));
-        OnPropertyChanged(nameof(LblTicketAssignToMe));
-        OnPropertyChanged(nameof(LblTicketSaveAssignment));
-        OnPropertyChanged(nameof(LblDetailsCloseTicket));
-        OnPropertyChanged(nameof(LblDetailsDeleteTicket));
-        OnPropertyChanged(nameof(LblDetailsLocalAuditTitle));
-        OnPropertyChanged(nameof(LblDetailsLocalAuditSubtitle));
-        OnPropertyChanged(nameof(LblDetailsLocalAuditEmpty));
-        OnPropertyChanged(nameof(LblDetailsMessagesTitle));
-        OnPropertyChanged(nameof(LblDetailsMessagesSubtitle));
-        OnPropertyChanged(nameof(LblDetailsMessagePlaceholder));
-        OnPropertyChanged(nameof(LblDetailsSend));
-        OnPropertyChanged(nameof(LblDetailsNoMessages));
-        OnPropertyChanged(nameof(LblDetailsAssignedHint));
-        OnPropertyChanged(nameof(LblDetailsNotAssignedHint));
-        OnPropertyChanged(nameof(LblRequestAccountTitle));
-        OnPropertyChanged(nameof(LblRequestAccountSubtitle));
-        OnPropertyChanged(nameof(LblRequestAccountFullName));
-        OnPropertyChanged(nameof(LblRequestAccountLogin));
-        OnPropertyChanged(nameof(LblRequestAccountEmail));
-        OnPropertyChanged(nameof(LblRequestAccountPassword));
-        OnPropertyChanged(nameof(LblRequestAccountPasswordConfirm));
-        OnPropertyChanged(nameof(LblRequestAccountPlaceholderName));
-        OnPropertyChanged(nameof(LblRequestAccountPlaceholderLogin));
-        OnPropertyChanged(nameof(LblRequestAccountPlaceholderEmail));
-        OnPropertyChanged(nameof(LblRequestAccountPlaceholderPassword));
-        OnPropertyChanged(nameof(LblRequestAccountPlaceholderPasswordConfirm));
-        OnPropertyChanged(nameof(LblRequestAccountSubmit));
-        OnPropertyChanged(nameof(LblAdminRegisterTitle));
-        OnPropertyChanged(nameof(LblAdminRegisterSubtitle));
-        OnPropertyChanged(nameof(LblRegisterUserTitle));
-        OnPropertyChanged(nameof(LblRegisterUserSubtitle));
-        OnPropertyChanged(nameof(LblRegisterUserFullName));
-        OnPropertyChanged(nameof(LblRegisterUserLogin));
-        OnPropertyChanged(nameof(LblRegisterUserEmail));
-        OnPropertyChanged(nameof(LblRegisterUserPassword));
-        OnPropertyChanged(nameof(LblRegisterUserPasswordConfirm));
-        OnPropertyChanged(nameof(LblRegisterUserRole));
-        OnPropertyChanged(nameof(LblRegisterUserSubmit));
-        OnPropertyChanged(nameof(LblAuditTitle));
-        OnPropertyChanged(nameof(LblAuditSubtitle));
-        OnPropertyChanged(nameof(LblAuditRefresh));
-        OnPropertyChanged(nameof(LblAuditClear));
-        OnPropertyChanged(nameof(LblAuditEmpty));
-        OnPropertyChanged(nameof(LblAuditColumnTimestamp));
-        OnPropertyChanged(nameof(LblAuditColumnUser));
-        OnPropertyChanged(nameof(LblAuditColumnAction));
-        OnPropertyChanged(nameof(LblAuditColumnTicketId));
-        OnPropertyChanged(nameof(LblAuditColumnDescription));
+        foreach (var property in GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (property.PropertyType != typeof(string) ||
+                !property.Name.StartsWith("Lbl", StringComparison.Ordinal))
+                continue;
+
+            OnPropertyChanged(property.Name);
+        }
     }
 }
