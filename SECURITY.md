@@ -85,16 +85,6 @@ $env:ZGRZYT_PASSWORD = "twoje_haslo"
 | **Deinstalator** | `ZgrzytDesktopUninstall.exe` **nie usuwa plików ręcznie** — szuka `unins000.exe` w rejestrze Windows (AppId / DisplayName) z fallbackiem do `%LocalAppData%\Programs\ZgrzytDesktop\` i uruchamia deinstalator Inno Setup |
 
 Skrypt publikacji lokalnej: [`scripts/publish-release.ps1`](scripts/publish-release.ps1). Build release w CI: [`.github/workflows/release.yml`](.github/workflows/release.yml).
-
-## 8. Checklist bezpieczeństwa przed oddaniem
-
-- [ ] Brak sekretów, haseł i tokenów w repozytorium (w tym `.env`, logi, testy)
-- [ ] Brak haseł i tokenów w lokalnym audycie i komunikatach błędów
-- [ ] `dotnet test ZgrzytDesktop.sln -c Release --filter "Category!=Integration"` przechodzi
-- [ ] Artefakty release mają pliki `.sha256`
-- [ ] Aplikacja używa HTTPS dla produkcyjnego API
-- [ ] Testy integracyjne live uruchamiane tylko ze świadomie skonfigurowanymi sekretami
-
 ## Powiązane
 
 - [README.md](README.md) — architektura, testy, CI/CD, uruchomienie release
