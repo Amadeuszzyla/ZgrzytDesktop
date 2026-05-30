@@ -12,8 +12,10 @@ namespace ZgrzytDesktop.ViewModels;
 public partial class MainWindowViewModel
 {
     private readonly TimeSpan _autoLoginColdStartHintDelay;
+    private readonly TimeSpan _autoLoginTimeout;
 
     private CancellationTokenSource? _autoLoginCts;
+    private int _autoLoginSessionId;
     private bool _isAutoLoginInProgress;
     private string _autoLoginStatusMessage = string.Empty;
 
@@ -50,6 +52,7 @@ public partial class MainWindowViewModel
         _autoLoginCts?.Cancel();
         _autoLoginCts?.Dispose();
         _autoLoginCts = new CancellationTokenSource();
+        _autoLoginSessionId++;
 
         IsAutoLoginInProgress = true;
         AutoLoginStatusMessage = AppStrings.Get("Login_AutoLogin_CheckingSession");
@@ -119,17 +122,41 @@ public partial class MainWindowViewModel
         }
     }
 
-    private async Task<User?> WaitForAutoLoginUserAsync(Task<User?> getUserTask, CancellationToken cancellationToken)
+    private void AbandonAutoLoginSession() => _autoLoginSessionId++;
+
+    private void ApplyAutoLoginTimeoutMessage()
+    {
+        if (_currentViewModel is LoginViewModel login)
+            login.ErrorMessage = AppStrings.Get("Login_AutoLogin_Timeout");
+    }
+
+    private async Task<(User? User, bool TimedOut)> WaitForAutoLoginUserAsync(
+        Task<User?> getUserTask,
+        CancellationToken cancellationToken,
+        TimeSpan timeout)
     {
         if (cancellationToken.IsCancellationRequested)
-            return null;
+            return (null, false);
 
+        using var timeoutCts = new CancellationTokenSource();
+        var timeoutTask = Task.Delay(timeout, timeoutCts.Token);
         var cancellationTask = Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
-        var completed = await Task.WhenAny(getUserTask, cancellationTask);
 
-        if (completed != getUserTask || cancellationToken.IsCancellationRequested)
-            return null;
+        var completed = await Task.WhenAny(getUserTask, timeoutTask, cancellationTask);
 
-        return await getUserTask;
+        if (completed == getUserTask)
+        {
+            timeoutCts.Cancel();
+
+            if (cancellationToken.IsCancellationRequested)
+                return (null, false);
+
+            return (await getUserTask, false);
+        }
+
+        if (completed == timeoutTask && !cancellationToken.IsCancellationRequested)
+            return (null, true);
+
+        return (null, false);
     }
 }

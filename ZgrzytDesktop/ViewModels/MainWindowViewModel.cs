@@ -72,6 +72,7 @@ public partial class MainWindowViewModel : ViewModelBase
             _apiService = dependencies.ApiService;
             _diagnosticLogService = dependencies.DiagnosticLogService;
             _autoLoginColdStartHintDelay = dependencies.AutoLoginColdStartHintDelay;
+            _autoLoginTimeout = dependencies.AutoLoginTimeout;
 
             CancelAutoLoginCommand = new RelayCommand(CancelAutoLogin);
 
@@ -101,7 +102,8 @@ public partial class MainWindowViewModel : ViewModelBase
             IUserAdminService userAdminService,
             IApiService apiService,
             ILocalDiagnosticLogService diagnosticLogService,
-            TimeSpan? autoLoginColdStartHintDelay = null)
+            TimeSpan? autoLoginColdStartHintDelay = null,
+            TimeSpan? autoLoginTimeout = null)
         {
             AuthService = authService;
             TicketService = ticketService;
@@ -113,6 +115,7 @@ public partial class MainWindowViewModel : ViewModelBase
             ApiService = apiService;
             DiagnosticLogService = diagnosticLogService;
             AutoLoginColdStartHintDelay = autoLoginColdStartHintDelay ?? TimeSpan.FromSeconds(3);
+            AutoLoginTimeout = autoLoginTimeout ?? TimeSpan.FromSeconds(20);
         }
 
         public IAuthService AuthService { get; }
@@ -133,11 +136,14 @@ public partial class MainWindowViewModel : ViewModelBase
         public ILocalDiagnosticLogService DiagnosticLogService { get; }
 
         public TimeSpan AutoLoginColdStartHintDelay { get; }
+
+        public TimeSpan AutoLoginTimeout { get; }
     }
 
     private async Task TryAutoLoginAsync()
     {
         BeginAutoLogin();
+        var sessionId = _autoLoginSessionId;
         var cancellationToken = _autoLoginCts?.Token ?? CancellationToken.None;
 
         try
@@ -145,14 +151,27 @@ public partial class MainWindowViewModel : ViewModelBase
             using (StartupPerf.Measure("Auto-login flow"))
             {
                 User? user;
+                var timedOut = false;
                 using (StartupPerf.Measure("Auto-login — GetCurrentUserAsync (API)"))
                 {
-                    user = await WaitForAutoLoginUserAsync(
+                    (user, timedOut) = await WaitForAutoLoginUserAsync(
                         _authService.GetCurrentUserAsync(),
-                        cancellationToken);
+                        cancellationToken,
+                        _autoLoginTimeout);
                 }
 
-                if (user is null || cancellationToken.IsCancellationRequested)
+                if (timedOut)
+                {
+                    AbandonAutoLoginSession();
+                    _diagnosticLogService.LogWarning(
+                        $"Auto-login timed out after {_autoLoginTimeout.TotalSeconds:0}s waiting for GET user.");
+                    ApplyAutoLoginTimeoutMessage();
+                    return;
+                }
+
+                if (user is null ||
+                    cancellationToken.IsCancellationRequested ||
+                    sessionId != _autoLoginSessionId)
                     return;
 
                 await TryEnterApplicationAsync(user, "Audit_Desc_LoginAuto");

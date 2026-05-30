@@ -78,7 +78,9 @@ public static class ViewModelTestFactory
         FakeTicketService? tickets = null,
         FakeSettingsService? settings = null,
         FakeAuditLogService? audit = null,
-        TimeSpan? autoLoginColdStartHintDelay = null)
+        TimeSpan? autoLoginColdStartHintDelay = null,
+        TimeSpan? autoLoginTimeout = null,
+        ILocalDiagnosticLogService? diagnosticLog = null)
     {
         auth ??= new FakeAuthService();
         tickets ??= new FakeTicketService();
@@ -98,7 +100,8 @@ public static class ViewModelTestFactory
             audit,
             new FakeUserAdminService(),
             api,
-            NullLocalDiagnosticLogService.Instance,
-            autoLoginColdStartHintDelay);
+            diagnosticLog ?? NullLocalDiagnosticLogService.Instance,
+            autoLoginColdStartHintDelay,
+            autoLoginTimeout);
     }
 }
