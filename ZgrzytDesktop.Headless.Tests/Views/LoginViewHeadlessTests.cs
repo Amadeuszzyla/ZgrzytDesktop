@@ -1,5 +1,6 @@
 using System.Linq;
 using ZgrzytDesktop.Headless.Tests.Headless;
+using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Tests.Infrastructure;
 using ZgrzytDesktop.Tests.ViewModels;
 
@@ -7,6 +8,8 @@ namespace ZgrzytDesktop.Headless.Tests.Views;
 
 public class LoginViewHeadlessTests : HeadlessViewTestsBase
 {
+    public LoginViewHeadlessTests() => ViewModelTestSetup.EnsureAppStrings();
+
     [Fact]
     public void LoginView_CreatesWithoutException()
     {
@@ -27,6 +30,25 @@ public class LoginViewHeadlessTests : HeadlessViewTestsBase
                 HeadlessViewTestHelper
                     .FindDescendants<Avalonia.Controls.Button>(view)
                     .FirstOrDefault(b => b.Command == vm.LoginCommand));
+        });
+    }
+
+    [Fact]
+    public void LoginView_DoesNotRenderAutoLoginStatusPanel()
+    {
+        AvaloniaHeadlessTestHost.RunOnUiThread(() =>
+        {
+            var vm = ViewModelTestFactory.CreateLoginViewModel();
+            var view = HeadlessViewTestHelper.CreateLoginView(vm);
+            HeadlessViewTestHelper.ShowInWindow(view, 500, 700);
+
+            Assert.Empty(HeadlessViewTestHelper.FindDescendants<Avalonia.Controls.ProgressBar>(view));
+            Assert.False(HeadlessViewTestHelper.ContainsText(
+                view,
+                AppStrings.Get("Login_AutoLogin_CheckingSession")));
+            Assert.False(HeadlessViewTestHelper.ContainsText(
+                view,
+                AppStrings.Get("Login_AutoLogin_Cancel")));
         });
     }
 }

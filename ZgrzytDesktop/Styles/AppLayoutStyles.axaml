@@ -638,27 +638,6 @@
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
-    <Style Selector="Border.login-status">
-        <Setter Property="Background" Value="#EFF6FF" />
-        <Setter Property="BorderBrush" Value="#BFDBFE" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="Padding" Value="12,10" />
-        <Setter Property="Margin" Value="0,4,0,0" />
-    </Style>
-
-    <Style Selector="TextBlock.login-status-text">
-        <Setter Property="Foreground" Value="#1D4ED8" />
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-
-    <Style Selector="Button.login-auto-cancel">
-        <Setter Property="MinHeight" Value="40" />
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="CornerRadius" Value="10" />
-    </Style>
-
     <!-- Tickets panel — card list -->
     <Style Selector="Border.tickets-toolbar-card">
         <Setter Property="Padding" Value="16,14" />
