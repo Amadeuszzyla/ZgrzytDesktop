@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:ZgrzytDesktop.ViewModels"
     x:DataType="vm:MainWindowViewModel"
-    Icon="/Assets/avalonia-logo.ico"
+    Icon="/Assets/zgrzyt-logo.ico"
     Title="ZGRZYT Desktop"
     Width="1200"
     Height="750"

@@ -10,6 +10,7 @@
         <Version>0.1.0</Version>
         <InformationalVersion>0.1.0-alpha</InformationalVersion>
         <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+        <ApplicationIcon>..\assets\branding\zgrzyt-logo.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>

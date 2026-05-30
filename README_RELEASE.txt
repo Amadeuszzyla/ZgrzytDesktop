@@ -20,7 +20,12 @@ ZGRZYT Desktop — instrukcja uruchomienia (Windows x64)
 
 6. Dane na tym komputerze
    Token, cache i ustawienia: %AppData%\ZgrzytDesktop\
+   (Settings/, Cache/, Logs/, token.txt, audit-log.json, diagnostic.log)
    Nie wymaga uprawnień administratora Windows.
+
+   Instalator (ZgrzytDesktopSetup.exe) używa logo projektu w kreatorze instalacji.
+   Odinstalowanie przez Ustawienia Windows lub wpis w menu Start usuwa także
+   katalog %AppData%\ZgrzytDesktop\ wraz z lokalnymi danymi aplikacji.
 
 7. Język
    W Ustawieniach: polski lub angielski. Interfejs jest tylko w jasnym motywie.
@@ -124,6 +129,7 @@ Po ręcznym uruchomieniu workflow Release pobierz artefakty instalatora z runu
    Start-Process -FilePath $setupPath -Wait
 
    Podczas instalacji:
+   - kreator instalatora wyświetla logo ZgrzytDesktop,
    - domyślnie powstaje skrót w menu Start (ZgrzytDesktop),
    - opcjonalnie zaznacz skrót na pulpicie.
 
@@ -133,7 +139,8 @@ Po ręcznym uruchomieniu workflow Release pobierz artefakty instalatora z runu
 5. Smoke test UI (ręcznie):
 
    [ ] Instalator kończy się bez błędu.
-   [ ] Skrót w menu Start działa.
+   [ ] Skrót w menu Start działa i ma ikonę logo ZgrzytDesktop.
+   [ ] ZgrzytDesktop.exe w folderze instalacji ma ikonę logo.
    [ ] Aplikacja startuje (ekran logowania, badge wersji).
    [ ] README_RELEASE.txt jest w folderze instalacji obok ZgrzytDesktop.exe.
 
@@ -142,5 +149,12 @@ Po ręcznym uruchomieniu workflow Release pobierz artefakty instalatora z runu
    Ustawienia Windows → Aplikacje → ZgrzytDesktop → Odinstaluj
    (lub wpis „Odinstaluj ZgrzytDesktop” w menu Start).
 
-Kryterium PASS: checksuma OK, instalacja i skrót Start Menu działają, aplikacja startuje.
-FAIL: błąd hash, instalator się wykrzacza, brak skrótu, crash przy starcie.
+   Po odinstalowaniu sprawdź, że usunięto:
+   - folder instalacji (%LocalAppData%\Programs\ZgrzytDesktop\),
+   - skróty Start Menu / pulpit,
+   - dane użytkownika (%AppData%\ZgrzytDesktop\).
+
+Kryterium PASS: checksuma OK, instalacja i skrót Start Menu działają, aplikacja startuje,
+ikona logo widoczna, odinstalowanie usuwa pliki programu i dane z AppData.
+FAIL: błąd hash, instalator się wykrzacza, brak skrótu, brak ikony, crash przy starcie,
+pozostałe pliki w AppData po odinstalowaniu.
