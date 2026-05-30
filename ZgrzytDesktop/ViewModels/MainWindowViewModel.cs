@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
 using ZgrzytDesktop.Cache;
+using ZgrzytDesktop.Diagnostics;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
@@ -27,7 +30,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ViewModelBase CurrentViewModel
     {
         get => _currentViewModel;
-        set => SetProperty(ref _currentViewModel, value);
+        set => SetCurrentViewModel(value);
     }
 
     public MainWindowViewModel(
@@ -57,17 +60,26 @@ public partial class MainWindowViewModel : ViewModelBase
 
     internal MainWindowViewModel(MainWindowDependencies dependencies, bool runStartup = false)
     {
-        _authService = dependencies.AuthService;
-        _ticketService = dependencies.TicketService;
-        _settingsService = dependencies.SettingsService;
-        _ticketCacheService = dependencies.TicketCacheService;
-        _userCacheService = dependencies.UserCacheService;
-        _auditLogService = dependencies.AuditLogService;
-        _userAdminService = dependencies.UserAdminService;
-        _apiService = dependencies.ApiService;
-        _diagnosticLogService = dependencies.DiagnosticLogService;
+        using (StartupPerf.Measure("MainWindowViewModel ctor"))
+        {
+            _authService = dependencies.AuthService;
+            _ticketService = dependencies.TicketService;
+            _settingsService = dependencies.SettingsService;
+            _ticketCacheService = dependencies.TicketCacheService;
+            _userCacheService = dependencies.UserCacheService;
+            _auditLogService = dependencies.AuditLogService;
+            _userAdminService = dependencies.UserAdminService;
+            _apiService = dependencies.ApiService;
+            _diagnosticLogService = dependencies.DiagnosticLogService;
+            _autoLoginColdStartHintDelay = dependencies.AutoLoginColdStartHintDelay;
 
-        _currentViewModel = CreateLoginViewModel();
+            CancelAutoLoginCommand = new RelayCommand(CancelAutoLogin);
+
+            using (StartupPerf.Measure("Create LoginViewModel"))
+                _currentViewModel = CreateLoginViewModel();
+
+            AttachLoginViewModelHandlers(_currentViewModel);
+        }
 
         if (runStartup)
             SafeFireAndForget.Run(TryAutoLoginAsync());
@@ -88,7 +100,8 @@ public partial class MainWindowViewModel : ViewModelBase
             ILocalAuditLogService auditLogService,
             IUserAdminService userAdminService,
             IApiService apiService,
-            ILocalDiagnosticLogService diagnosticLogService)
+            ILocalDiagnosticLogService diagnosticLogService,
+            TimeSpan? autoLoginColdStartHintDelay = null)
         {
             AuthService = authService;
             TicketService = ticketService;
@@ -99,6 +112,7 @@ public partial class MainWindowViewModel : ViewModelBase
             UserAdminService = userAdminService;
             ApiService = apiService;
             DiagnosticLogService = diagnosticLogService;
+            AutoLoginColdStartHintDelay = autoLoginColdStartHintDelay ?? TimeSpan.FromSeconds(3);
         }
 
         public IAuthService AuthService { get; }
@@ -117,32 +131,59 @@ public partial class MainWindowViewModel : ViewModelBase
         public IApiService ApiService { get; }
 
         public ILocalDiagnosticLogService DiagnosticLogService { get; }
+
+        public TimeSpan AutoLoginColdStartHintDelay { get; }
     }
 
     private async Task TryAutoLoginAsync()
     {
+        BeginAutoLogin();
+        var cancellationToken = _autoLoginCts?.Token ?? CancellationToken.None;
+
         try
         {
-            var user = await _authService.GetCurrentUserAsync();
+            using (StartupPerf.Measure("Auto-login flow"))
+            {
+                User? user;
+                using (StartupPerf.Measure("Auto-login — GetCurrentUserAsync (API)"))
+                {
+                    user = await WaitForAutoLoginUserAsync(
+                        _authService.GetCurrentUserAsync(),
+                        cancellationToken);
+                }
 
-            if (user is not null)
+                if (user is null || cancellationToken.IsCancellationRequested)
+                    return;
+
                 await TryEnterApplicationAsync(user, "Audit_Desc_LoginAuto");
+            }
         }
         catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
         {
-            await TryOpenOfflineDashboardAsync();
+            if (!cancellationToken.IsCancellationRequested)
+                await TryOpenOfflineDashboardAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            // Auto-login cancelled by user.
         }
         catch
         {
             // Brak tokenu, token wygasł albo użytkownik nie jest zalogowany.
             // Zostajemy na ekranie logowania.
         }
-
+        finally
+        {
+            EndAutoLogin();
+            StartupPerf.NotifyAutoLoginFinished();
+        }
     }
 
     private async Task TryOpenOfflineDashboardAsync()
     {
-        var cachedUser = await _userCacheService.LoadUserAsync();
+        User? cachedUser;
+        using (StartupPerf.Measure("Offline fallback — load user cache"))
+            cachedUser = await _userCacheService.LoadUserAsync();
 
         if (cachedUser is null)
             return;
@@ -169,19 +210,26 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task TryEnterApplicationAsync(User user, string? loginAuditDescription)
     {
-        if (!DesktopAccessHelper.IsDesktopAccessAllowed(user.Role))
+        using (StartupPerf.Measure("Enter application flow"))
         {
-            await DenyDesktopAccessAsync();
-            return;
+            if (!DesktopAccessHelper.IsDesktopAccessAllowed(user.Role))
+            {
+                await DenyDesktopAccessAsync();
+                return;
+            }
+
+            using (StartupPerf.Measure("Save user cache"))
+                await _userCacheService.SaveUserAsync(user);
+
+            if (!string.IsNullOrWhiteSpace(loginAuditDescription))
+            {
+                using (StartupPerf.Measure("Audit log — login entry"))
+                    await LogLoginAsync(user, loginAuditDescription);
+            }
+
+            CurrentViewModel = CreateDashboard(user);
+            RestartInactivityMonitor();
         }
-
-        await _userCacheService.SaveUserAsync(user);
-
-        if (!string.IsNullOrWhiteSpace(loginAuditDescription))
-            await LogLoginAsync(user, loginAuditDescription);
-
-        CurrentViewModel = CreateDashboard(user);
-        RestartInactivityMonitor();
     }
 
     private async Task DenyDesktopAccessAsync()
@@ -207,19 +255,27 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private DashboardViewModel CreateDashboard(User user)
     {
-        var dashboard = new DashboardViewModel(
-            user,
-            _authService,
-            _ticketService,
-            _settingsService,
-            _ticketCacheService,
-            _auditLogService,
-            _userAdminService,
-            () => LogoutAsync(),
-            ApplyAutoLogoutSettings,
-            _diagnosticLogService);
+        DashboardViewModel dashboard;
+        using (StartupPerf.Measure("Create DashboardViewModel"))
+        {
+            dashboard = new DashboardViewModel(
+                user,
+                _authService,
+                _ticketService,
+                _settingsService,
+                _ticketCacheService,
+                _auditLogService,
+                _userAdminService,
+                () => LogoutAsync(),
+                ApplyAutoLogoutSettings,
+                _diagnosticLogService);
+        }
+
+        StartupPerf.MarkDashboardCreated();
+
         if (_apiService is ApiService apiService)
             apiService.OnSessionExpiredAsync = dashboard.HandleSessionExpiredFromApiAsync;
+
         return dashboard;
     }
 

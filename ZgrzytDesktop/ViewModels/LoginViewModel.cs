@@ -76,6 +76,8 @@ public partial class LoginViewModel : ViewModelBase
 
     public string LblPasswordPlaceholder => AppStrings.Get("Login_PlaceholderPassword");
 
+    public string LblAutoLoginCancel => AppStrings.Get("Login_AutoLogin_Cancel");
+
     public IAsyncRelayCommand LoginCommand { get; }
 
     public LoginViewModel(

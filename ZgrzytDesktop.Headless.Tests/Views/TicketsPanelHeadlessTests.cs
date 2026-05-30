@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using ZgrzytDesktop.Constants;
 using ZgrzytDesktop.Headless.Tests.Headless;
 using ZgrzytDesktop.Models;
@@ -183,7 +181,11 @@ public class TicketsPanelHeadlessTests : HeadlessViewTestsBase
     {
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>
         {
+            using var cultureScope = new TestCultureScope("pl");
+            HeadlessViewTestHelper.ApplyUiCulture("pl");
+
             var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("it");
+            Avalonia.Controls.Window? window = null;
 
             try
             {
@@ -192,19 +194,26 @@ public class TicketsPanelHeadlessTests : HeadlessViewTestsBase
                 vm.TicketsPanel.Tickets.Clear();
 
                 var panelView = new TicketsPanelView { DataContext = vm };
-                HeadlessViewTestHelper.ShowInWindow(panelView);
+                window = HeadlessViewTestHelper.ShowInWindow(panelView);
+                HeadlessViewTestHelper.RefreshDataContext(panelView, vm);
 
                 Assert.True(vm.TicketsPanel.HasNoTickets);
 
-                var emptyState = HeadlessViewTestHelper.FindTextBlockWithExactText(
-                    panelView,
-                    AppStrings.Get("Tickets_EmptyList"));
+                var expectedEmptyText = vm.LblTicketsEmptyList;
+                HeadlessViewTestHelper.WaitForCondition(
+                    () =>
+                    {
+                        var emptyState = HeadlessViewTestHelper.FindTextBlockWithExactText(panelView, expectedEmptyText);
+                        return emptyState is not null && emptyState.IsVisible;
+                    });
 
+                var emptyState = HeadlessViewTestHelper.FindTextBlockWithExactText(panelView, expectedEmptyText);
                 Assert.NotNull(emptyState);
                 Assert.True(emptyState!.IsVisible);
             }
             finally
             {
+                HeadlessViewTestHelper.CloseWindow(window);
                 TestApiFactory.Cleanup(tempDir);
             }
         });

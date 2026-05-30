@@ -116,6 +116,9 @@
   <data name="Login_PlaceholderPassword" xml:space="preserve"><value>Enter password</value></data>
   <data name="Login_Button" xml:space="preserve"><value>Sign in</value></data>
   <data name="Login_ButtonLoading" xml:space="preserve"><value>Signing in...</value></data>
+  <data name="Login_AutoLogin_CheckingSession" xml:space="preserve"><value>Checking session…</value></data>
+  <data name="Login_AutoLogin_ColdStartHint" xml:space="preserve"><value>The server may be waking up — this can take up to a minute.</value></data>
+  <data name="Login_AutoLogin_Cancel" xml:space="preserve"><value>Sign in manually instead</value></data>
   <data name="Grid_Id" xml:space="preserve"><value>ID</value></data>
   <data name="Grid_Category" xml:space="preserve"><value>Category</value></data>
   <data name="Grid_Title" xml:space="preserve"><value>Title</value></data>

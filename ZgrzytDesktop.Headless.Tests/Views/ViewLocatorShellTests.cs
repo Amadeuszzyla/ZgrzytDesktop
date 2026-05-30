@@ -12,13 +12,8 @@ using ZgrzytDesktop.Views;
 namespace ZgrzytDesktop.Headless.Tests.Views;
 
 [Collection(AvaloniaHeadlessCollection.Name)]
-public class ViewLocatorShellTests : IDisposable
+public class ViewLocatorShellTests : HeadlessViewTestsBase
 {
-    public ViewLocatorShellTests() => ViewModelTestSetup.EnsureAppStrings();
-
-    public void Dispose() =>
-        AvaloniaHeadlessTestHost.RunOnUiThread(HeadlessViewTestHelper.ResetSharedTestState);
-
     [Fact]
     public void ViewLocator_Build_ReturnsLoginView_ForLoginViewModel()
     {
@@ -67,25 +62,35 @@ public class ViewLocatorShellTests : IDisposable
         {
             var deps = ViewModelTestFactory.CreateMainWindowDependencies();
             var shell = new MainWindowViewModel(deps, runStartup: false);
+            Window? window = null;
 
-            var window = new MainWindow
+            try
             {
-                DataContext = shell,
-                Width = 1200,
-                Height = 750
-            };
+                window = new MainWindow
+                {
+                    DataContext = shell,
+                    Width = 1200,
+                    Height = 750
+                };
 
-            window.Show();
+                window.Show();
+                HeadlessViewTestHelper.WaitForUiIdle(window);
 
-            var contentControl = window.GetVisualDescendants()
-                .OfType<ContentControl>()
-                .FirstOrDefault();
+                var contentControl = window.GetVisualDescendants()
+                    .OfType<ContentControl>()
+                    .FirstOrDefault();
 
-            Assert.NotNull(contentControl);
-            Assert.Same(shell.CurrentViewModel, contentControl!.Content);
+                Assert.NotNull(contentControl);
+                Assert.Same(shell.CurrentViewModel, contentControl!.Content);
 
-            shell.CurrentViewModel = ViewModelTestFactory.CreateLoginViewModel();
-            Assert.Same(shell.CurrentViewModel, contentControl.Content);
+                shell.CurrentViewModel = ViewModelTestFactory.CreateLoginViewModel();
+                HeadlessViewTestHelper.WaitForUiIdle(window);
+                Assert.Same(shell.CurrentViewModel, contentControl.Content);
+            }
+            finally
+            {
+                HeadlessViewTestHelper.CloseWindow(window);
+            }
         });
     }
 
@@ -96,24 +101,33 @@ public class ViewLocatorShellTests : IDisposable
         {
             var deps = ViewModelTestFactory.CreateMainWindowDependencies();
             var shell = new MainWindowViewModel(deps, runStartup: false);
+            Window? window = null;
 
-            Assert.IsType<LoginViewModel>(shell.CurrentViewModel);
-
-            var window = new MainWindow
+            try
             {
-                DataContext = shell,
-                Width = 1200,
-                Height = 750
-            };
+                Assert.IsType<LoginViewModel>(shell.CurrentViewModel);
 
-            window.Show();
+                window = new MainWindow
+                {
+                    DataContext = shell,
+                    Width = 1200,
+                    Height = 750
+                };
 
-            var loginView = window.GetVisualDescendants()
-                .OfType<LoginView>()
-                .FirstOrDefault();
+                window.Show();
+                HeadlessViewTestHelper.WaitForUiIdle(window);
 
-            Assert.NotNull(loginView);
-            Assert.Same(shell.CurrentViewModel, loginView!.DataContext);
+                var loginView = window.GetVisualDescendants()
+                    .OfType<LoginView>()
+                    .FirstOrDefault();
+
+                Assert.NotNull(loginView);
+                Assert.Same(shell.CurrentViewModel, loginView!.DataContext);
+            }
+            finally
+            {
+                HeadlessViewTestHelper.CloseWindow(window);
+            }
         });
     }
 
@@ -125,12 +139,13 @@ public class ViewLocatorShellTests : IDisposable
             var deps = ViewModelTestFactory.CreateMainWindowDependencies();
             var shell = new MainWindowViewModel(deps, runStartup: false);
             var (dashboard, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("it");
+            Window? window = null;
 
             try
             {
                 shell.CurrentViewModel = dashboard;
 
-                var window = new MainWindow
+                window = new MainWindow
                 {
                     DataContext = shell,
                     Width = 1200,
@@ -138,6 +153,7 @@ public class ViewLocatorShellTests : IDisposable
                 };
 
                 window.Show();
+                HeadlessViewTestHelper.WaitForUiIdle(window);
 
                 var dashboardView = window.GetVisualDescendants()
                     .OfType<DashboardView>()
@@ -148,6 +164,7 @@ public class ViewLocatorShellTests : IDisposable
             }
             finally
             {
+                HeadlessViewTestHelper.CloseWindow(window);
                 TestApiFactory.Cleanup(tempDir);
             }
         });

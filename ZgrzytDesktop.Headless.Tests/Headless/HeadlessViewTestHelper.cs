@@ -47,6 +47,7 @@ internal static class HeadlessViewTestHelper
     {
         CloseAllOpenWindows();
         ApplyUiCulture("pl");
+        WaitForUiIdle();
     }
 
     public static void ApplyUiCulture(string culture)
@@ -56,10 +57,21 @@ internal static class HeadlessViewTestHelper
 
     public static void WaitForUiIdle(AvaloniaControl? root = null)
     {
-        if (root is not null)
-            root.UpdateLayout();
+        for (var pass = 0; pass < 3; pass++)
+        {
+            if (root is not null)
+                root.UpdateLayout();
 
-        Dispatcher.UIThread.RunJobs();
+            Dispatcher.UIThread.RunJobs();
+        }
+    }
+
+    public static void RefreshDataContext(AvaloniaControl control, object? dataContext)
+    {
+        control.DataContext = null;
+        WaitForUiIdle(control);
+        control.DataContext = dataContext;
+        WaitForUiIdle(control);
     }
 
     public static void WaitForCondition(Func<bool> predicate, int timeoutMs = 5000, int pollIntervalMs = 10)

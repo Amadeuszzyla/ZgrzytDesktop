@@ -3,7 +3,8 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:ZgrzytDesktop.ViewModels"
-    x:DataType="vm:LoginViewModel">
+    x:DataType="vm:LoginViewModel"
+    x:CompileBindings="False">
 
     <Grid RowDefinitions="Auto,*" Background="{DynamicResource AppPageBackgroundBrush}">
 
@@ -68,7 +69,7 @@
                             MinHeight="44"
                             FontSize="14"
                             VerticalContentAlignment="Center"
-                            IsEnabled="{Binding IsNotLoading}" />
+                            IsEnabled="{Binding #RootWindow.DataContext.IsManualLoginAllowed}" />
                     </StackPanel>
 
                     <StackPanel Spacing="8">
@@ -84,7 +85,7 @@
                             MinHeight="44"
                             FontSize="14"
                             VerticalContentAlignment="Center"
-                            IsEnabled="{Binding IsNotLoading}" />
+                            IsEnabled="{Binding #RootWindow.DataContext.IsManualLoginAllowed}" />
                     </StackPanel>
 
                     <Button
@@ -93,7 +94,31 @@
                         Command="{Binding LoginCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
-                        IsEnabled="{Binding IsNotLoading}" />
+                        IsEnabled="{Binding #RootWindow.DataContext.IsManualLoginAllowed}" />
+
+                    <Border
+                        Classes="login-status"
+                        IsVisible="{Binding #RootWindow.DataContext.IsAutoLoginInProgress}">
+                        <StackPanel Spacing="10">
+                            <ProgressBar
+                                IsIndeterminate="True"
+                                Height="4"
+                                Margin="0,0,0,4" />
+
+                            <TextBlock
+                                Classes="login-status-text"
+                                Text="{Binding #RootWindow.DataContext.AutoLoginStatusMessage}"
+                                TextWrapping="Wrap" />
+
+                            <Button
+                                Classes="btn-secondary login-auto-cancel"
+                                Content="{Binding LblAutoLoginCancel}"
+                                Command="{Binding #RootWindow.DataContext.CancelAutoLoginCommand}"
+                                IsVisible="{Binding #RootWindow.DataContext.CanCancelAutoLogin}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center" />
+                        </StackPanel>
+                    </Border>
 
                     <Border
                         Classes="login-error"

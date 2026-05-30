@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Diagnostics;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Security;
 using ZgrzytDesktop.Services.Interfaces;
@@ -51,22 +52,24 @@ public class LocalAuditLogService : ILocalAuditLogService
 
     public async Task<List<AuditLogEntry>> LoadAsync()
     {
-        try
+        using (StartupPerf.Measure("LocalAuditLogService.LoadAsync"))
         {
-            var json = await SecureLocalFileStorage.ReadDecryptedAsync(
-                _filePath,
-                SecureLocalFileStorage.LooksLikeJsonDocument);
+            try
+            {
+                var json = await SecureLocalFileStorage.ReadDecryptedAsync(
+                    _filePath,
+                    SecureLocalFileStorage.LooksLikeJsonDocument);
 
-            if (string.IsNullOrWhiteSpace(json))
+                if (string.IsNullOrWhiteSpace(json))
+                    return [];
+
+                return JsonSerializer.Deserialize<List<AuditLogEntry>>(json, _jsonOptions) ?? [];
+            }
+            catch
+            {
                 return [];
-
-            return JsonSerializer.Deserialize<List<AuditLogEntry>>(json, _jsonOptions) ?? [];
+            }
         }
-        catch
-        {
-            return [];
-        }
-
     }
 
     public async Task<List<AuditLogEntry>> LoadForTicketAsync(int ticketId)

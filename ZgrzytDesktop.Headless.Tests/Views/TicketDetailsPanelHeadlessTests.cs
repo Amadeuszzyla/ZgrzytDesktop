@@ -105,9 +105,12 @@ public class TicketDetailsPanelHeadlessTests : HeadlessViewTestsBase
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>
         {
             using var cultureScope = new TestCultureScope("en");
+            HeadlessViewTestHelper.ApplyUiCulture("en");
+
             var settings = new FakeSettingsService();
             settings.Settings.UiCulture = "en";
             var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("it", settings: settings);
+            Avalonia.Controls.Window? window = null;
 
             try
             {
@@ -120,25 +123,31 @@ public class TicketDetailsPanelHeadlessTests : HeadlessViewTestsBase
                     Priority = TicketPriorities.Low,
                     UserId = 1
                 };
-                HeadlessViewTestHelper.ApplyUiCulture("en");
                 vm.TicketDetailsPanel.NotifyLocalization();
 
                 var view = HeadlessViewTestHelper.CreateDashboardView(vm);
-                HeadlessViewTestHelper.ShowInWindow(view);
+                window = HeadlessViewTestHelper.ShowInWindow(view);
+                HeadlessViewTestHelper.RefreshDataContext(view, vm);
+
                 var detailsPanel = HeadlessViewTestHelper
                     .FindDescendants<TicketDetailsPanelView>(view)
                     .FirstOrDefault();
 
                 Assert.NotNull(detailsPanel);
+
+                var expectedAssignToMe = vm.LblTicketAssignToMe;
                 HeadlessViewTestHelper.WaitForCondition(
-                    () => HeadlessViewTestHelper.ContainsText(detailsPanel!, vm.LblTicketAssignToMe),
-                    timeoutMs: 5000);
+                    () => vm.IsDetailsPageVisible && detailsPanel!.IsVisible);
+                HeadlessViewTestHelper.WaitForCondition(
+                    () => HeadlessViewTestHelper.ContainsText(detailsPanel!, expectedAssignToMe));
+
                 Assert.False(vm.IsAdminRole);
-                Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, vm.LblTicketAssignToMe));
+                Assert.True(HeadlessViewTestHelper.ContainsText(detailsPanel!, expectedAssignToMe));
                 Assert.Empty(vm.TicketDetailsPanel.AssignableUsers);
             }
             finally
             {
+                HeadlessViewTestHelper.CloseWindow(window);
                 TestApiFactory.Cleanup(tempDir);
             }
         });
@@ -186,7 +195,11 @@ public class TicketDetailsPanelHeadlessTests : HeadlessViewTestsBase
     {
         AvaloniaHeadlessTestHost.RunOnUiThread(() =>
         {
+            using var cultureScope = new TestCultureScope("pl");
+            HeadlessViewTestHelper.ApplyUiCulture("pl");
+
             var (vm, _, _, tempDir) = ViewModelTestFactory.CreateDashboard("it");
+            Avalonia.Controls.Window? window = null;
 
             try
             {
@@ -204,7 +217,10 @@ public class TicketDetailsPanelHeadlessTests : HeadlessViewTestsBase
                 };
 
                 var view = HeadlessViewTestHelper.CreateDashboardView(vm);
-                var window = HeadlessViewTestHelper.ShowInWindow(view);
+                window = HeadlessViewTestHelper.ShowInWindow(view);
+                HeadlessViewTestHelper.RefreshDataContext(view, vm);
+
+                HeadlessViewTestHelper.WaitForCondition(() => vm.IsDetailsPageVisible);
 
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblDetailsBackToList));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, "Wiadomości"));
@@ -214,6 +230,7 @@ public class TicketDetailsPanelHeadlessTests : HeadlessViewTestsBase
             }
             finally
             {
+                HeadlessViewTestHelper.CloseWindow(window);
                 TestApiFactory.Cleanup(tempDir);
             }
         });

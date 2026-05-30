@@ -7,6 +7,7 @@ using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using ZgrzytDesktop.Cache;
 using ZgrzytDesktop.Diagnostics;
+using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Services;
 using ZgrzytDesktop.Services.Interfaces;
@@ -35,13 +36,26 @@ public partial class App : Application
 
             try
             {
-                _serviceProvider = BuildServiceProvider();
-                var shellViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
-
-                desktop.MainWindow = new MainWindow
+                using (StartupPerf.Measure("OnFrameworkInitializationCompleted"))
                 {
-                    DataContext = shellViewModel
-                };
+                    ServiceProvider provider;
+                    using (StartupPerf.Measure("BuildServiceProvider"))
+                        provider = BuildServiceProvider();
+
+                    _serviceProvider = provider;
+
+                    MainWindowViewModel shellViewModel;
+                    using (StartupPerf.Measure("Resolve MainWindowViewModel"))
+                        shellViewModel = provider.GetRequiredService<MainWindowViewModel>();
+
+                    using (StartupPerf.Measure("Create MainWindow"))
+                    {
+                        desktop.MainWindow = new MainWindow
+                        {
+                            DataContext = shellViewModel
+                        };
+                    }
+                }
             }
             catch (Exception)
             {
@@ -98,18 +112,36 @@ public partial class App : Application
     private static ServiceProvider BuildServiceProvider()
     {
         var services = new ServiceCollection();
-        ConfigureServices(services);
-        var provider = services.BuildServiceProvider();
+        using (StartupPerf.Measure("ConfigureServices"))
+            ConfigureServices(services);
 
-        var apiService = provider.GetRequiredService<ApiService>();
-        var authService = provider.GetRequiredService<IAuthService>();
-        apiService.TryRefreshSessionAsync = () => authService.RefreshTokenAsync();
+        ServiceProvider provider;
+        using (StartupPerf.Measure("ServiceCollection.BuildServiceProvider"))
+            provider = services.BuildServiceProvider();
 
-        var settingsService = provider.GetRequiredService<ISettingsService>();
-        var settings = settingsService.LoadSync();
-        AppStrings.ApplyCulture(settings.UiCulture);
-        SettingsService.ApplyThemeMode(settings.ThemeMode);
-        DiagnosticLogBridge.Service = provider.GetRequiredService<ILocalDiagnosticLogService>();
+        using (StartupPerf.Measure("Wire session refresh callback"))
+        {
+            var apiService = provider.GetRequiredService<ApiService>();
+            var authService = provider.GetRequiredService<IAuthService>();
+            apiService.TryRefreshSessionAsync = () => authService.RefreshTokenAsync();
+        }
+
+        AppSettings settings;
+        using (StartupPerf.Measure("Load settings (App bootstrap)"))
+        {
+            var settingsService = provider.GetRequiredService<ISettingsService>();
+            settings = settingsService.LoadSync();
+        }
+
+        using (StartupPerf.Measure("Apply culture and theme"))
+        {
+            AppStrings.ApplyCulture(settings.UiCulture);
+            SettingsService.ApplyThemeMode(settings.ThemeMode);
+        }
+
+        var diagnosticLog = provider.GetRequiredService<ILocalDiagnosticLogService>();
+        DiagnosticLogBridge.Service = diagnosticLog;
+        StartupPerf.AttachLogger(diagnosticLog);
 
         return provider;
     }

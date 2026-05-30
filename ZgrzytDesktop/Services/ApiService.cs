@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -6,7 +7,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Diagnostics;
 using ZgrzytDesktop.Exceptions;
+using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
 using ZgrzytDesktop.Security;
 using ZgrzytDesktop.Services.Interfaces;
@@ -41,7 +44,9 @@ public class ApiService : IApiService
 
     public ApiService(ITokenStorage tokenStorage, ISettingsService settingsService)
     {
-        var settings = settingsService.LoadSync();
+        AppSettings settings;
+        using (StartupPerf.Measure("ApiService ctor — load settings"))
+            settings = settingsService.LoadSync();
 
         _httpClient = new HttpClient
         {
@@ -49,7 +54,9 @@ public class ApiService : IApiService
         };
 
         SetBaseAddress(settings.ApiBaseUrl);
-        TryLoadStoredToken(tokenStorage);
+
+        using (StartupPerf.Measure("ApiService ctor — load token"))
+            TryLoadStoredToken(tokenStorage);
     }
 
     public void SetBaseAddress(string apiBaseUrl)
@@ -99,6 +106,9 @@ public class ApiService : IApiService
 
     private async Task<T?> SendAsync<T>(HttpMethod method, string endpoint, object? body)
     {
+        var trackApi = StartupPerf.IsTrackingApi;
+        Stopwatch? requestTimer = trackApi ? Stopwatch.StartNew() : null;
+
         try
         {
             for (var attempt = 0; attempt < 2; attempt++)
@@ -111,6 +121,16 @@ public class ApiService : IApiService
                 AddAuthorizationHeader(request);
 
                 using var response = await _httpClient.SendAsync(request);
+
+                if (trackApi && requestTimer is not null)
+                {
+                    StartupPerf.TrackApiRequest(
+                        method.Method,
+                        endpoint,
+                        requestTimer.ElapsedMilliseconds,
+                        (int)response.StatusCode);
+                    requestTimer.Restart();
+                }
 
                 if (response.StatusCode == HttpStatusCode.Unauthorized &&
                     attempt == 0 &&

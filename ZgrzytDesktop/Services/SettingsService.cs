@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Diagnostics;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Security;
 using ZgrzytDesktop.Services.Interfaces;
@@ -44,6 +45,8 @@ public class SettingsService : ISettingsService
 
     public AppSettings LoadSync()
     {
+        using (StartupPerf.Measure("SettingsService.LoadSync"))
+        {
         try
         {
             if (!File.Exists(_filePath))
@@ -80,6 +83,7 @@ public class SettingsService : ISettingsService
                 ApiBaseUrl = ApiDefaults.ProductionApiBaseUrl,
                 ThemeMode = "Light"
             };
+        }
         }
     }
 

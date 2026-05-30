@@ -6,6 +6,7 @@
     x:DataType="vm:MainWindowViewModel"
     Icon="/Assets/zgrzyt-logo.ico"
     Title="ZGRZYT Desktop"
+    x:Name="RootWindow"
     Width="1200"
     Height="750"
     MinWidth="1000"

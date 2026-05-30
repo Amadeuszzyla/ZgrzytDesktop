@@ -33,12 +33,23 @@ public sealed class FakeAuthService : IAuthService
         return Task.FromResult(LoginResult);
     }
 
+    public int GetCurrentUserDelayMs { get; set; }
+
     public Task<User?> GetCurrentUserAsync()
     {
         if (CurrentUserException is not null)
             throw CurrentUserException;
 
-        return Task.FromResult(CurrentUserResult);
+        if (GetCurrentUserDelayMs <= 0)
+            return Task.FromResult(CurrentUserResult);
+
+        return DelayGetCurrentUserAsync();
+    }
+
+    private async Task<User?> DelayGetCurrentUserAsync()
+    {
+        await Task.Delay(GetCurrentUserDelayMs);
+        return CurrentUserResult;
     }
 
     public Task<bool> RequestAccountAsync(RequestAccountRequest request) =>

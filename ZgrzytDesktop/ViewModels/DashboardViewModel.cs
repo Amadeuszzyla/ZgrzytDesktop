@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using ZgrzytDesktop.Cache;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Diagnostics;
 using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
 using ZgrzytDesktop.Resources;
@@ -77,43 +78,75 @@ public partial class DashboardViewModel : ViewModelBase
         _onLogoutRequested = onLogoutRequested;
         _onAutoLogoutSettingsChanged = onAutoLogoutSettingsChanged;
 
-        _toast.PropertyChanged += (_, e) =>
+        using (StartupPerf.Measure("DashboardViewModel ctor"))
         {
-            var forwarded = e.PropertyName switch
+            _toast.PropertyChanged += (_, e) =>
             {
-                nameof(DashboardToastViewModel.Message) => nameof(ToastMessage),
-                nameof(DashboardToastViewModel.IsVisible) => nameof(IsToastVisible),
-                nameof(DashboardToastViewModel.Background) => nameof(ToastBackground),
-                nameof(DashboardToastViewModel.Foreground) => nameof(ToastForeground),
-                _ => null
+                var forwarded = e.PropertyName switch
+                {
+                    nameof(DashboardToastViewModel.Message) => nameof(ToastMessage),
+                    nameof(DashboardToastViewModel.IsVisible) => nameof(IsToastVisible),
+                    nameof(DashboardToastViewModel.Background) => nameof(ToastBackground),
+                    nameof(DashboardToastViewModel.Foreground) => nameof(ToastForeground),
+                    _ => null
+                };
+
+                if (forwarded is not null)
+                    OnPropertyChanged(forwarded);
             };
 
-            if (forwarded is not null)
-                OnPropertyChanged(forwarded);
-        };
+            using (StartupPerf.Measure("Initialize dashboard panels"))
+                InitializeDashboardPanels();
 
-        InitializeDashboardPanels();
-        InitializeRequestAccountPanel();
-        InitializeTicketsPanel();
-        InitializeTicketDetailsPanel();
-        InitializeAdminPanel();
-        InitializeCommands();
-        InitializeTicketCollections();
-        SettingsPanel.ApplyBootstrapFromSettings();
-        AppStrings.ApplyCulture(SettingsPanel.SelectedUiCulture);
-        SettingsService.ApplyThemeMode(SettingsPanelViewModel.LightThemeMode);
-        ApplyDefaultSortAndAdminFilter();
-        TicketsPanel.ConfigureQueueViewsForRole(CanManageTickets);
-        PollingStatusMessage = TicketsPanel.AutoRefreshStatusText;
-        if (bootstrap.EnableTimers)
-            InitializeTimers();
-        TicketsPanel.BootstrapPaginationSelection();
+            using (StartupPerf.Measure("Initialize request account panel"))
+                InitializeRequestAccountPanel();
+
+            using (StartupPerf.Measure("Initialize tickets panel"))
+                InitializeTicketsPanel();
+
+            using (StartupPerf.Measure("Initialize ticket details panel"))
+                InitializeTicketDetailsPanel();
+
+            using (StartupPerf.Measure("Initialize admin panel"))
+                InitializeAdminPanel();
+
+            using (StartupPerf.Measure("Initialize commands"))
+                InitializeCommands();
+
+            using (StartupPerf.Measure("Initialize ticket collections"))
+                InitializeTicketCollections();
+
+            using (StartupPerf.Measure("Apply settings bootstrap"))
+                SettingsPanel.ApplyBootstrapFromSettings();
+
+            AppStrings.ApplyCulture(SettingsPanel.SelectedUiCulture);
+            SettingsService.ApplyThemeMode(SettingsPanelViewModel.LightThemeMode);
+            ApplyDefaultSortAndAdminFilter();
+            TicketsPanel.ConfigureQueueViewsForRole(CanManageTickets);
+            PollingStatusMessage = TicketsPanel.AutoRefreshStatusText;
+
+            if (bootstrap.EnableTimers)
+            {
+                using (StartupPerf.Measure("Initialize timers"))
+                    InitializeTimers();
+            }
+
+            TicketsPanel.BootstrapPaginationSelection();
+        }
 
         if (bootstrap.ShowLoginToast)
             ShowToastKey("Toast_LoggedIn", ToastTypes.Info, CurrentUser.Name);
 
         if (bootstrap.RunInitialLoad)
-            SafeFireAndForget.Run(LoadTicketsAsync());
+            SafeFireAndForget.Run(RunInitialTicketsLoadAsync());
+    }
+
+    private async Task RunInitialTicketsLoadAsync()
+    {
+        using (StartupPerf.Measure("LoadTicketsAsync (initial)"))
+            await LoadTicketsAsync();
+
+        StartupPerf.NotifyInitialTicketsLoadFinished();
     }
 
     private void ApplyDefaultSortAndAdminFilter()

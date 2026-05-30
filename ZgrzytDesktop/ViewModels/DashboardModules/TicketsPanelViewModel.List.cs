@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using ZgrzytDesktop.Constants;
+using ZgrzytDesktop.Diagnostics;
 using ZgrzytDesktop.Exceptions;
 using ZgrzytDesktop.Helpers;
 using ZgrzytDesktop.Models;
@@ -23,18 +25,22 @@ public sealed partial class TicketsPanelViewModel
                 StatusMessage = AppStrings.Get("Tickets_Loading");
             }
 
-            var response = await _ticketService.GetTicketsAsync(
-                page: CurrentPage,
-                perPage: PageSize,
-                search: string.IsNullOrWhiteSpace(SearchText) ? null : SearchText.Trim(),
-                status: GetSelectedFilterValue(SelectedFilterStatus),
-                priority: GetSelectedFilterValue(SelectedFilterPriority),
-                sortBy: SelectedTicketSortField?.SortBy ?? TicketSortHelper.DefaultField.SortBy,
-                sortDirection: SelectedTicketSortDirection?.Direction ?? TicketSortHelper.DefaultDirection.Direction,
-                queueView: GetSelectedTicketQueueView(),
-                categoryFilter: SelectedCategoryFilterKey,
-                assignmentFilter: SelectedAssignmentFilterKey,
-                currentUserId: _callbacks.GetCurrentUserId());
+            PaginatedResponse<Ticket>? response;
+            using (StartupPerf.Measure("LoadTicketsAsync — GetTicketsAsync (API)"))
+            {
+                response = await _ticketService.GetTicketsAsync(
+                    page: CurrentPage,
+                    perPage: PageSize,
+                    search: string.IsNullOrWhiteSpace(SearchText) ? null : SearchText.Trim(),
+                    status: GetSelectedFilterValue(SelectedFilterStatus),
+                    priority: GetSelectedFilterValue(SelectedFilterPriority),
+                    sortBy: SelectedTicketSortField?.SortBy ?? TicketSortHelper.DefaultField.SortBy,
+                    sortDirection: SelectedTicketSortDirection?.Direction ?? TicketSortHelper.DefaultDirection.Direction,
+                    queueView: GetSelectedTicketQueueView(),
+                    categoryFilter: SelectedCategoryFilterKey,
+                    assignmentFilter: SelectedAssignmentFilterKey,
+                    currentUserId: _callbacks.GetCurrentUserId());
+            }
 
             _callbacks.SetIsOffline(false);
 
@@ -110,7 +116,9 @@ public sealed partial class TicketsPanelViewModel
 
     public async Task LoadTicketsFromCacheAsync()
     {
-        var cachedTickets = await _ticketCacheService.LoadTicketsAsync();
+        List<Ticket> cachedTickets;
+        using (StartupPerf.Measure("LoadTicketsFromCacheAsync — read ticket cache"))
+            cachedTickets = await _ticketCacheService.LoadTicketsAsync();
         var filteredTickets = TicketQueueListProcessor.Filter(
             cachedTickets,
             GetSelectedFilterValue(SelectedFilterStatus),

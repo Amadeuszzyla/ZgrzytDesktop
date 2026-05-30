@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using ZgrzytDesktop.Diagnostics;
 using ZgrzytDesktop.Security;
 using ZgrzytDesktop.Services.Interfaces;
 
@@ -35,17 +36,20 @@ public class TokenStorage : ITokenStorage
 
     public string? LoadTokenSync()
     {
-        try
+        using (StartupPerf.Measure("TokenStorage.LoadTokenSync"))
         {
-            if (!File.Exists(_filePath))
-                return null;
+            try
+            {
+                if (!File.Exists(_filePath))
+                    return null;
 
-            var stored = File.ReadAllText(_filePath);
-            return ParseStoredToken(stored, migrateLegacyPlaintext: true);
-        }
-        catch
-        {
-            return null;
+                var stored = File.ReadAllText(_filePath);
+                return ParseStoredToken(stored, migrateLegacyPlaintext: true);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 
