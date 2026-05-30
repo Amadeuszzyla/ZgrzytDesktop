@@ -366,6 +366,9 @@
           "CommunityToolkit.Mvvm": "[8.4.1, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.8, )"
         }
+      },
+      "ZgrzytDesktopUninstall": {
+        "type": "Project"
       }
     }
   }

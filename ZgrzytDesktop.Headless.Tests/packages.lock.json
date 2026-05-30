@@ -383,10 +383,14 @@
           "Microsoft.NET.Test.Sdk": "[18.0.1, )",
           "Xunit.SkippableFact": "[1.5.23, )",
           "ZgrzytDesktop": "[0.1.0, )",
+          "ZgrzytDesktopUninstall": "[0.1.0, )",
           "coverlet.collector": "[6.0.4, )",
           "xunit": "[2.9.3, )",
           "xunit.runner.visualstudio": "[3.1.5, )"
         }
+      },
+      "ZgrzytDesktopUninstall": {
+        "type": "Project"
       }
     }
   }

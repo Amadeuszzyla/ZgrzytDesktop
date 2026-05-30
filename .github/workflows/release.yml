@@ -13,6 +13,8 @@ env:
   PROJECT: ZgrzytDesktop/ZgrzytDesktop.csproj
   ZIP_NAME: ZgrzytDesktop-win-x64-release.zip
   SETUP_NAME: ZgrzytDesktopSetup.exe
+  UNINSTALL_NAME: ZgrzytDesktopUninstall.exe
+  UNINSTALLER_PROJECT: ZgrzytDesktop.Uninstaller/ZgrzytDesktop.Uninstaller.csproj
 
 jobs:
   build-release:
@@ -136,6 +138,41 @@ jobs:
           "SETUP_PATH=$setupPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "SETUP_CHECKSUM_PATH=$setupChecksumPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Restore uninstaller publish runtime
+        run: dotnet restore ${{ env.UNINSTALLER_PROJECT }} -r ${{ env.RUNTIME }}
+
+      - name: Publish uninstaller wrapper
+        run: |
+          dotnet publish ${{ env.UNINSTALLER_PROJECT }} `
+            -c ${{ env.CONFIGURATION }} `
+            -r ${{ env.RUNTIME }} `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:PublishTrimmed=false `
+            --no-restore
+
+      - name: Prepare uninstaller artifact
+        shell: pwsh
+        run: |
+          $publishDir = Join-Path $env:GITHUB_WORKSPACE "ZgrzytDesktop.Uninstaller/bin/$env:CONFIGURATION/net10.0-windows/$env:RUNTIME/publish"
+          $publishedExe = Join-Path $publishDir "ZgrzytDesktopUninstall.exe"
+          $releaseDir = Join-Path $env:GITHUB_WORKSPACE "release"
+          $uninstallPath = Join-Path $releaseDir $env:UNINSTALL_NAME
+          $uninstallChecksumPath = "$uninstallPath.sha256"
+
+          if (-not (Test-Path $publishedExe)) {
+            throw "Missing uninstaller publish output: $publishedExe"
+          }
+
+          Copy-Item -Path $publishedExe -Destination $uninstallPath -Force
+
+          $hash = (Get-FileHash -Path $uninstallPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          $fileName = [IO.Path]::GetFileName($uninstallPath)
+          [IO.File]::WriteAllText($uninstallChecksumPath, ("{0}  {1}" -f $hash, $fileName), [Text.UTF8Encoding]::new($false))
+
+          "UNINSTALL_PATH=$uninstallPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "UNINSTALL_CHECKSUM_PATH=$uninstallChecksumPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Upload release ZIP
         uses: actions/upload-artifact@v4
         with:
@@ -162,4 +199,18 @@ jobs:
         with:
           name: ${{ env.SETUP_NAME }}.sha256
           path: ${{ env.SETUP_CHECKSUM_PATH }}
+          if-no-files-found: error
+
+      - name: Upload uninstaller wrapper
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.UNINSTALL_NAME }}
+          path: ${{ env.UNINSTALL_PATH }}
+          if-no-files-found: error
+
+      - name: Upload uninstaller SHA256 checksum
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.UNINSTALL_NAME }}.sha256
+          path: ${{ env.UNINSTALL_CHECKSUM_PATH }}
           if-no-files-found: error

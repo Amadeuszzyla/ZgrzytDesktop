@@ -27,6 +27,12 @@ ZGRZYT Desktop — instrukcja uruchomienia (Windows x64)
    Odinstalowanie przez Ustawienia Windows lub wpis w menu Start usuwa także
    katalog %AppData%\ZgrzytDesktop\ wraz z lokalnymi danymi aplikacji.
 
+   Artefakty release (obok portable ZIP):
+   - ZgrzytDesktopSetup.exe — instaluje aplikację w %LocalAppData%\Programs\ZgrzytDesktop\
+   - ZgrzytDesktopUninstall.exe — uruchamia deinstalator Inno Setup zainstalowanej aplikacji
+     (%LocalAppData%\Programs\ZgrzytDesktop\unins000.exe); nie usuwa plików ręcznie
+   - Portable ZIP (ZgrzytDesktop-win-x64-release.zip) — usuwa się ręcznie (skasuj folder publish)
+
 7. Język
    W Ustawieniach: polski lub angielski. Interfejs jest tylko w jasnym motywie.
 
@@ -41,11 +47,15 @@ Wersja: Release, win-x64, self-contained
 Smoke test release (GitHub Actions — dla QA / maintainerów)
 ============================================================
 
-Po ręcznym uruchomieniu workflow Release w GitHub Actions pobierz oba artefakty
+Po ręcznym uruchomieniu workflow Release w GitHub Actions pobierz artefakty
 z runu workflow (Actions → Release → wybrany run → Artifacts):
 
   - ZgrzytDesktop-win-x64-release.zip
   - ZgrzytDesktop-win-x64-release.zip.sha256
+  - ZgrzytDesktopSetup.exe
+  - ZgrzytDesktopSetup.exe.sha256
+  - ZgrzytDesktopUninstall.exe
+  - ZgrzytDesktopUninstall.exe.sha256
 
 1. Pobierz ZIP i plik SHA256 do tego samego folderu, np. C:\Temp\ZgrzytRelease\
 
@@ -158,3 +168,45 @@ Kryterium PASS: checksuma OK, instalacja i skrót Start Menu działają, aplikac
 ikona logo widoczna, odinstalowanie usuwa pliki programu i dane z AppData.
 FAIL: błąd hash, instalator się wykrzacza, brak skrótu, brak ikony, crash przy starcie,
 pozostałe pliki w AppData po odinstalowaniu.
+
+
+Smoke test deinstalatora (GitHub Actions — dla QA / maintainerów)
+==================================================================
+
+Po ręcznym uruchomieniu workflow Release pobierz artefakty deinstalatora z runu
+(Actions → Release → wybrany run → Artifacts):
+
+  - ZgrzytDesktopUninstall.exe
+  - ZgrzytDesktopUninstall.exe.sha256
+
+1. Zainstaluj aplikację przez ZgrzytDesktopSetup.exe (patrz sekcja powyżej).
+
+2. Pobierz oba pliki deinstalatora do folderu, np. C:\Temp\ZgrzytUninstall\
+
+3. Zweryfikuj checksumę (PowerShell):
+
+   cd C:\Temp\ZgrzytUninstall
+
+   $uninstallPath = ".\ZgrzytDesktopUninstall.exe"
+   $checksumPath = ".\ZgrzytDesktopUninstall.exe.sha256"
+
+   $computed = (Get-FileHash -Path $uninstallPath -Algorithm SHA256).Hash.ToLowerInvariant()
+   $expected = (Get-Content -Path $checksumPath -Raw).Trim().Split([char[]]@(' ', "`t"), [StringSplitOptions]::RemoveEmptyEntries)[0].ToLowerInvariant()
+
+   if ($computed -eq $expected) {
+       Write-Host "SHA256 OK: $computed"
+   } else {
+       throw "SHA256 mismatch. Expected=$expected Actual=$computed"
+   }
+
+4. Uruchom ZgrzytDesktopUninstall.exe (double-click).
+
+   [ ] Otwiera się kreator deinstalacji Inno Setup (unins000.exe).
+   [ ] Po zakończeniu odinstalowania znikają folder instalacji i dane w AppData.
+
+5. Uruchom ZgrzytDesktopUninstall.exe ponownie bez instalacji:
+
+   [ ] Pojawia się komunikat: „ZgrzytDesktop nie jest zainstalowany albo deinstalator nie został znaleziony.”
+
+Kryterium PASS: checksuma OK, wrapper uruchamia unins000.exe gdy aplikacja zainstalowana,
+komunikat błędu gdy brak instalacji. FAIL: błąd hash, brak reakcji, brak komunikatu przy braku instalacji.

@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZgrzytDesktop\ZgrzytDesktop.csproj" />
+    <ProjectReference Include="..\ZgrzytDesktop.Uninstaller\ZgrzytDesktop.Uninstaller.csproj" />
   </ItemGroup>
 
 
