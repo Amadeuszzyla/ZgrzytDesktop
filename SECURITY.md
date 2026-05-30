@@ -9,9 +9,6 @@ Jeśli odkryjesz problem bezpieczeństwa:
 1. **Nie publikuj** szczegółów publicznie (issue, PR, social media) przed uzgodnieniem.
 2. Zgłoś problem **prywatnie** — preferowany kanał: [GitHub Security Advisories](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability) dla tego repozytorium.
 3. Dołącz: opis problemu, kroki reprodukcji, wersję aplikacji / commit, ocenę wpływu oraz ewentualną propozycję naprawy.
-4. Odpowiemy w rozsądnym terminie i uzgodnimy harmonogram publikacji poprawki.
-
-Nie prowadzimy programu bug bounty. Doceniamy jednak odpowiedzialne zgłoszenia.
 
 ## 2. Dane lokalne aplikacji
 
