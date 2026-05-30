@@ -28,10 +28,10 @@ public class SettingsPanelHeadlessTests : HeadlessViewTestsBase
 
                 SettingsService.ApplyThemeMode("Dark");
                 Assert.Equal(Avalonia.Styling.ThemeVariant.Light, Avalonia.Application.Current!.ActualThemeVariant);
-                Assert.Equal(SettingsPanelViewModel.LightThemeMode, vm.SelectedThemeMode);
+                Assert.Equal(SettingsPanelViewModel.LightThemeMode, vm.SettingsPanel.SelectedThemeMode);
 
-                vm.SaveSettingsCommand.ExecuteAsync(null).GetAwaiter().GetResult();
-                Assert.Equal("pl", vm.SelectedUiCulture);
+                vm.SettingsPanel.SaveSettingsCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                Assert.Equal("pl", vm.SettingsPanel.SelectedUiCulture);
             }
             finally
             {
@@ -60,9 +60,9 @@ public class SettingsPanelHeadlessTests : HeadlessViewTestsBase
 
                 Assert.NotNull(settingsPanel);
                 Assert.False(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_Theme")));
-                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblSettingsLanguage));
-                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblSettingsSave));
-                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.LblSettingsRefreshSession));
+                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.SettingsPanel.LblSettingsLanguage));
+                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.SettingsPanel.LblSettingsSave));
+                Assert.True(HeadlessViewTestHelper.ContainsText(window, vm.SettingsPanel.LblSettingsRefreshSession));
                 Assert.False(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_ResetApiUrl")));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_AutoLogout")));
                 Assert.True(HeadlessViewTestHelper.ContainsText(window, AppStrings.Get("Settings_AutoLogoutTimeout")));

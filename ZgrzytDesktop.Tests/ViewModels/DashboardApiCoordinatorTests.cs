@@ -217,9 +217,9 @@ public class DashboardApiCoordinatorTests
 
         try
         {
-            await vm.RefreshSessionCommand.ExecuteAsync(null);
+            await vm.SettingsPanel.RefreshSessionCommand.ExecuteAsync(null);
 
-            Assert.Equal(AppStrings.Get("Api_Unauthorized"), vm.SettingsStatusMessage);
+            Assert.Equal(AppStrings.Get("Api_Unauthorized"), vm.SettingsPanel.SettingsStatusMessage);
             Assert.True(vm.IsToastVisible);
             Assert.Equal(AppStrings.Get("Api_Unauthorized"), vm.ToastMessage);
         }

@@ -86,14 +86,14 @@ public class DashboardViewModelTests
         var settings = new FakeSettingsService();
         var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard(settings: settings);
 
-        vm.SelectedUiCulture = "en";
+        vm.SettingsPanel.SelectedUiCulture = "en";
 
-        await vm.SaveSettingsCommand.ExecuteAsync(null);
+        await vm.SettingsPanel.SaveSettingsCommand.ExecuteAsync(null);
 
         Assert.Equal(1, settings.SaveAsyncCallCount);
         Assert.Equal(SettingsPanelViewModel.LightThemeMode, settings.Settings.ThemeMode);
         Assert.Equal("en", settings.Settings.UiCulture);
-        Assert.Equal("en", vm.SelectedUiCulture);
+        Assert.Equal("en", vm.SettingsPanel.SelectedUiCulture);
     }
 
     [Fact]
@@ -116,9 +116,9 @@ public class DashboardViewModelTests
         };
         var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard(auth: auth);
 
-        await vm.RefreshSessionCommand.ExecuteAsync(null);
+        await vm.SettingsPanel.RefreshSessionCommand.ExecuteAsync(null);
 
-        Assert.Equal(AppStrings.Get("Api_Unauthorized"), vm.SettingsStatusMessage);
+        Assert.Equal(AppStrings.Get("Api_Unauthorized"), vm.SettingsPanel.SettingsStatusMessage);
         Assert.True(vm.IsToastVisible);
         Assert.Equal(AppStrings.Get("Api_Unauthorized"), vm.ToastMessage);
     }
@@ -132,9 +132,9 @@ public class DashboardViewModelTests
         };
         var (vm, _, _, _) = ViewModelTestFactory.CreateDashboard(auth: auth);
 
-        await vm.RefreshSessionCommand.ExecuteAsync(null);
+        await vm.SettingsPanel.RefreshSessionCommand.ExecuteAsync(null);
 
-        Assert.Equal(AppStrings.Get("Api_Forbidden"), vm.SettingsStatusMessage);
+        Assert.Equal(AppStrings.Get("Api_Forbidden"), vm.SettingsPanel.SettingsStatusMessage);
         Assert.Equal(AppStrings.Get("Api_Forbidden"), vm.ToastMessage);
     }
 

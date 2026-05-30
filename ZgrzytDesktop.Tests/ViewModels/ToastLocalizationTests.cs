@@ -26,8 +26,8 @@ public class ToastLocalizationTests
         try
         {
             vm.CurrentSection = AppSections.Settings;
-            vm.SelectedUiCulture = "en";
-            await vm.SaveSettingsCommand.ExecuteAsync(null);
+            vm.SettingsPanel.SelectedUiCulture = "en";
+            await vm.SettingsPanel.SaveSettingsCommand.ExecuteAsync(null);
 
             Assert.True(vm.IsToastVisible);
             AppStrings.ApplyCulture("en");
@@ -48,8 +48,8 @@ public class ToastLocalizationTests
         try
         {
             vm.CurrentSection = AppSections.Settings;
-            vm.SelectedUiCulture = "pl";
-            await vm.SaveSettingsCommand.ExecuteAsync(null);
+            vm.SettingsPanel.SelectedUiCulture = "pl";
+            await vm.SettingsPanel.SaveSettingsCommand.ExecuteAsync(null);
 
             Assert.True(vm.IsToastVisible);
             AppStrings.ApplyCulture("pl");
@@ -159,7 +159,7 @@ public class ToastLocalizationTests
         try
         {
             AppStrings.ApplyCulture("en");
-            await vm.RefreshSessionCommand.ExecuteAsync(null);
+            await vm.SettingsPanel.RefreshSessionCommand.ExecuteAsync(null);
 
             Assert.True(vm.IsToastVisible);
             AppStrings.ApplyCulture("en");

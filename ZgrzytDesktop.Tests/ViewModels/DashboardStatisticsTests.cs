@@ -28,10 +28,10 @@ public class DashboardStatisticsTests
         {
             await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
-            Assert.Equal(5, vm.StatsTotalTickets);
-            Assert.Equal(2, vm.StatsNewTickets);
-            Assert.Equal(1, vm.StatsInProgressTickets);
-            Assert.Equal(2, vm.StatsClosedTickets);
+            Assert.Equal(5, vm.StatisticsPanel.StatsTotalTickets);
+            Assert.Equal(2, vm.StatisticsPanel.StatsNewTickets);
+            Assert.Equal(1, vm.StatisticsPanel.StatsInProgressTickets);
+            Assert.Equal(2, vm.StatisticsPanel.StatsClosedTickets);
         }
         finally
         {
@@ -57,9 +57,9 @@ public class DashboardStatisticsTests
         {
             await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
-            Assert.Equal(2, vm.StatsLowPriorityTickets);
-            Assert.Equal(2, vm.StatsMediumPriorityTickets);
-            Assert.Equal(1, vm.StatsHighPriorityTickets);
+            Assert.Equal(2, vm.StatisticsPanel.StatsLowPriorityTickets);
+            Assert.Equal(2, vm.StatisticsPanel.StatsMediumPriorityTickets);
+            Assert.Equal(1, vm.StatisticsPanel.StatsHighPriorityTickets);
         }
         finally
         {
@@ -85,8 +85,8 @@ public class DashboardStatisticsTests
         {
             await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
-            Assert.Equal(3, vm.StatsAssignedTickets);
-            Assert.Equal(2, vm.StatsUnassignedTickets);
+            Assert.Equal(3, vm.StatisticsPanel.StatsAssignedTickets);
+            Assert.Equal(2, vm.StatisticsPanel.StatsUnassignedTickets);
         }
         finally
         {
@@ -108,11 +108,11 @@ public class DashboardStatisticsTests
         {
             await vm.TicketsPanel.RefreshTicketsNowCommand.ExecuteAsync(null);
 
-            Assert.Equal(0, vm.StatsTotalTickets);
-            Assert.Equal(1, vm.StatsStatusChartMaximum);
-            Assert.Equal(1, vm.StatsPriorityChartMaximum);
-            Assert.Equal(1, vm.StatsAssignmentChartMaximum);
-            Assert.Contains("Brak zgłoszeń", vm.StatsScopeMessage, StringComparison.Ordinal);
+            Assert.Equal(0, vm.StatisticsPanel.StatsTotalTickets);
+            Assert.Equal(1, vm.StatisticsPanel.StatsStatusChartMaximum);
+            Assert.Equal(1, vm.StatisticsPanel.StatsPriorityChartMaximum);
+            Assert.Equal(1, vm.StatisticsPanel.StatsAssignmentChartMaximum);
+            Assert.Contains("Brak zgłoszeń", vm.StatisticsPanel.StatsScopeMessage, StringComparison.Ordinal);
         }
         finally
         {
@@ -134,14 +134,14 @@ public class DashboardStatisticsTests
 
         try
         {
-            await vm.LoadAllPagesStatisticsCommand.ExecuteAsync(null);
+            await vm.StatisticsPanel.LoadAllPagesStatisticsCommand.ExecuteAsync(null);
 
             Assert.Equal(2, tickets.GetTicketsCallCount);
-            Assert.Equal(5, vm.StatsTotalTickets);
-            Assert.Equal(2, vm.StatsNewTickets);
-            Assert.Equal(1, vm.StatsInProgressTickets);
-            Assert.Equal(2, vm.StatsClosedTickets);
-            Assert.Contains("łącznie w systemie: 5", vm.StatsScopeMessage, StringComparison.Ordinal);
+            Assert.Equal(5, vm.StatisticsPanel.StatsTotalTickets);
+            Assert.Equal(2, vm.StatisticsPanel.StatsNewTickets);
+            Assert.Equal(1, vm.StatisticsPanel.StatsInProgressTickets);
+            Assert.Equal(2, vm.StatisticsPanel.StatsClosedTickets);
+            Assert.Contains("łącznie w systemie: 5", vm.StatisticsPanel.StatsScopeMessage, StringComparison.Ordinal);
         }
         finally
         {
